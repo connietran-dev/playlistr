@@ -2,6 +2,8 @@ let express = require('express');
 let request = require('request');
 let querystring = require('querystring');
 
+require('dotenv').config();
+
 let app = express();
 
 let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/callback';
