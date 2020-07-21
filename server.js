@@ -8,7 +8,7 @@ let app = express();
 
 let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/callback';
 
-app.get('/login', function (req, res) {
+app.get('/spotify/login', function (req, res) {
 	res.redirect(
 		'https://accounts.spotify.com/authorize?' +
 			querystring.stringify({
@@ -38,7 +38,7 @@ app.get('/callback', function (req, res) {
 	};
 	request.post(authOptions, function (error, response, body) {
 		var access_token = body.access_token;
-		let uri = process.env.FRONTEND_URI || 'http://localhost:3000';
+		let uri = process.env.FRONTEND_URI || 'http://localhost:3000/home';
 		res.redirect(uri + '?access_token=' + access_token);
 	});
 });
