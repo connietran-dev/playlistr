@@ -5,7 +5,9 @@
 	"private": true,
 	"proxy": "http://localhost:8888/",
 	"dependencies": {
+		"bootstrap": "^4.5.0",
 		"react": "^16.6.3",
+		"react-bootstrap": "^1.2.2",
 		"react-dom": "^16.6.3",
 		"react-router-dom": "^5.2.0",
 		"react-scripts": "^2.1.1"

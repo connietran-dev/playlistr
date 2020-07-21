@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
 
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 class Home extends Component {
     constructor() {
         super();
@@ -26,13 +30,19 @@ class Home extends Component {
 
     render() {
         return (
-            <div>
-                <div>
-                    <h1>Welcome to Playlistr, {this.state.serverData.display_name}</h1>
-                </div>
-            </div>
+            <Container>
+                <Row>
+                    <Col xs={8}>
+                        <h1>Welcome to Playlistr, {this.state.serverData.display_name}</h1>
+                    </Col>
+                    <Col>
+                        <input
+                            placeholder="Search a track"
+                        />
+                    </Col>
+                </Row>
+            </Container>
         )
-
     }
 }
 
