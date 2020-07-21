@@ -29,6 +29,24 @@ class Home extends Component {
 				console.log(data);
 				this.setState({ serverData: data });
 			});
+
+		// Fetch playlists
+		fetch('https://api.spotify.com/v1/me/playlists', {
+			headers: { 'Authorization': 'Bearer ' + token }
+		})
+			.then(res => res.json())
+			.then(playlistData => {
+				let playlists = playlistData.items;
+				console.log(playlists);
+				this.setState({
+					playlists: playlists.map(item => {
+						return {
+							name: item.name,
+							imageUrl: item.images[0].url
+						}
+					})
+				})
+			})
 	}
 
 	render() {
