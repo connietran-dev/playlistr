@@ -18,6 +18,7 @@ class Home extends Component {
         let parsed = queryString.parse(window.location.search);
         let token = parsed.access_token;
 
+        // Fetch user data
         fetch('https://api.spotify.com/v1/me', {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -28,6 +29,25 @@ class Home extends Component {
                 console.log(data);
                 this.setState({ serverData: data });
             });
+
+        // Fetch playlists
+        fetch('https://api.spotify.com/v1/me/playlists', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(res => res.json())
+            .then(playlistData => {
+                let playlists = playlistData.items;
+                console.log(playlists);
+                this.setState({
+                    playlists: playlists.map(item => {
+                        return {
+                            name: item.name,
+                            imageUrl: item.images[0].url
+                        }
+                    })
+                })
+            })
+
     }
 
     render() {
@@ -36,6 +56,7 @@ class Home extends Component {
                 <Row>
                     <Col xs={8}>
                         <h1>Welcome to Playlistr, {this.state.serverData.display_name}</h1>
+                        {console.log(this.state.playlists)}
                     </Col>
                     <Col>
                         <input
