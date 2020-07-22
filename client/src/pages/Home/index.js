@@ -16,13 +16,16 @@ class Home extends Component {
 
 		this.state = {
 			user: {},
-			playlists: []
+			playlists: [],
+			accessToken: ''
 		};
 	}
 
 	componentDidMount() {
 		let parsed = queryString.parse(window.location.search);
 		let token = parsed.access_token;
+
+		this.setState({ accessToken: token });
 
 		// Fetch user data
 		fetch('https://api.spotify.com/v1/me', {
@@ -47,11 +50,11 @@ class Home extends Component {
 				playlists.map(item => {
 					if (item.images[0] === undefined) {
 						item.images.push({
-							url: "https://via.placeholder.com/200"
-						})
+							url: 'https://via.placeholder.com/200'
+						});
 					}
 				});
-				this.setState({ playlists: playlists })
+				this.setState({ playlists: playlists });
 			});
 	}
 
@@ -61,10 +64,7 @@ class Home extends Component {
 				<Container>
 					<Row>
 						<Col xs={8}>
-							<h1>
-								Welcome to Playlistr,{' '}
-								{this.state.user.display_name}
-							</h1>
+							<h1>Welcome to Playlistr, {this.state.user.display_name}</h1>
 						</Col>
 						<Col>
 							<input placeholder="Search" />
@@ -87,7 +87,10 @@ class Home extends Component {
 				<Container>
 					<Row>
 						<Col>
-							<RoomButtons />
+							<RoomButtons
+								token={this.state.accessToken}
+								userId={this.state.user.id}
+							/>
 						</Col>
 					</Row>
 				</Container>
