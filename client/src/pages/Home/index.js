@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import Playlist from '../../components/Playlist';
 import RoomButtons from '../../components/RoomButtons';
 
 import './style.css';
@@ -13,13 +14,17 @@ class Home extends Component {
 	constructor() {
 		super();
 
-		this.state = { serverData: {} };
+		this.state = {
+			user: {},
+			playlists: []
+		};
 	}
 
 	componentDidMount() {
 		let parsed = queryString.parse(window.location.search);
 		let token = parsed.access_token;
 
+		// Fetch user data
 		fetch('https://api.spotify.com/v1/me', {
 			headers: {
 				Authorization: 'Bearer ' + token
@@ -28,11 +33,11 @@ class Home extends Component {
 			.then(res => res.json())
 			.then(data => {
 				console.log(data);
-				this.setState({ serverData: data });
+				this.setState({ user: data });
 			});
 
 		// Fetch playlists
-		fetch('https://api.spotify.com/v1/me/playlists', {
+		fetch('https://api.spotify.com/v1/me/playlists?limit=8', {
 			headers: { Authorization: 'Bearer ' + token }
 		})
 			.then(res => res.json())
@@ -40,19 +45,13 @@ class Home extends Component {
 				let playlists = playlistData.items;
 				// If playlist image is undefined, create placeholder image
 				playlists.map(item => {
-					if (item.images[0] === undefined ) {
-						item.images.push("https://via.placeholder.com/200")
+					if (item.images[0] === undefined) {
+						item.images.push({
+							url: "https://via.placeholder.com/200"
+						})
 					}
-				})
-				console.log(playlists);
-				this.setState({
-					playlists: playlists.map(item => {
-						return {
-							name: item.name,
-							imageUrl: item.images[0].url
-						};
-					})
 				});
+				this.setState({ playlists: playlists })
 			});
 	}
 
@@ -64,69 +63,25 @@ class Home extends Component {
 						<Col xs={8}>
 							<h1>
 								Welcome to Playlistr,{' '}
-								{this.state.serverData.display_name}
+								{this.state.user.display_name}
 							</h1>
 						</Col>
 						<Col>
-							<input placeholder="Search a track" />
+							<input placeholder="Search" />
+							<i class="fa fa-search" aria-hidden="true"></i>
 						</Col>
 					</Row>
+				</Container>
+				<Container>
 					<Row>
-						<Col xs={6} md={3}>
-							<div
-								style={{
-									height: '150px',
-									width: '150px',
-									border: '1px solid black'
-								}}
-								color="red">
-								Playlist
-							</div>
-						</Col>
-						<Col xs={6} md={3}>
-							<div
-								style={{
-									height: '150px',
-									width: '150px',
-									border: '1px solid black'
-								}}
-								color="red">
-								Playlist
-							</div>
-						</Col>
-						<Col xs={6} md={3}>
-							<div
-								style={{
-									height: '150px',
-									width: '150px',
-									border: '1px solid black'
-								}}
-								color="red">
-								Playlist
-							</div>
-						</Col>
-						<Col xs={6} md={3}>
-							<div
-								style={{
-									height: '150px',
-									width: '150px',
-									border: '1px solid black'
-								}}
-								color="red">
-								Playlist
-							</div>
-						</Col>
-						<Col xs={6} md={3}>
-							<div
-								style={{
-									height: '150px',
-									width: '150px',
-									border: '1px solid black'
-								}}
-								color="red">
-								Playlist
-							</div>
-						</Col>
+						{this.state.playlists.map(playlist => (
+							<Playlist
+								key={playlist.id}
+								image={playlist.images[0].url}
+								link={playlist.owner.external_urls.spotify}
+								name={playlist.name}
+							/>
+						))}
 					</Row>
 				</Container>
 				<Container>
