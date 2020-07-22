@@ -1,4 +1,5 @@
 import React from 'react';
+import queryString from 'query-string';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -6,12 +7,24 @@ import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
 const Room = () => {
+	let parsedUrl = queryString.parse(window.location.search);
+	let token = parsedUrl.access_token;
+	let userId = parsedUrl.user_id;
+	let roomId = parsedUrl.room_id;
+
+	console.log('Token:');
+	console.log(token);
+	console.log('User ID:');
+	console.log(userId);
+	console.log('Room ID:');
+	console.log(roomId);
+
 	return (
 		<div>
 			<Container>
 				<Row>
 					<Col xs={5} md={6}>
-						<h1>Current Room: 123456789 </h1>
+						<h1>Current Room: {roomId} </h1>
 					</Col>
 					<Col xs={4} md={4}>
 						<Button>Add</Button>

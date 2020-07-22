@@ -13,7 +13,8 @@ module.exports = {
 				querystring.stringify({
 					response_type: 'code',
 					client_id: process.env.client_id,
-					scope: 'user-read-private user-read-email',
+					scope:
+						'user-read-private user-read-email playlist-modify-private playlist-modify-public',
 					redirect_uri
 				})
 		);
