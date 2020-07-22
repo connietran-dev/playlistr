@@ -15,8 +15,8 @@ const RoomButtons = ({ token, userId }) => {
 			window.location.href = `http://localhost:3000/room?access_token=${accessToken}&user_id=${user}&room_id=${hex}`;
 		}
 
-		if (homeUrl === `https://playlistr-io.herokuapp.com/room?access_token=${accessToken}`) {
-			window.location.href = `http://localhost:3000/room?access_token=${accessToken}&user_id=${user}&room_id=${hex}`;
+		if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
+			window.location.href = `http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&user_id=${user}&room_id=${hex}`;
 		}
 	};
 
