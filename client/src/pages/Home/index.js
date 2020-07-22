@@ -4,7 +4,8 @@ import queryString from 'query-string';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+
+import RoomButtons from '../../components/RoomButtons';
 
 import './style.css';
 
@@ -32,7 +33,7 @@ class Home extends Component {
 
 		// Fetch playlists
 		fetch('https://api.spotify.com/v1/me/playlists', {
-			headers: { 'Authorization': 'Bearer ' + token }
+			headers: { Authorization: 'Bearer ' + token }
 		})
 			.then(res => res.json())
 			.then(playlistData => {
@@ -43,10 +44,10 @@ class Home extends Component {
 						return {
 							name: item.name,
 							imageUrl: item.images[0].url
-						}
+						};
 					})
-				})
-			})
+				});
+			});
 	}
 
 	render() {
@@ -125,8 +126,7 @@ class Home extends Component {
 				<Container>
 					<Row>
 						<Col>
-							<Button className="float-left">Join a Room</Button>
-							<Button className="float-right">Create a Room</Button>
+							<RoomButtons />
 						</Col>
 					</Row>
 				</Container>
