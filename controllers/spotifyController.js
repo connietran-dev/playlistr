@@ -4,6 +4,7 @@ const querystring = require('querystring');
 require('dotenv').config();
 
 let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/callback';
+console.log("redirect_uri: ", redirect_uri);
 
 module.exports = {
 	login: (req, res) => {
@@ -35,9 +36,11 @@ module.exports = {
 			},
 			json: true
 		};
+		console.log("/callback redirect_uri: ", redirect_uri);
 		request.post(authOptions, (error, response, body) => {
 			var access_token = body.access_token;
 			let uri = process.env.FRONTEND_URI || 'http://localhost:3000/home';
+			console.log("/callback FRONTEND_URI: ", uri);
 			res.redirect(uri + '?access_token=' + access_token);
 		});
 	}
