@@ -38,6 +38,12 @@ class Home extends Component {
 			.then(res => res.json())
 			.then(playlistData => {
 				let playlists = playlistData.items;
+				// If playlist image is undefined, create placeholder image
+				playlists.map(item => {
+					if (item.images[0] === undefined ) {
+						item.images.push("https://via.placeholder.com/200")
+					}
+				})
 				console.log(playlists);
 				this.setState({
 					playlists: playlists.map(item => {
