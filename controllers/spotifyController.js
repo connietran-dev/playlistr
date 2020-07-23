@@ -8,6 +8,7 @@ console.log("redirect_uri: ", redirect_uri);
 
 module.exports = {
 	login: (req, res) => {
+		console.log("/login redirect_uri: ", redirect_uri);
 		res.redirect(
 			'https://accounts.spotify.com/authorize?' +
 				querystring.stringify({
