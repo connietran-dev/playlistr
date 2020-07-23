@@ -49,9 +49,11 @@ class Home extends Component {
 				// If playlist image is undefined, create placeholder image
 				playlists.map(item => {
 					if (item.images[0] === undefined) {
-						item.images.push({
+						return item.images.push({
 							url: 'https://via.placeholder.com/200'
 						});
+					} else {
+						return item.images
 					}
 				});
 				this.setState({ playlists: playlists });
