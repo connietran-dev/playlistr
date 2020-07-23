@@ -25,21 +25,21 @@ body {
 body {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   color:white;
-  background: #171C20;
+  background-color: #171C20;
 }
 
 button {
-  background-color: #EBA404;
+  background-color: #FED402;
   color: black;
-  margin: 10px 0 5px 0;
+  margin: 20px 0 5px 0;
   padding: 5px 10px;
+  border-style: none;
   border-radius: 8px;
 }
 
 button:hover {
   background-color: #171C20;
   color: white;
-  margin: 10px 0 5px 0;
 }
 
 
@@ -49,7 +49,7 @@ button:hover {
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
   font-size: 4rem;
-  color: white;
+  color: #2c2f33;
 }
 
 .brand-logo {
@@ -58,9 +58,6 @@ button:hover {
 }
 
 .backdrop {
-  height: 40vh;
+  height: 50vh;
   width: 100%;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-  background:#EBA404;
 }

@@ -1,21 +1,19 @@
 .login-div {
     margin: 50px auto;
     padding: 60px 40px;
-    width: 80vw;
+    width: 60vw;
     height: 25vh;
     background-color: white;
     border-radius: 15px;
     color: black;
-    opacity: 0.75;
-}
-
-.login-button {
-    background-color: #EBA404;
-    border-style: none;
-    color: black;
-    margin: 10px 0 5px 0;
+    opacity: 0.90;
 }
 
 .login.backdrop {
-    padding: 40px;
+    padding: 78px;
+    background: url('/images/yellow-backdrop.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 40% 85%;
+    opacity: 0.96;
 }

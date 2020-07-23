@@ -21,8 +21,8 @@ function Login() {
             <Row>
                 <Col>
                     <div className="login-div text-center">
-                        <h5>To continue, log in to Spotify</h5>
-                        <button className="login-button" onClick={() => {
+                        <h5>To continue, log in to your Spotify account</h5>
+                        <button onClick={() => {
                             window.location = window.location.href.includes('localhost')
                                 ? 'http://localhost:8888/spotify/login'
                                 : 'https://playlistr-io.herokuapp.com/spotify/login'
