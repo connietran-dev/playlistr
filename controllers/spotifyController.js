@@ -3,7 +3,7 @@ const querystring = require('querystring');
 
 require('dotenv').config();
 
-let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/callback';
+let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/api/spotify/callback';
 console.log("redirect_uri: ", redirect_uri);
 
 module.exports = {

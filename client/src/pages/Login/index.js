@@ -24,8 +24,8 @@ function Login() {
                         <h5>To continue, log in to your Spotify account</h5>
                         <button onClick={() => {
                             window.location = window.location.href.includes('localhost')
-                                ? 'http://localhost:8888/spotify/login'
-                                : 'https://playlistr-io.herokuapp.com/spotify/login'
+                                ? 'http://localhost:8888/api/spotify/login'
+                                : 'https://playlistr-io.herokuapp.com/api/spotify/login'
                         }}>Sign in with Spotify
                         </button>
                     </div>
