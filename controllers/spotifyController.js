@@ -7,8 +7,18 @@ let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/api/spotif
 console.log("redirect_uri: ", redirect_uri);
 
 module.exports = {
-	login: (req, res) => {
+	login: function (req, res) {
 		console.log("/login redirect_uri: ", redirect_uri);
+
+		let query = querystring.stringify({
+			response_type: 'code',
+			client_id: process.env.client_id,
+			scope:
+				'user-read-private user-read-email playlist-modify-private playlist-modify-public',
+			redirect_uri
+		});
+		console.log(query);
+
 		res.redirect(
 			'https://accounts.spotify.com/authorize?' +
 				querystring.stringify({
@@ -20,7 +30,7 @@ module.exports = {
 				})
 		);
 	},
-	callback: (req, res) => {
+	callback: function (req, res) {
 		let code = req.query.code || null;
 		let authOptions = {
 			url: 'https://accounts.spotify.com/api/token',
