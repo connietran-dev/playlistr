@@ -3,25 +3,32 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
-import Button from 'react-bootstrap/Button';
+import Image from 'react-bootstrap/Image';
 
 import './style.css';
 
 function Login() {
     return (
-        <Container>
+        <Container fluid>
             <Row>
                 <Col>
-                    <h1>Welcome to Playlistr</h1>
-                    <h3>To continue, log in to Spotify</h3>
-                    <Button variant="info" onClick={() => {
-                        window.location = window.location.href.includes('localhost')
-                            ? 'http://localhost:8888/spotify/login'
-                            : 'https://playlistr-io.herokuapp.com/spotify/login'
-                    }}>
-                        Sign in with Spotify
-                </Button>
+                    <div className="backdrop login text-center">
+                        <h1 className="brand-name">Playlistr</h1>
+                        <Image roundedCircle className="brand-logo" src="./images/logo.jpg" />
+                    </div>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <div className="login-div text-center">
+                        <h5>To continue, log in to Spotify</h5>
+                        <button className="login-button" onClick={() => {
+                            window.location = window.location.href.includes('localhost')
+                                ? 'http://localhost:8888/spotify/login'
+                                : 'https://playlistr-io.herokuapp.com/spotify/login'
+                        }}>Sign in with Spotify
+                        </button>
+                    </div>
                 </Col>
             </Row>
         </Container>

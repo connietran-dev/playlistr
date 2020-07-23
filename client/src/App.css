@@ -1,24 +1,66 @@
-.App {
-  text-align: center;
+/* Layout */
+
+/* Override defaults */
+html,
+body, 
+.col {
+  margin: 0;
+  padding: 0;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+/* Use viewport-relative units to cover page fully */
+body {
+  height: 100vh;
+  width: 100vw;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
+/* Include border and padding in element width and height */
+* {
+  box-sizing: border-box;
+}
+
+
+/* Branding - Global Elements */
+
+body {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  color:white;
+  background: #171C20;
+}
+
+button {
+  background-color: #EBA404;
+  color: black;
+  margin: 10px 0 5px 0;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+button:hover {
+  background-color: #171C20;
+  color: white;
+  margin: 10px 0 5px 0;
+}
+
+
+/* Branding - Brand Elements */
+
+.brand-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 4rem;
   color: white;
 }
 
-.App-intro {
-  font-size: large;
+.brand-logo {
+  height: 6rem;
+  margin: 26px;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.backdrop {
+  height: 40vh;
+  width: 100%;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  background:#EBA404;
 }
