@@ -70,7 +70,7 @@ class Home extends Component {
 						</Col>
 						<Col>
 							<input placeholder="Search" />
-							<i class="fa fa-search" aria-hidden="true"></i>
+							<i className="fa fa-search" aria-hidden="true"></i>
 						</Col>
 					</Row>
 				</Container>
