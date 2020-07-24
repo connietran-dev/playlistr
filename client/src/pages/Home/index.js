@@ -4,6 +4,7 @@ import queryString from 'query-string';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Image from 'react-bootstrap/Image';
 
 import Playlist from '../../components/Playlist';
 import RoomButtons from '../../components/RoomButtons';
@@ -16,6 +17,7 @@ class Home extends Component {
 
 		this.state = {
 			user: {},
+			userImage: {},
 			playlists: [],
 			accessToken: ''
 		};
@@ -36,7 +38,10 @@ class Home extends Component {
 			.then(res => res.json())
 			.then(data => {
 				console.log(data);
-				this.setState({ user: data });
+				this.setState({ 
+					user: data,
+					userImage: data.images[0].url
+				});
 			});
 
 		// Fetch playlists
@@ -64,7 +69,10 @@ class Home extends Component {
 		return (
 			<div>
 				<Container>
-					<Row>
+					<Row className="welcome-banner">
+						<Col className="text-center">
+							<Image roundedCircle src={this.state.userImage} className="profile-pic"/>
+						</Col>
 						<Col xs={8}>
 							<h1>Welcome to Playlistr, {this.state.user.display_name}</h1>
 						</Col>
@@ -87,7 +95,7 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<Row>
+					<Row className="order-1">
 						<Col>
 							<RoomButtons
 								token={this.state.accessToken}
