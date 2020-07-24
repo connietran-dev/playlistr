@@ -19,7 +19,6 @@
 		"nodemon": "^1.18.7"
 	},
 	"dependencies": {
-		"compression": "^1.7.4",
 		"dotenv": "^8.2.0",
 		"express": "^4.16.3",
 		"if-env": "^1.0.4",

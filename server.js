@@ -1,5 +1,4 @@
 const express = require('express');
-const compression = require('compression');
 const request = require('request');
 const querystring = require('querystring');
 
@@ -14,8 +13,6 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'production') {
 	app.use(express.static('client/build'));
 }
-
-app.use(compression());
 
 let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/api/spotify/callback';
 console.log("redirect_uri: ", redirect_uri);
