@@ -28,8 +28,18 @@ body {
   background-color: #171C20;
 }
 
+.top-banner {
+  padding: 10px;
+}
+
+h1.top-banner {
+  margin: 46px 0 0 0;
+  font-size: 2.75rem;
+}
+
 button {
   background-color: #FED402;
+  opacity: 0.96;
   color: black;
   margin: 20px 0 5px 0;
   padding: 5px 10px;
@@ -40,6 +50,15 @@ button {
 button:hover {
   background-color: #171C20;
   color: white;
+}
+
+input {
+  border-radius: 5px;
+  border-style: none;
+  margin: 63px 10px 0 26px;
+  height: 2rem;
+  width: 10rem;
+  color: #171C20;
 }
 
 

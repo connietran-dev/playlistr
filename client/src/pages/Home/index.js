@@ -69,14 +69,15 @@ class Home extends Component {
 		return (
 			<div>
 				<Container>
-					<Row className="welcome-banner">
-						<Col className="text-center">
+					<Row className="top-banner">
+						<Col xs={12} md={2} className="text-center">
 							<Image roundedCircle src={this.state.userImage} className="profile-pic"/>
+							<p className="user-name">{this.state.user.display_name}</p>
 						</Col>
-						<Col xs={8}>
-							<h1>Welcome to Playlistr, {this.state.user.display_name}</h1>
+						<Col xs={12} md={7} >
+							<h1 className="top-banner">Welcome to <span className="welcome-brand">Playlistr</span></h1>
 						</Col>
-						<Col>
+						<Col xs={12} md={2} className="float-right">
 							<input placeholder="Search" />
 							<i className="fa fa-search" aria-hidden="true"></i>
 						</Col>
@@ -95,7 +96,7 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<Row className="order-1">
+					<Row>
 						<Col>
 							<RoomButtons
 								token={this.state.accessToken}

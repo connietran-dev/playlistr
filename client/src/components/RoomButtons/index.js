@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
 import hexGen from 'hex-generator';
 
 const RoomButtons = ({ token }) => {
@@ -22,12 +21,12 @@ const RoomButtons = ({ token }) => {
 
 	return (
 		<div>
-			<Button className="float-left">Join a Room</Button>
+			<button className="float-left">Join a Room</button>
 
 			<Link to="/room">
-				<Button onClick={() => setUrl(token, roomHex)} className="float-right">
+				<button onClick={() => setUrl(token, roomHex)} className="float-right">
 					Create a Room
-				</Button>
+				</button>
 			</Link>
 		</div>
 	);

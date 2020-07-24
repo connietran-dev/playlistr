@@ -1,0 +1,19 @@
+h1.top-banner {
+    color: #646a74;
+}
+
+.welcome-brand {
+    color: white;
+    font-weight: 600;
+}
+
+.profile-pic {
+    height: 6.75rem;
+    margin: 20px 0 9px;
+}
+
+.user-name {
+    color: #FED402;
+    opacity: 0.98;
+    margin: 0 0 18px;
+}
