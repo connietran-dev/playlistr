@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
+import TrackSearch from '../../components/TrackSearch';
 
 class Room extends Component {
 	constructor() {
@@ -70,11 +71,13 @@ class Room extends Component {
 						<Col xs={5} md={6}>
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
-						<Col xs={4} md={4}>
-							<Button>Add</Button>
-							<input placeholder="Add a Track" />
+						<Col xs={4} md={3}>
+							<TrackSearch
+								token={this.state.accessToken}
+								playlistId={this.state.playlist.id}
+							/>
 						</Col>
-						<Col xs={3} md={2}>
+						<Col xs={3} md={3}>
 							<Link to="/">
 								<Button className="float-right">Home</Button>
 							</Link>
