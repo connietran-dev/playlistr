@@ -67,7 +67,11 @@ class Room extends Component {
 
 	// GETs playlist data to maintain an update list of tracks on the playlist after a new song is added
 	getPlaylistData = (token, playlistId) => {
-		fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {})
+		fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+			headers: {
+				Authorization: 'Bearer ' + token
+			}
+		})
 			.then(res => res.json())
 			.then(data => {
 				this.setState({ playlistTracks: data });

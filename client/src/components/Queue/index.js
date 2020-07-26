@@ -7,11 +7,8 @@ const Queue = props => {
 		if (!props.playlistTracks.items || !props.playlistTracks.items.length) {
 			return;
 		} else {
-			console.log('Playlist Tracks:');
-			console.log(props.playlistTracks.items);
-
 			return props.playlistTracks.items.map(trackData => (
-				<ListGroup.Item action variant="dark" id={trackData.track.id}>
+				<ListGroup.Item key={trackData.track.uri} action variant="dark" id={trackData.track.id}>
 					{`${trackData.track.name} - ${trackData.track.artists[0].name}`}
 				</ListGroup.Item>
 			));
@@ -22,7 +19,8 @@ const Queue = props => {
 		<div
 			style={{
 				height: '300px',
-				border: '1px solid black'
+				border: '1px solid black',
+				overflowY: 'auto'
 			}}>
 			<h1>Play Queue</h1>
 			<ListGroup variant="dark">{handleQueueRender()}</ListGroup>
