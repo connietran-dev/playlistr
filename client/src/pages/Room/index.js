@@ -65,7 +65,7 @@ class Room extends Component {
 			});
 	};
 
-	// GETs playlist data to maintain an update list of tracks on the playlist after a new song is added
+	// GETs playlist data to maintain an updated list of tracks on the playlist after a new song is added
 	getPlaylistData = (token, playlistId) => {
 		fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
 			headers: {
