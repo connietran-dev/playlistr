@@ -18,7 +18,7 @@ class TrackSearch extends Component {
 
 	// Takes in a track name and sets state of filteredTracks array
 	querySpotifyTracks = track => {
-		console.log(this.props.token);
+		// console.log(this.props.token);
 
 		fetch(`https://api.spotify.com/v1/search?q=${track}&type=track&limit=20`, {
 			headers: {
@@ -60,6 +60,7 @@ class TrackSearch extends Component {
 		console.log('Playlist ID: ' + this.props.playlistId);
 
 		this.addTrackToPlaylist(this.props.playlistId, e.target.id);
+		this.props.getPlaylistData(this.props.token, this.props.playlistId);
 
 		// Reset state of track input and hide the trackListDisplay
 		this.setState({ trackInput: '', trackListDisplay: 'd-none' });
