@@ -6,6 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import TrackSearch from '../../components/TrackSearch';
+import Queue from '../../components/Queue';
 
 class Room extends Component {
 	constructor() {
@@ -17,7 +18,8 @@ class Room extends Component {
 
 		this.state = {
 			user: {},
-			playlist: {},
+			createdPlaylist: {},
+			playlistTracks: {},
 			accessToken: token,
 			roomId: roomId
 		};
@@ -32,7 +34,7 @@ class Room extends Component {
 		})
 			.then(res => res.json())
 			.then(data => {
-				console.log(data);
+				// console.log(data);
 				this.setState({ user: data });
 			})
 			.then(() => this.createPlaylist(this.state.user.id, this.state.roomId, this.state.accessToken));
@@ -58,8 +60,21 @@ class Room extends Component {
 		})
 			.then(res => res.json())
 			.then(data => {
-				console.log(data);
-				this.setState({ playlist: data });
+				// console.log(data);
+				this.setState({ createdPlaylist: data });
+			});
+	};
+
+	// GETs playlist data to maintain an updated list of tracks on the playlist after a new song is added
+	getPlaylistData = (token, playlistId) => {
+		fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+			headers: {
+				Authorization: 'Bearer ' + token
+			}
+		})
+			.then(res => res.json())
+			.then(data => {
+				this.setState({ playlistTracks: data });
 			});
 	};
 
@@ -74,7 +89,8 @@ class Room extends Component {
 						<Col xs={4} md={3}>
 							<TrackSearch
 								token={this.state.accessToken}
-								playlistId={this.state.playlist.id}
+								playlistId={this.state.createdPlaylist.id}
+								getPlaylistData={this.getPlaylistData}
 							/>
 						</Col>
 						<Col xs={3} md={3}>
@@ -94,23 +110,7 @@ class Room extends Component {
 							</div>
 						</Col>
 						<Col xs={4} md={6}>
-							<div
-								style={{
-									height: '100%',
-									border: '1px solid black'
-								}}>
-								<h1>Play Queue</h1>
-								<ol>
-									<li>Track</li>
-									<li>Track</li>
-									<li>Track</li>
-									<li>Track</li>
-									<li>Track</li>
-									<li>Track</li>
-									<li>Track</li>
-									<li>Track</li>
-								</ol>
-							</div>
+							<Queue playlistTracks={this.state.playlistTracks} />
 						</Col>
 					</Row>
 					<Row>
