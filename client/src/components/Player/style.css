@@ -1,0 +1,27 @@
+.now-playing-container {
+	border: 1px;
+}
+
+.now-playing-name {
+	font-size: 1.5em;
+	margin-bottom: 0.2em;
+}
+.now-playing-img {
+	margin-bottom: 1em;
+}
+.now-playing-status {
+	margin-bottom: 1em;
+}
+
+.now-playing-side {
+	margin-left: 5%;
+	width: 45%;
+}
+
+.player-buttons button {
+	color: limegreen;
+}
+
+.player-buttons button:hover {
+	background-color: limegreen;
+}

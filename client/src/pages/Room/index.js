@@ -7,6 +7,8 @@ import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import TrackSearch from '../../components/TrackSearch';
 import Queue from '../../components/Queue';
+import Player from '../../components/Player';
+import NowPlayingImg from '../../components/NowPlayingImg';
 
 class Room extends Component {
 	constructor() {
@@ -21,7 +23,17 @@ class Room extends Component {
 			createdPlaylist: {},
 			playlistTracks: {},
 			accessToken: token,
-			roomId: roomId
+			roomId: roomId,
+			item: {
+				album: {
+					images: [{ url: '' }]
+				},
+				name: '',
+				artists: [{ name: '' }],
+				duration_ms: 0
+			},
+			is_playing: 'Paused',
+			progress_ms: 0
 		};
 	}
 
@@ -38,6 +50,8 @@ class Room extends Component {
 				this.setState({ user: data });
 			})
 			.then(() => this.createPlaylist(this.state.user.id, this.state.roomId, this.state.accessToken));
+
+		this.getCurrentlyPlaying(this.state.accessToken);
 	}
 
 	createPlaylist = (user, room, token) => {
@@ -78,6 +92,23 @@ class Room extends Component {
 			});
 	};
 
+	getCurrentlyPlaying = token => {
+		fetch('https://api.spotify.com/v1/me/player', {
+			headers: {
+				Authorization: 'Bearer ' + token
+			}
+		})
+			.then(res => res.json())
+			.then(data => {
+				console.log(data);
+				this.setState({
+					item: data.item,
+					isPlaying: data.is_playing,
+					progress: data.progress_ms
+				});
+			});
+	};
+
 	render() {
 		return (
 			<div>
@@ -101,13 +132,7 @@ class Room extends Component {
 					</Row>
 					<Row>
 						<Col xs={8} md={6}>
-							<div
-								style={{
-									height: '100%',
-									border: '1px solid black'
-								}}>
-								Artwork of Track Currently Playing
-							</div>
+							<NowPlayingImg item={this.state.item} />
 						</Col>
 						<Col xs={4} md={6}>
 							<Queue playlistTracks={this.state.playlistTracks} />
@@ -115,16 +140,12 @@ class Room extends Component {
 					</Row>
 					<Row>
 						<Col xs={12} sm={6} md={6}>
-							<div>
-								<h1>Now Playing</h1>
-								<div
-									style={{
-										height: '200px',
-										border: '1px solid black'
-									}}>
-									Music Player
-								</div>
-							</div>
+							<Player
+								token={this.state.accessToken}
+								item={this.state.item}
+								isPlaying={this.state.isPlaying}
+								progress={this.state.progress}
+							/>
 						</Col>
 						<Col xs={12} sm={6} md={6}>
 							<Row className="pt-5">
