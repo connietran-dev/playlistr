@@ -9,6 +9,7 @@ import TrackSearch from '../../components/TrackSearch';
 import Queue from '../../components/Queue';
 import Player from '../../components/Player';
 import NowPlayingImg from '../../components/NowPlayingImg';
+import ListGroup from 'react-bootstrap/esm/ListGroup';
 
 class Room extends Component {
 	constructor() {
@@ -20,8 +21,7 @@ class Room extends Component {
 
 		this.state = {
 			user: {},
-			createdPlaylist: {},
-			playlistTracks: {},
+			addedTracks: [],
 			accessToken: token,
 			roomId: roomId,
 			item: {
@@ -46,50 +46,25 @@ class Room extends Component {
 		})
 			.then(res => res.json())
 			.then(data => {
-				// console.log(data);
 				this.setState({ user: data });
-			})
-			.then(() => this.createPlaylist(this.state.user.id, this.state.roomId, this.state.accessToken));
+			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
 	}
 
-	createPlaylist = (user, room, token) => {
-		// console.log('UserId: ' + user);
-		console.log('Room: ' + room);
-		console.log('Token: ' + token);
+	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
+		let updatedTrackList = this.state.addedTracks;
 
-		fetch(`https://api.spotify.com/v1/users/${user}/playlists`, {
-			method: 'POST',
-			headers: {
-				Authorization: 'Bearer ' + token,
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				name: room,
-				public: false,
-				collaborative: true,
-				description: 'Playlistr: ' + room
-			})
-		})
-			.then(res => res.json())
-			.then(data => {
-				// console.log(data);
-				this.setState({ createdPlaylist: data });
-			});
-	};
+		updatedTrackList.push({
+			room: roomId,
+			id: trackId,
+			info: trackInfo
+		});
 
-	// GETs playlist data to maintain an updated list of tracks on the playlist after a new song is added
-	getPlaylistData = (token, playlistId) => {
-		fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-			headers: {
-				Authorization: 'Bearer ' + token
-			}
-		})
-			.then(res => res.json())
-			.then(data => {
-				this.setState({ playlistTracks: data });
-			});
+		this.setState({ addedTracks: updatedTrackList }, () => {
+			console.log('Added Tracks State:');
+			console.log(this.state.addedTracks);
+		});
 	};
 
 	getCurrentlyPlaying = token => {
@@ -100,13 +75,33 @@ class Room extends Component {
 		})
 			.then(res => res.json())
 			.then(data => {
-				console.log(data);
-				this.setState({
-					item: data.item,
-					isPlaying: data.is_playing,
-					progress: data.progress_ms
-				});
+				this.setState(
+					{
+						item: data.item,
+						isPlaying: data.is_playing,
+						progress: data.progress_ms
+					},
+					() => {
+						console.log('Now Playing State:');
+						console.log(this.state.item);
+					}
+				);
 			});
+	};
+
+	// Using the state of addedTracks to conditionally render the Play Queue.
+	handleQueueRender = () => {
+		let addedTracks = this.state.addedTracks;
+
+		if (!addedTracks.length) {
+			return <p>Add a track to get started...</p>;
+		} else {
+			return addedTracks.map(track => (
+				<ListGroup.Item key={track.id} variant="dark">
+					{track.info}
+				</ListGroup.Item>
+			));
+		}
 	};
 
 	render() {
@@ -120,8 +115,9 @@ class Room extends Component {
 						<Col xs={4} md={3}>
 							<TrackSearch
 								token={this.state.accessToken}
-								playlistId={this.state.createdPlaylist.id}
-								getPlaylistData={this.getPlaylistData}
+								roomId={this.state.roomId}
+								addTrackToDisplayQueue={this.addTrackToDisplayQueue}
+								// getPlaylistData={this.getPlaylistData}
 							/>
 						</Col>
 						<Col xs={3} md={3}>
@@ -135,7 +131,7 @@ class Room extends Component {
 							<NowPlayingImg item={this.state.item} />
 						</Col>
 						<Col xs={4} md={6}>
-							<Queue playlistTracks={this.state.playlistTracks} />
+							<Queue handleQueueRender={this.handleQueueRender} />
 						</Col>
 					</Row>
 					<Row>

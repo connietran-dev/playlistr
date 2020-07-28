@@ -18,8 +18,6 @@ class TrackSearch extends Component {
 
 	// Takes in a track name and sets state of filteredTracks array
 	querySpotifyTracks = track => {
-		// console.log(this.props.token);
-
 		fetch(`https://api.spotify.com/v1/search?q=${track}&type=track&limit=20`, {
 			headers: {
 				Authorization: 'Bearer ' + this.props.token
@@ -30,16 +28,13 @@ class TrackSearch extends Component {
 			.catch(err => console.log(err));
 	};
 
-	addTrackToPlaylist = (playlistId, trackId) => {
-		fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?uris=spotify%3Atrack%3A${trackId}`, {
+	addTrackToPlaybackQueue = (token, trackId) => {
+		fetch(`https://api.spotify.com/v1/me/player/queue?uri=spotify:track:${trackId}`, {
 			method: 'POST',
 			headers: {
-				Authorization: 'Bearer ' + this.props.token,
-				'Content-Type': 'application/json'
+				Authorization: 'Bearer ' + token
 			}
-		})
-			.then(res => res.json())
-			.catch(err => console.log(err));
+		}).catch(err => console.log(err));
 	};
 
 	handleOnChange = e => {
@@ -56,11 +51,10 @@ class TrackSearch extends Component {
 	};
 
 	handleTrackSelection = e => {
-		console.log('Song ID: ' + e.target.id);
-		console.log('Playlist ID: ' + this.props.playlistId);
+		// Takes in Room, Track Id and Track Info
+		this.props.addTrackToDisplayQueue(this.props.roomId, e.target.id, e.target.innerText);
 
-		this.addTrackToPlaylist(this.props.playlistId, e.target.id);
-		this.props.getPlaylistData(this.props.token, this.props.playlistId);
+		this.addTrackToPlaybackQueue(this.props.token, e.target.id);
 
 		// Reset state of track input and hide the trackListDisplay
 		this.setState({ trackInput: '', trackListDisplay: 'd-none' });
