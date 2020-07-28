@@ -21,9 +21,7 @@ const Player = props => {
 				Authorization: 'Bearer ' + token,
 				'Content-Type': 'application/json'
 			}
-		})
-			.then(res => res.json())
-			.catch(err => console.log(err));
+		}).catch(err => console.log(err));
 	};
 
 	return (
@@ -38,16 +36,16 @@ const Player = props => {
 					id="button_play"
 					className="btn"
 					onClick={() => handlePlayPauseClick('play', props.token)}>
-					<i class="fa fa-play"></i>
+					<i className="fa fa-play"></i>
 				</button>
 				<button
 					type="button"
 					className="btn"
 					onClick={() => handlePlayPauseClick('pause', props.token)}>
-					<i class="fa fa-pause"></i>
+					<i className="fa fa-pause"></i>
 				</button>
 				<button type="button" className="btn" onClick={() => handleNextClick(props.token)}>
-					<i class="fa fa-forward"></i>
+					<i className="fa fa-forward"></i>
 				</button>
 			</div>
 		</div>
