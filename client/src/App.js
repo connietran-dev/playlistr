@@ -10,8 +10,8 @@ import './App.css';
 function App() {
 	return (
 		<Router>
-			<Route exact path={['/', '/login']} component={Login} />
-			<Route exact path="/home" component={Home} />
+			<Route exact strict path={['/', '/login']} component={Login} />
+			<Route exact strict path="/home" component={Home} />
 			<Route path="/room" component={Room} />
 		</Router>
 	);
