@@ -3,8 +3,6 @@ import queryString from 'query-string';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import { Link } from 'react-router-dom';
 import TrackSearch from '../../components/TrackSearch';
 import Queue from '../../components/Queue';
 import Player from '../../components/Player';
@@ -107,25 +105,21 @@ class Room extends Component {
 	render() {
 		return (
 			<div>
-				<Container>
+				<Container className="mb-3">
 					<Row>
-						<Col xs={5} md={6}>
+						<Col xs={12} md={6}>
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
-						<Col xs={4} md={3}>
+						<Col xs={12} md={6}>
 							<TrackSearch
 								token={this.state.accessToken}
 								roomId={this.state.roomId}
 								addTrackToDisplayQueue={this.addTrackToDisplayQueue}
-								// getPlaylistData={this.getPlaylistData}
 							/>
 						</Col>
-						<Col xs={3} md={3}>
-							<Link to="/">
-								<Button className="float-right">Home</Button>
-							</Link>
-						</Col>
 					</Row>
+				</Container>
+				<Container>
 					<Row>
 						<Col xs={8} md={6}>
 							<NowPlayingImg item={this.state.item} />
@@ -134,6 +128,8 @@ class Room extends Component {
 							<Queue handleQueueRender={this.handleQueueRender} />
 						</Col>
 					</Row>
+				</Container>
+				<Container>
 					<Row>
 						<Col xs={12} sm={6} md={6}>
 							<Player

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Form from 'react-bootstrap/Form';
+
+import './style.css';
 
 class TrackSearch extends Component {
 	constructor(props) {
@@ -11,8 +13,9 @@ class TrackSearch extends Component {
 		this.state = {
 			trackInput: '',
 			filteredTracks: [],
-			trackListDisplay: '',
-			selectedTrack: ''
+			selectedTrack: '',
+			trackListDisplay: 'd-none',
+			searchBtnIcon: 'fa fa-search'
 		};
 	}
 
@@ -39,14 +42,20 @@ class TrackSearch extends Component {
 
 	handleOnChange = e => {
 		this.setState({ trackInput: e.target.value });
+
+		// Resets icon image if there is input to be searched
+		if (this.state.trackInput) this.setState({ searchBtnIcon: 'fa fa-search' });
 	};
 
-	handleOnSubmit = e => {
+	handleSubmitBtnClick = e => {
 		e.preventDefault();
 
+		// Conditionally handle submit button click if there is input to search. Else statement gives ability to collapse the dropdown.
 		if (this.state.trackInput) {
 			this.querySpotifyTracks(this.state.trackInput);
-			this.setState({ trackListDisplay: '' });
+			this.setState({ trackInput: '', trackListDisplay: '', searchBtnIcon: 'fa fa-chevron-up' });
+		} else {
+			this.setState({ trackListDisplay: 'd-none', searchBtnIcon: 'fa fa-search' });
 		}
 	};
 
@@ -63,31 +72,33 @@ class TrackSearch extends Component {
 	render() {
 		return (
 			<div>
-				<InputGroup className="mb-3">
-					<InputGroup.Prepend>
-						<Button onClick={this.handleOnSubmit}>
-							<i className="fa fa-search" aria-hidden="true"></i>
-						</Button>
-					</InputGroup.Prepend>
-					<FormControl
-						onKeyDown={this.handleOnKeyPress}
-						onChange={this.handleOnChange}
-						value={this.state.trackInput}
-						placeholder="Add a Track"
-						aria-describedby="basic-addon1"
-					/>
-				</InputGroup>
+				<Form>
+					<InputGroup className="float-right mb-2">
+						<button
+							className="track-search-btn"
+							onClick={this.handleSubmitBtnClick}>
+							<i className={this.state.searchBtnIcon} aria-hidden="true"></i>
+						</button>
+
+						<FormControl
+							className="track-input"
+							onKeyDown={this.handleOnKeyPress}
+							onChange={this.handleOnChange}
+							value={this.state.trackInput}
+							placeholder="Add a Track"
+							aria-describedby="basic-addon1"
+						/>
+					</InputGroup>
+				</Form>
+
 				<div className={this.state.trackListDisplay}>
-					<ListGroup
-						variant="flush"
-						className="text-dark"
-						style={{ maxHeight: '100px', overflowY: 'scroll' }}>
+					<ListGroup className="track-dropdown" variant="flush">
 						{this.state.filteredTracks.map(track => (
 							<ListGroup.Item
+								className="track-dropdown-item"
 								key={track.id}
 								id={track.id}
-								onClick={this.handleTrackSelection}
-								style={{ cursor: 'pointer' }}>
+								onClick={this.handleTrackSelection}>
 								{`${track.name} - ${track.artists[0].name}`}
 							</ListGroup.Item>
 						))}
