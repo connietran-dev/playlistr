@@ -1,6 +1,7 @@
 const express = require('express');
 const request = require('request');
 const querystring = require('querystring');
+const morgan = require('morgan');
 
 require('dotenv').config();
 
@@ -9,6 +10,7 @@ const port = process.env.PORT || 8888;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(morgan('tiny'));
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(express.static('client/build'));
@@ -31,13 +33,13 @@ app.get('/api/spotify/login', function (req, res) {
 
 	res.redirect(
 		'https://accounts.spotify.com/authorize?' +
-			querystring.stringify({
-				response_type: 'code',
-				client_id: process.env.client_id,
-				scope:
-					'user-read-private user-read-email playlist-modify-private playlist-modify-public user-read-currently-playing user-read-playback-state user-modify-playback-state',
-				redirect_uri
-			})
+		querystring.stringify({
+			response_type: 'code',
+			client_id: process.env.client_id,
+			scope:
+				'user-read-private user-read-email playlist-modify-private playlist-modify-public user-read-currently-playing user-read-playback-state user-modify-playback-state',
+			redirect_uri
+		})
 	);
 });
 
