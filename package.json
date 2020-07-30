@@ -8,9 +8,7 @@
 		"start:prod": "node server.js",
 		"start:dev": "concurrently \"nodemon --ignore 'client/*'\" \"npm run client\"",
 		"client": "cd client && npm run start",
-		"install": "cd client && npm install",
-		"build": "cd client && npm run build",
-		"heroku-postbuild": "cd client && npm run build"
+		"install": "cd client && npm install"
 	},
 	"author": "",
 	"license": "ISC",
