@@ -30,8 +30,8 @@ class Room extends Component {
 				artists: [{ name: '' }],
 				duration_ms: 0
 			},
-			is_playing: 'Paused',
-			progress_ms: 0
+			playbackQueueStatus: 'Paused',
+			progress: 0
 		};
 	}
 
@@ -53,6 +53,8 @@ class Room extends Component {
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
 		let updatedTrackList = this.state.addedTracks;
 
+		console.log(this.state.item.id);
+
 		updatedTrackList.push({
 			room: roomId,
 			id: trackId,
@@ -65,6 +67,7 @@ class Room extends Component {
 		});
 	};
 
+	// GETs track that is currently playing on the users playback queue (Spotify), sets the state with the returned data, and then updates the Play Queue to highlight the track currently playing on the queue
 	getCurrentlyPlaying = token => {
 		fetch('https://api.spotify.com/v1/me/player', {
 			headers: {
@@ -73,18 +76,14 @@ class Room extends Component {
 		})
 			.then(res => res.json())
 			.then(data => {
-				this.setState(
-					{
-						item: data.item,
-						isPlaying: data.is_playing,
-						progress: data.progress_ms
-					},
-					() => {
-						console.log('Now Playing State:');
-						console.log(this.state.item);
-					}
-				);
-			});
+				this.setState({
+					item: data.item,
+					playbackQueueStatus: data.is_playing,
+					progress: data.progress_ms
+				});
+			})
+			.then(() => this.handleQueueRender())
+			.catch(err => console.log(err));
 	};
 
 	// Using the state of addedTracks to conditionally render the Play Queue.
@@ -95,11 +94,19 @@ class Room extends Component {
 			return <p>Add a track to get started...</p>;
 		} else {
 			return addedTracks.map(track => (
-				<ListGroup.Item key={track.id} variant="dark">
+				<ListGroup.Item
+					key={track.id}
+					variant={this.setVariant(track.id, this.state.item.id, 'warning', 'dark')}>
 					{track.info}
 				</ListGroup.Item>
 			));
 		}
+	};
+
+	// Helper method that compares two id's and sets a variant based on result
+	setVariant = (id, comparedId, variantA, variantB) => {
+		if (id === comparedId) return variantA;
+		return variantB;
 	};
 
 	render() {
@@ -115,6 +122,8 @@ class Room extends Component {
 								token={this.state.accessToken}
 								roomId={this.state.roomId}
 								addTrackToDisplayQueue={this.addTrackToDisplayQueue}
+								getCurrentlyPlaying={this.getCurrentlyPlaying}
+								currentlyPlayingTrack={this.state.item}
 							/>
 						</Col>
 					</Row>
@@ -137,6 +146,7 @@ class Room extends Component {
 								item={this.state.item}
 								isPlaying={this.state.isPlaying}
 								progress={this.state.progress}
+								getCurrentlyPlaying={this.getCurrentlyPlaying}
 							/>
 						</Col>
 						<Col xs={12} sm={6} md={6}>

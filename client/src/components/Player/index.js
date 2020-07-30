@@ -10,10 +10,11 @@ const Player = props => {
 				'Content-Type': 'application/json'
 			}
 		})
-			.then(res => res.json())
+			.then(() => props.getCurrentlyPlaying(props.token))
 			.catch(err => console.log(err));
 	};
 
+	// POST that changes to next song in users playback. After track is changed, we GET current playback data to update displaying track data
 	const handleNextClick = token => {
 		fetch('https://api.spotify.com/v1/me/player/next', {
 			method: 'POST',
@@ -21,7 +22,9 @@ const Player = props => {
 				Authorization: 'Bearer ' + token,
 				'Content-Type': 'application/json'
 			}
-		}).catch(err => console.log(err));
+		})
+			.then(() => props.getCurrentlyPlaying(props.token))
+			.catch(err => console.log(err));
 	};
 
 	return (
