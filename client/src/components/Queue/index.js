@@ -10,7 +10,7 @@ const Queue = props => {
 					height: '200px',
 					overflowY: 'auto'
 				}}>
-				<ListGroup variant="dark">{props.handleQueueRender()}</ListGroup>
+				<ListGroup>{props.handleQueueRender()}</ListGroup>
 			</div>
 		</div>
 	);

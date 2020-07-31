@@ -64,9 +64,10 @@ class TrackSearch extends Component {
 		this.props.addTrackToDisplayQueue(this.props.roomId, e.target.id, e.target.innerText);
 
 		this.addTrackToPlaybackQueue(this.props.token, e.target.id);
+		this.props.getCurrentlyPlaying(this.props.token);
 
 		// Reset state of track input and hide the trackListDisplay
-		this.setState({ trackInput: '', trackListDisplay: 'd-none' });
+		this.setState({ trackInput: '', trackListDisplay: 'd-none', searchBtnIcon: 'fa fa-search' });
 	};
 
 	render() {
