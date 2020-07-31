@@ -1,0 +1,19 @@
+.now-playing-img {
+	max-width: 50vmin;
+	max-height: 50vmin;
+	width: 100%;
+}
+
+.play-queue {
+	max-height: 50vmin;
+}
+
+.play-queue-list {
+	/* height: 60vmin; */
+	max-height: 34vmin;
+	overflow-y: auto;
+}
+
+.play-queue h1 {
+	font-size: 5vw;
+}

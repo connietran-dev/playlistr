@@ -29,7 +29,7 @@ const Player = props => {
 
 	return (
 		<div className="now-playing-container">
-			<div className="pt-5">
+			<div className="pt-2">
 				<div className="now-playing-name">{props.item.name}</div>
 				<div className="now-playing-artist">{props.item.artists[0].name}</div>
 			</div>
