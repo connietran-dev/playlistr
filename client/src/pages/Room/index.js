@@ -112,7 +112,7 @@ class Room extends Component {
 	render() {
 		return (
 			<div>
-				<Container className="mb-3">
+				<Container className="py-3">
 					<Row>
 						<Col xs={12} md={6}>
 							<h1>Current Room: {this.state.roomId} </h1>

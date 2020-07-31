@@ -1,5 +1,10 @@
 .track-input {
-	width: auto;
+	margin: 0;
+}
+
+.track-search-btn {
+	width: 10%;
+	margin: 0;
 }
 
 .track-dropdown {
