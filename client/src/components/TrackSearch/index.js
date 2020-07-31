@@ -74,15 +74,15 @@ class TrackSearch extends Component {
 		return (
 			<div>
 				<Form>
-					<InputGroup className="float-right mb-2">
+					<InputGroup>
 						<button
-							className="track-search-btn"
+							className="rounded-right track-search-btn"
 							onClick={this.handleSubmitBtnClick}>
 							<i className={this.state.searchBtnIcon} aria-hidden="true"></i>
 						</button>
 
 						<FormControl
-							className="track-input"
+							className="rounded-right track-input"
 							onKeyDown={this.handleOnKeyPress}
 							onChange={this.handleOnChange}
 							value={this.state.trackInput}
