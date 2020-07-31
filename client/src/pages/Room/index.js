@@ -10,11 +10,9 @@ import ListGroup from 'react-bootstrap/esm/ListGroup';
 import './style.css';
 
 import apiUrl from '../../apiConfig';
-
 import socketIOClient from 'socket.io-client';
 
 const ENDPOINT = apiUrl;
-console.log('ENDPOINT: ', apiUrl);
 
 class Room extends Component {
 	constructor() {
@@ -43,10 +41,13 @@ class Room extends Component {
 		};
 	}
 
-	// When component mounts, user state will be set to response from API call. Then the playlist will be created.
+	// When component mounts, app will connect to socket and user state will be set to response from API call. Then the playlist will be created.
 	componentDidMount() {
-		// Establish connection to socket
-		this.connectToSocket();
+
+		let socket = socketIOClient(ENDPOINT);
+
+		// Emit that user has joined room
+		socket.emit('join room', this.state.roomId, this.state.accessToken);
 
 		fetch('https://api.spotify.com/v1/me', {
 			headers: {
@@ -61,11 +62,9 @@ class Room extends Component {
 		this.getCurrentlyPlaying(this.state.accessToken);
 	}
 
-	connectToSocket = () => {
+	componentWillUnmount() {
 		let socket = socketIOClient(ENDPOINT);
-		socket.on('FromAPI', data => {
-			this.setState({ socketData: data });
-		});
+
 		// Close connection when component unmounts
 		return () => socket.disconnect();
 	};
@@ -137,12 +136,6 @@ class Room extends Component {
 					<Row>
 						<Col xs={12} md={6}>
 							<h1>Current Room: {this.state.roomId} </h1>
-							<p>
-								It's{' '}
-								<time dateTime={this.state.socketData}>
-									{this.state.socketData}
-								</time>
-							</p>
 						</Col>
 						<Col xs={12} md={6}>
 							<TrackSearch

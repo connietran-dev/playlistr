@@ -80,25 +80,20 @@ const io = socketio(server);
 let interval;
 
 io.on('connection', (socket) => {
-	console.log('New user client connected');
+	console.log('New client connected: ', socket.id);
 
-	// Test function - TODO - to be removed
-	if (interval) {
-		clearInterval(interval);
-	}
-	interval = setInterval(() => { getApiAndEmit(socket) }, 1000);
+	// When user is connected and joins room
+	socket.on('join room', (roomId, accessToken) => {
+		// Subscribe the user's socket to a channel for the room
+		socket.join(roomId);
+		console.log('User has joined the room: ', roomId, ", user accessToken: ",  accessToken);
+		console.log('Current rooms: ', socket.rooms);
+	})
 
 	socket.on('disconnect', () => {
-		console.log('User client disconnected');
-		clearInterval(interval);
+		console.log('Client disconnected');
 	});
 });
-
-const getApiAndEmit = socket => {
-	const response = new Date();
-	// Emitting a new message. Will be consumed by the client
-	socket.emit('FromAPI', response);
-};
 
 console.log(`Listening on port ${port}.`);
 server.listen(port);
