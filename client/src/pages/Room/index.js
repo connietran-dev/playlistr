@@ -9,6 +9,13 @@ import Player from '../../components/Player';
 import NowPlayingImg from '../../components/NowPlayingImg';
 import ListGroup from 'react-bootstrap/esm/ListGroup';
 
+import apiUrl from '../../apiConfig';
+
+import socketIOClient from 'socket.io-client';
+
+const ENDPOINT = apiUrl;
+console.log('ENDPOINT: ', apiUrl);
+
 class Room extends Component {
 	constructor() {
 		super();
@@ -31,12 +38,17 @@ class Room extends Component {
 				duration_ms: 0
 			},
 			playbackQueueStatus: 'Paused',
-			progress: 0
+			progress: 0,
+			socketData: ''
 		};
 	}
 
 	// When component mounts, user state will be set to response from API call. Then the playlist will be created.
 	componentDidMount() {
+
+		// Establish connection to socket
+		this.connectToSocket();
+
 		fetch('https://api.spotify.com/v1/me', {
 			headers: {
 				Authorization: 'Bearer ' + this.state.accessToken
@@ -48,6 +60,15 @@ class Room extends Component {
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
+	}
+
+	connectToSocket = () => {
+		let socket = socketIOClient(ENDPOINT);
+		socket.on('FromAPI', data => {
+			this.setState({ socketData: data });
+		});
+		// Close connection when component unmounts
+		return () => socket.disconnect();
 	}
 
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
@@ -116,6 +137,9 @@ class Room extends Component {
 					<Row>
 						<Col xs={12} md={6}>
 							<h1>Current Room: {this.state.roomId} </h1>
+							<p>
+								It's <time dateTime={this.state.socketData}>{this.state.socketData}</time>
+							</p>
 						</Col>
 						<Col xs={12} md={6}>
 							<TrackSearch

@@ -25,6 +25,7 @@
 		"morgan": "^1.10.0",
 		"query-string": "^6.13.1",
 		"request": "^2.81.0",
-		"serve": "^11.3.2"
+		"serve": "^11.3.2",
+		"socket.io": "^2.3.0"
 	}
 }

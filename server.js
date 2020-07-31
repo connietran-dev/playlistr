@@ -2,7 +2,9 @@ const express = require('express'),
 	request = require('request'),
 	querystring = require('querystring'),
 	morgan = require('morgan'),
-	path = require('path');
+	path = require('path'),
+	http = require('http'),
+	socketio = require('socket.io');
 
 require('dotenv').config();
 
@@ -72,5 +74,31 @@ if (process.env.NODE_ENV === 'production') {
 	});
 }
 
+const server = http.createServer(app);
+const io = socketio(server);
+
+let interval;
+
+io.on('connection', (socket) => {
+	console.log('New user client connected');
+
+	// Test function - TODO - to be removed
+	if (interval) {
+		clearInterval(interval);
+	}
+	interval = setInterval(() => { getApiAndEmit(socket) }, 1000);
+
+	socket.on('disconnect', () => {
+		console.log('User client disconnected');
+		clearInterval(interval);
+	});
+});
+
+const getApiAndEmit = socket => {
+	const response = new Date();
+	// Emitting a new message. Will be consumed by the client
+	socket.emit('FromAPI', response);
+};
+
 console.log(`Listening on port ${port}.`);
-app.listen(port);
+server.listen(port);

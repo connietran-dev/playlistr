@@ -5,6 +5,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 
+import apiUrl from '../../apiConfig';
+
 import './style.css';
 
 function Login() {
@@ -23,9 +25,7 @@ function Login() {
                     <div className="login-div text-center">
                         <h5>To continue, log in to your Spotify account</h5>
                         <button onClick={() => {
-                            window.location = window.location.href.includes('localhost')
-                                ? 'http://localhost:8888/api/spotify/login'
-                                : '/api/spotify/login'
+                            window.location = apiUrl + '/api/spotify/login'
                         }}>Sign in with Spotify
                         </button>
                     </div>
