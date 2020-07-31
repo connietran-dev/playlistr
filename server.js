@@ -1,7 +1,8 @@
 const express = require('express'),
 	request = require('request'),
 	querystring = require('querystring'),
-	morgan = require('morgan');
+	morgan = require('morgan'),
+	path = require('path');
 
 require('dotenv').config();
 
@@ -11,10 +12,6 @@ const port = process.env.PORT || 8888;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('tiny'));
-
-if (process.env.NODE_ENV === 'production') {
-	app.use(express.static('client/build'));
-}
 
 let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/api/spotify/callback';
 console.log('redirect_uri: ', redirect_uri);
@@ -67,6 +64,13 @@ app.get('/api/spotify/callback', function (req, res) {
 		res.redirect(uri + '?access_token=' + access_token);
 	});
 });
+
+if (process.env.NODE_ENV === 'production') {
+	app.use(express.static('client/build'));
+	app.get('*', function (req, res) {
+		res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
+	});
+}
 
 console.log(`Listening on port ${port}.`);
 app.listen(port);
