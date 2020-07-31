@@ -4,10 +4,10 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TrackSearch from '../../components/TrackSearch';
-import Queue from '../../components/Queue';
 import Player from '../../components/Player';
-import NowPlayingImg from '../../components/NowPlayingImg';
 import ListGroup from 'react-bootstrap/esm/ListGroup';
+
+import './style.css';
 
 import apiUrl from '../../apiConfig';
 
@@ -45,7 +45,6 @@ class Room extends Component {
 
 	// When component mounts, user state will be set to response from API call. Then the playlist will be created.
 	componentDidMount() {
-
 		// Establish connection to socket
 		this.connectToSocket();
 
@@ -69,7 +68,7 @@ class Room extends Component {
 		});
 		// Close connection when component unmounts
 		return () => socket.disconnect();
-	}
+	};
 
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
 		let updatedTrackList = this.state.addedTracks;
@@ -116,6 +115,7 @@ class Room extends Component {
 		} else {
 			return addedTracks.map(track => (
 				<ListGroup.Item
+					className="play-queue-item"
 					key={track.id}
 					variant={this.setVariant(track.id, this.state.item.id, 'warning', 'dark')}>
 					{track.info}
@@ -138,7 +138,10 @@ class Room extends Component {
 						<Col xs={12} md={6}>
 							<h1>Current Room: {this.state.roomId} </h1>
 							<p>
-								It's <time dateTime={this.state.socketData}>{this.state.socketData}</time>
+								It's{' '}
+								<time dateTime={this.state.socketData}>
+									{this.state.socketData}
+								</time>
 							</p>
 						</Col>
 						<Col xs={12} md={6}>
@@ -154,11 +157,21 @@ class Room extends Component {
 				</Container>
 				<Container>
 					<Row>
-						<Col xs={8} md={6}>
-							<NowPlayingImg item={this.state.item} />
+						<Col xs={6} md={6}>
+							<img
+								className="now-playing-img"
+								src={this.state.item.album.images[0].url}
+								alt="Track album artwork"
+							/>
 						</Col>
-						<Col xs={4} md={6}>
-							<Queue handleQueueRender={this.handleQueueRender} />
+						<Col xs={6} md={6}>
+							<div className="play-queue">
+								<h1>Play Queue</h1>
+
+								<ListGroup className="play-queue-list">
+									{this.handleQueueRender()}
+								</ListGroup>
+							</div>
 						</Col>
 					</Row>
 				</Container>
