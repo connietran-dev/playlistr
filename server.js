@@ -4,7 +4,8 @@ const express = require('express'),
 	morgan = require('morgan'),
 	path = require('path'),
 	http = require('http'),
-	socketio = require('socket.io');
+	socketio = require('socket.io'),
+	handlers = require('./handlers');
 
 require('dotenv').config();
 
@@ -16,20 +17,8 @@ app.use(express.json());
 app.use(morgan('tiny'));
 
 let redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/api/spotify/callback';
-console.log('redirect_uri: ', redirect_uri);
 
 app.get('/api/spotify/login', function (req, res) {
-	console.log('/login redirect_uri: ', redirect_uri);
-
-	let query = querystring.stringify({
-		response_type: 'code',
-		client_id: process.env.client_id,
-		scope:
-			'user-read-private user-read-email playlist-modify-private playlist-modify-public user-read-currently-playing user-read-playback-state user-modify-playback-state',
-		redirect_uri
-	});
-	console.log(query);
-
 	res.redirect(
 		'https://accounts.spotify.com/authorize?' +
 		querystring.stringify({
@@ -58,11 +47,9 @@ app.get('/api/spotify/callback', function (req, res) {
 		},
 		json: true
 	};
-	console.log('/callback redirect_uri: ', redirect_uri);
 	request.post(authOptions, (error, response, body) => {
 		var access_token = body.access_token;
 		let uri = process.env.FRONTEND_URI || 'http://localhost:3000/home';
-		console.log('/callback FRONTEND_URI: ', uri);
 		res.redirect(uri + '?access_token=' + access_token);
 	});
 });
@@ -77,18 +64,21 @@ if (process.env.NODE_ENV === 'production') {
 const server = http.createServer(app);
 const io = socketio(server);
 
-let interval;
-
 io.on('connection', (socket) => {
 	console.log('New client connected: ', socket.id);
 
-	// When user is connected and joins room
-	socket.on('join room', (roomId, accessToken) => {
-		// Subscribe the user's socket to a channel for the room
+	// After user is connected, then joins room
+	socket.on('join room', (roomId, user) => {
+		
+		// Utilize handler to add user
+		handlers.addUser(roomId, user);
+
+		// Then subscribe (join) the user's socket to a channel for the room
 		socket.join(roomId);
-		console.log('User has joined the room: ', roomId, ", user accessToken: ",  accessToken);
-		console.log('Current rooms: ', socket.rooms);
-	})
+
+		// And emit the user just joined to all users in the room 
+		io.in(roomId).emit('user joined', { roomId, user });
+	});
 
 	socket.on('disconnect', () => {
 		console.log('Client disconnected');

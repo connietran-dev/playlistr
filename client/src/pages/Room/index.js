@@ -36,19 +36,16 @@ class Room extends Component {
 				duration_ms: 0
 			},
 			playbackQueueStatus: 'Paused',
-			progress: 0,
-			socketData: ''
+			progress: 0
 		};
 	}
 
 	// When component mounts, app will connect to socket and user state will be set to response from API call. Then the playlist will be created.
+
+	// When the current user creates & joins the room, add them to the array of current users on the server (in handler.js)
+	// When another user joins the existing room, they're also added to the array
+	// (TODO) All users then need to see users already in the room
 	componentDidMount() {
-
-		let socket = socketIOClient(ENDPOINT);
-
-		// Emit that user has joined room
-		socket.emit('join room', this.state.roomId, this.state.accessToken);
-
 		fetch('https://api.spotify.com/v1/me', {
 			headers: {
 				Authorization: 'Bearer ' + this.state.accessToken
@@ -57,16 +54,34 @@ class Room extends Component {
 			.then(res => res.json())
 			.then(data => {
 				this.setState({ user: data });
+			})
+			.then(() => {
+				this.joinRoomSocket();
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
-	}
+	};
 
 	componentWillUnmount() {
 		let socket = socketIOClient(ENDPOINT);
 
 		// Close connection when component unmounts
 		return () => socket.disconnect();
+	};
+
+	joinRoomSocket = () => {
+		// Connect to socket
+		let socket = socketIOClient(ENDPOINT);
+
+		// Upon connecting to socket, emit that the current user has joined current room
+		socket.on('connect', () => {
+			socket.emit('join room', this.state.roomId, this.state.user);
+		});
+
+		// Listen for 'user joined' message for user who just joined room
+		socket.on('user joined', message => {
+			console.log('User joined: ', message);
+		});
 	};
 
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
