@@ -78,10 +78,15 @@ class Room extends Component {
 			socket.emit('join room', this.state.roomId, this.state.user);
 		});
 
-		// Listen for 'user joined' message for user who just joined room
-		socket.on('user joined', message => {
-			console.log('User joined: ', message);
+		// Listen for status updates for when users join or leave room
+		socket.on('user status', (message) => {
+			console.log('Status update: ', message);
 		});
+
+		// Listen for the room's current users
+		socket.on('current users', (users) => {
+			console.log('Current users in room: ', users);
+		})
 	};
 
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {

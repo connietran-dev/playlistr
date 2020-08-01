@@ -64,24 +64,37 @@ if (process.env.NODE_ENV === 'production') {
 const server = http.createServer(app);
 const io = socketio(server);
 
-io.on('connection', (socket) => {
-	console.log('New client connected: ', socket.id);
+io.on('connect', (socket) => {
+	console.log('Client connected to server: ', socket.id);
 
 	// After user is connected, then joins room
 	socket.on('join room', (roomId, user) => {
 		
 		// Utilize handler to add user
-		handlers.addUser(roomId, user);
+		handlers.addUser(roomId, user, socket);
 
 		// Then subscribe (join) the user's socket to a channel for the room
 		socket.join(roomId);
 
 		// And emit the user just joined to all users in the room 
-		io.in(roomId).emit('user joined', { roomId, user });
+		io.in(roomId).emit('user status', { text: `${user.display_name} has joined room ${roomId}`, roomId, user });
+
+		// Get current users in room and emit to room, including sender
+		let currentUsers = handlers.getUsersInRoom(roomId);
+		io.in(roomId).emit('current users', currentUsers);
 	});
 
 	socket.on('disconnect', () => {
-		console.log('Client disconnected');
+		let user = handlers.removeUser(socket);
+
+		// If user existed and was removed, emit message that user left to clients in user's room, excluding sender
+		// Also emit current users in room
+		if (user) {
+			io.to(user.room).emit('user status', { text: `${user.display_name} has left.` });
+			io.to(user.room).emit('current users', { room: user.room, users: handlers.getUsersInRoom(user.room) });
+		}
+
+		console.log('Client disconnected from server: ', socket.id);
 	});
 });
 
