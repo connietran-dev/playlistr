@@ -38,7 +38,7 @@ class Home extends Component {
 			.then(res => res.json())
 			.then(data => {
 				console.log(data);
-				this.setState({ 
+				this.setState({
 					user: data,
 					userImage: data.images[0].url
 				});
@@ -58,7 +58,7 @@ class Home extends Component {
 							url: 'https://via.placeholder.com/200'
 						});
 					} else {
-						return item.images
+						return item.images;
 					}
 				});
 				this.setState({ playlists: playlists });
@@ -71,11 +71,18 @@ class Home extends Component {
 				<Container>
 					<Row className="top-banner">
 						<Col xs={12} md={2} className="text-center">
-							<Image roundedCircle src={this.state.userImage} className="profile-pic"/>
+							<Image
+								roundedCircle
+								src={this.state.userImage}
+								className="profile-pic"
+							/>
 							<p className="user-name">{this.state.user.display_name}</p>
 						</Col>
-						<Col xs={12} md={7} >
-							<h1 className="top-banner">Welcome to <span className="welcome-brand">Playlistr</span></h1>
+						<Col xs={12} md={7}>
+							<h1 className="top-banner">
+								Welcome to{' '}
+								<span className="welcome-brand">Playlistr</span>
+							</h1>
 						</Col>
 						<Col xs={12} md={2} className="float-right">
 							<input placeholder="Search" />
@@ -96,14 +103,7 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<Row>
-						<Col>
-							<RoomButtons
-								token={this.state.accessToken}
-								userId={this.state.user.id}
-							/>
-						</Col>
-					</Row>
+					<RoomButtons token={this.state.accessToken} userId={this.state.user.id} />
 				</Container>
 			</div>
 		);
