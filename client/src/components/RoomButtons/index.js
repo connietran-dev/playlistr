@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import hexGen from 'hex-generator';
+import { Link } from 'react-router-dom';
 
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -10,19 +11,25 @@ import Alert from 'react-bootstrap/Alert';
 
 import './style.css';
 
-const RoomButtons = ({ token }) => {
-	// useState to set and store what the user room input
-	const [roomInput, setRoomInput] = useState('');
+class RoomButtons extends Component {
+	constructor(props) {
+		super(props);
 
-	// useState for error handler
-	const [show, setShow] = useState('d-none');
+		let roomHex = hexGen(24); // Output: 6 character hex
 
-	// Outputs 6 character hex code that will serve as the Room Id
-	let roomHex = hexGen(24);
+		this.state = {
+			joinRoomInput: '',
+			inputAlertDisplay: 'd-none',
+			roomHex: roomHex
+		};
+	}
 
-	// Helper function that set's the URL of the Room page when create room is interacted with
-	const setUrl = (accessToken, hex) => {
+	// // Helper function that set's the URL of the Room page when create room is interacted with
+	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
+
+		console.log(accessToken);
+		console.log(hex);
 
 		if (homeUrl === `http://localhost:3000/home?access_token=${accessToken}`) {
 			window.location.href = `http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`;
@@ -33,45 +40,68 @@ const RoomButtons = ({ token }) => {
 		}
 	};
 
+	// Handles Create Room button click
+	handleCreateRoom = e => {
+		e.preventDefault();
+
+		this.setUrl(this.props.token, this.state.roomHex);
+	};
+
 	// Verifies input is 6 digits and uses setUrl
-	const handleJoinRoom = e => {
+	handleJoinRoom = e => {
 		e.preventDefault();
 
 		// Verifies a user has put in a 6 digit room id
-		if (roomInput && roomInput.length === 6) setUrl(token, roomInput);
+		if (this.state.joinRoomInput && this.state.joinRoomInput.length === 6)
+			this.setUrl(this.props.token, this.state.joinRoomInput);
 		else {
-			setShow('');
-			setTimeout(() => setShow('d-none'), 3000);
+			this.setState({ inputAlertDisplay: '' });
+
+			setTimeout(() => this.setState({ inputAlertDisplay: 'd-none' }), 3000);
 		}
 	};
 
-	return (
-		<Row>
-			<Col md={6} xs={8}>
-				<Form className="join-room-form">
-					<InputGroup>
-						<button className="join-room-btn" onClick={handleJoinRoom}>
-							Join a Room
-						</button>
+	handleInputChange = e => {
+		this.setState({ joinRoomInput: e.target.value });
+	};
 
-						<FormControl
-							className="room-input"
-							onChange={e => setRoomInput(e.target.value)}
-							value={roomInput}
-						/>
-					</InputGroup>
-				</Form>
-				<Alert variant="warning" className={show}>
-					Please enter a valid Room ID
-				</Alert>
-			</Col>
-			<Col md={6} xs={4}>
-				<button onClick={() => setUrl(token, roomHex)} className="float-right join-room-btn">
-					Create a Room
-				</button>
-			</Col>
-		</Row>
-	);
-};
+	render() {
+		return (
+			<Row>
+				<Col md={6} xs={8}>
+					<Form className="join-room-form">
+						<InputGroup>
+							<Link to="/room">
+								<button
+									className="join-room-btn"
+									onClick={this.handleJoinRoom}>
+									Join a Room
+								</button>
+							</Link>
+
+							<FormControl
+								className="room-input"
+								onChange={this.handleInputChange}
+								value={this.state.joinRoomInput}
+							/>
+						</InputGroup>
+					</Form>
+					<Alert variant="warning" className={this.state.inputAlertDisplay}>
+						Please enter a valid Room ID
+					</Alert>
+				</Col>
+				<Col md={6} xs={4}>
+					<Link to="/room">
+						<button
+							onClick={this.handleCreateRoom}
+							className="float-right join-room-btn">
+							Create a Room
+						</button>{' '}
+					</Link>
+				</Col>
+			</Row>
+		);
+	}
+}
 
 export default RoomButtons;

@@ -103,7 +103,7 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<RoomButtons token={this.state.accessToken} userId={this.state.user.id} />
+					<RoomButtons token={this.state.accessToken} />
 				</Container>
 			</div>
 		);
