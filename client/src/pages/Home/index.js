@@ -17,7 +17,7 @@ class Home extends Component {
 
 		this.state = {
 			user: {},
-			userImage: {},
+			userImage: '',
 			playlists: [],
 			accessToken: ''
 		};

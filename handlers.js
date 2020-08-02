@@ -18,7 +18,7 @@ module.exports = {
 
     removeUser: (socket) => {
         // Find index of current socket/user and use to remove user from usersArray
-        let index = usersArray.findIndex((user) => user.socketId === user.id);
+        let index = usersArray.findIndex((user) => user.socketId === socket.id);
 
         if (index !== -1) return usersArray.splice(index, 1)[0];
     }

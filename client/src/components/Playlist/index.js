@@ -13,7 +13,7 @@ const Playlist = (props) => {
                     height={180}
                     alt={props.name}
                 />
-                <p>{props.name}</p>
+                <p className="text-white mt-2">{props.name}</p>
             </a>
         </Col>
     );

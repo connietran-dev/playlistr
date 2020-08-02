@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
+
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+
 import TrackSearch from '../../components/TrackSearch';
 import Player from '../../components/Player';
 import ListGroup from 'react-bootstrap/esm/ListGroup';
+import RoomUser from '../../components/RoomUser';
 
 import './style.css';
 
@@ -36,7 +39,8 @@ class Room extends Component {
 				duration_ms: 0
 			},
 			playbackQueueStatus: 'Paused',
-			progress: 0
+			progress: 0,
+			roomUsers: []
 		};
 	}
 
@@ -56,7 +60,7 @@ class Room extends Component {
 				this.setState({ user: data });
 			})
 			.then(() => {
-				this.joinRoomSocket();
+				this.joinRoomSockets();
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
@@ -69,7 +73,7 @@ class Room extends Component {
 		return () => socket.disconnect();
 	};
 
-	joinRoomSocket = () => {
+	joinRoomSockets = () => {
 		// Connect to socket
 		let socket = socketIOClient(ENDPOINT);
 
@@ -85,8 +89,10 @@ class Room extends Component {
 
 		// Listen for the room's current users
 		socket.on('current users', (users) => {
-			console.log('Current users in room: ', users);
-		})
+			this.setState({ roomUsers: users }, () => {
+				console.log('Users in room:', this.state.roomUsers);
+			});
+		});
 	};
 
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
@@ -201,36 +207,14 @@ class Room extends Component {
 						</Col>
 						<Col xs={12} sm={6} md={6}>
 							<Row className="pt-5">
-								<Col md={4} xs={4}>
-									<div
-										style={{
-											height: '100px',
-											border: '1px solid black'
-										}}>
-										Avatar
-									</div>
-									<h2>{this.state.user.display_name}</h2>
-								</Col>
-								<Col md={4} xs={4}>
-									<div
-										style={{
-											height: '100px',
-											border: '1px solid black'
-										}}>
-										Avatar
-									</div>
-									<h2>USER</h2>
-								</Col>
-								<Col md={4} xs={4}>
-									<div
-										style={{
-											height: '100px',
-											border: '1px solid black'
-										}}>
-										Avatar
-									</div>
-									<h2>USER</h2>
-								</Col>
+								{this.state.roomUsers.map(user => (
+									<RoomUser
+										key={user.id}
+										user={user}
+										avatar={user.images[0].url}
+										name={user.display_name}
+									/>
+								))}
 							</Row>
 						</Col>
 					</Row>
