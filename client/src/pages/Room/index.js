@@ -31,6 +31,7 @@ class Room extends Component {
 			addedTracks: [],
 			accessToken: token,
 			roomId: roomId,
+			currentSong: {},
 			item: {
 				album: {
 					images: [{ url: './images/logo.jpg' }]
@@ -42,6 +43,7 @@ class Room extends Component {
 			playbackQueueStatus: 'Paused',
 			progress: 0,
 			roomUsers: [],
+			roomHost: {},
 			alertShow: false
 		};
 	}
@@ -50,7 +52,8 @@ class Room extends Component {
 
 	// When the current user creates & joins the room, add them to the array of current users on the server (in handler.js)
 	// When another user joins the existing room, they're also added to the array
-	// (TODO) All users then need to see users already in the room
+	// The new user will see what the host is currently playing upon joining the room
+	// All users then need to see users already in the room
 	componentDidMount() {
 		fetch('https://api.spotify.com/v1/me', {
 			headers: {
@@ -66,14 +69,14 @@ class Room extends Component {
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
-	}
+	};
 
 	componentWillUnmount() {
 		let socket = socketIOClient(ENDPOINT);
 
 		// Close connection when component unmounts
 		return () => socket.disconnect();
-	}
+	};
 
 	joinRoomSockets = () => {
 		// Connect to socket
@@ -90,11 +93,35 @@ class Room extends Component {
 		});
 
 		// Listen for the room's current users
+		// Then set the host of the room to the first person in the currentUsers array
 		socket.on('current users', (currentUsers) => {
 			this.setState({ roomUsers: currentUsers }, () => {
 				console.log('Users in room:', this.state.roomUsers);
+
+				// The first user in the usersArray is the roomHost. If the host leaves, the next person becomes the first in usersArray, becoming the roomHost
+				this.setState({ roomHost: this.state.roomUsers[0] }, () => {
+					console.log('Current host: ', this.state.roomHost.display_name);
+
+					this.emitHostSong();
+				});
 			});
 		});
+
+		// Listen for the host's current song upon joining the room
+		socket.on('current song', song => {
+			console.log("Host's current song: ", song.item.name, '-', song.item.artists[0].name);
+		});
+	};
+
+	// If you are the host, emit your current song to the room so new users have it when they join
+	emitHostSong = () => {
+		let socket = socketIOClient(ENDPOINT);
+		if (this.state.roomHost.id === this.state.user.id) {
+			socket.emit('host song', {
+				song: this.state.currentSong,
+				room: this.state.roomId
+			});
+		}
 	};
 
 	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
@@ -126,7 +153,8 @@ class Room extends Component {
 				this.setState({
 					item: data.item,
 					playbackQueueStatus: data.is_playing,
-					progress: data.progress_ms
+					progress: data.progress_ms,
+					currentSong: data
 				});
 			})
 			.then(() => this.handleQueueRender())
