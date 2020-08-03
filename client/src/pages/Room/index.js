@@ -4,6 +4,7 @@ import queryString from 'query-string';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Alert from 'react-bootstrap/Alert';
 
 import TrackSearch from '../../components/TrackSearch';
 import Player from '../../components/Player';
@@ -32,7 +33,7 @@ class Room extends Component {
 			roomId: roomId,
 			item: {
 				album: {
-					images: [{ url: '' }]
+					images: [{ url: './images/logo.jpg' }]
 				},
 				name: '',
 				artists: [{ name: '' }],
@@ -40,7 +41,8 @@ class Room extends Component {
 			},
 			playbackQueueStatus: 'Paused',
 			progress: 0,
-			roomUsers: []
+			roomUsers: [],
+			alertShow: false
 		};
 	}
 
@@ -64,14 +66,14 @@ class Room extends Component {
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
-	};
+	}
 
 	componentWillUnmount() {
 		let socket = socketIOClient(ENDPOINT);
 
 		// Close connection when component unmounts
 		return () => socket.disconnect();
-	};
+	}
 
 	joinRoomSockets = () => {
 		// Connect to socket
@@ -83,12 +85,12 @@ class Room extends Component {
 		});
 
 		// Listen for status updates for when users join or leave room
-		socket.on('user status', (message) => {
+		socket.on('user status', message => {
 			console.log('Status update: ', message);
 		});
 
 		// Listen for the room's current users
-		socket.on('current users', (users) => {
+		socket.on('current users', users => {
 			this.setState({ roomUsers: users }, () => {
 				console.log('Users in room:', this.state.roomUsers);
 			});
@@ -128,7 +130,11 @@ class Room extends Component {
 				});
 			})
 			.then(() => this.handleQueueRender())
-			.catch(err => console.log(err));
+			.catch(err => {
+				if (err) {
+					this.setState({ alertShow: true });
+				}
+			});
 	};
 
 	// Using the state of addedTracks to conditionally render the Play Queue.
@@ -153,6 +159,12 @@ class Room extends Component {
 	setVariant = (id, comparedId, variantA, variantB) => {
 		if (id === comparedId) return variantA;
 		return variantB;
+	};
+
+	handleAlertClick = () => {
+		this.getCurrentlyPlaying(this.state.accessToken);
+
+		this.setState({ alertShow: false });
 	};
 
 	render() {
@@ -197,6 +209,20 @@ class Room extends Component {
 				<Container>
 					<Row>
 						<Col xs={12} sm={6} md={6}>
+							<Alert show={this.state.alertShow} variant="success">
+								<h5>
+									Please open the Spotify App and play a track to
+									get started.
+								</h5>
+
+								<div className="d-flex justify-content-end">
+									<button
+										onClick={() => this.handleAlertClick()}
+										variant="outline-success">
+										Ready
+									</button>
+								</div>
+							</Alert>
 							<Player
 								token={this.state.accessToken}
 								item={this.state.item}
