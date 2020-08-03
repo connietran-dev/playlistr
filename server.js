@@ -1,6 +1,4 @@
 const express = require('express'),
-	request = require('request'),
-	querystring = require('querystring'),
 	morgan = require('morgan'),
 	path = require('path'),
 	http = require('http'),
@@ -20,7 +18,7 @@ app.use(morgan('tiny'));
 
 app.use(routes);
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/playlistr', {
+mongoose.connect(process.env.MONGODB_ATLAS_URI || 'mongodb://localhost/playlistr', {
 	useNewUrlParser: true, // Removes deprecation warning
 	useUnifiedTopology: true
 });
