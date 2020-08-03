@@ -90,8 +90,8 @@ class Room extends Component {
 		});
 
 		// Listen for the room's current users
-		socket.on('current users', users => {
-			this.setState({ roomUsers: users }, () => {
+		socket.on('current users', (currentUsers) => {
+			this.setState({ roomUsers: currentUsers }, () => {
 				console.log('Users in room:', this.state.roomUsers);
 			});
 		});

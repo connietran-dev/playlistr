@@ -38,6 +38,7 @@ io.on('connect', socket => {
 
 	// After user is connected, then joins room
 	socket.on('join room', (roomId, user) => {
+
 		// Utilize handler to add user
 		handlers.addUser(roomId, user, socket);
 
@@ -62,13 +63,10 @@ io.on('connect', socket => {
 		// If user existed and was removed, emit message that user left to clients in user's room, excluding sender
 		// Also emit current users in room
 		if (user) {
-			io.to(user.room).emit('user status', {
-				text: `${user.display_name} has left the room ${user.room}`
-			});
-			io.to(user.room).emit('current users', {
-				room: user.room,
-				users: handlers.getUsersInRoom(user.room)
-			});
+
+			io.to(user.room).emit('user status', { text: `${user.display_name} has left the room ${user.room}` });
+			io.to(user.room).emit('current users', handlers.getUsersInRoom(user.room));
+
 		}
 
 		console.log('Client disconnected from server: ', socket.id);
