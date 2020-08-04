@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import hexGen from 'hex-generator';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+
+import API from '../../utils/API';
+import SpotifyAPI from '../../utils/SpotifyAPI';
 
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -41,13 +43,34 @@ class RoomButtons extends Component {
 		}
 	};
 
+	syncQueueWithRoomAndJoin = roomId => {
+		API.getTracks(roomId)
+			.then(res => {
+				// Creating an array of tracks that have yet to be played
+				let notPlayedTracks = res.data.addedTracks.filter(track => !track.played);
+
+				// Conditionally adding tracks to users playback queue -- setTimeout to ensure tracks are set in correct order
+				if (notPlayedTracks.length) {
+					notPlayedTracks.map(track => {
+						return setTimeout(() => {
+							SpotifyAPI.addTrackToQueue(
+								this.props.token,
+								track.spotifyId
+							).catch(err => console.log(err));
+						}, 50);
+					});
+				} else return;
+			})
+			// After determining what to add to the users playback queue, set url and join the room
+			.then(() => this.setUrl(this.props.token, roomId))
+			.catch(err => console.log(err));
+	};
+
 	// Create Room button handler. Creates new Room in DB, then sets url.
 	handleCreateRoom = e => {
 		e.preventDefault();
 
-		axios.post('/api/rooms', {
-			room_id: this.state.roomHex
-		})
+		API.createRoom(this.state.roomHex)
 			.then(() => this.setUrl(this.props.token, this.state.roomHex))
 			.catch(err => console.log(err));
 	};
@@ -57,9 +80,9 @@ class RoomButtons extends Component {
 		e.preventDefault();
 
 		// Verifies a user has put in a 6 digit room id
-		if (this.state.joinRoomInput && this.state.joinRoomInput.length === 6)
-			this.setUrl(this.props.token, this.state.joinRoomInput);
-		else {
+		if (this.state.joinRoomInput && this.state.joinRoomInput.length === 6) {
+			this.syncQueueWithRoomAndJoin(this.state.joinRoomInput);
+		} else {
 			this.setState({ inputAlertDisplay: true });
 
 			setTimeout(() => this.setState({ inputAlertDisplay: false }), 3000);
