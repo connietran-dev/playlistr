@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import hexGen from 'hex-generator';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 
 import API from '../../utils/API';
 import SpotifyAPI from '../../utils/SpotifyAPI';
@@ -71,9 +70,7 @@ class RoomButtons extends Component {
 	handleCreateRoom = e => {
 		e.preventDefault();
 
-		axios.post('/api/rooms', {
-			room_id: this.state.roomHex
-		})
+		API.createRoom(this.state.roomHex)
 			.then(() => this.setUrl(this.props.token, this.state.roomHex))
 			.catch(err => console.log(err));
 	};
