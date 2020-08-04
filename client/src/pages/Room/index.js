@@ -32,7 +32,7 @@ class Room extends Component {
 			addedTracks: [],
 			accessToken: token,
 			roomId: roomId,
-			currentSong: {},
+			userSong: {},
 			item: {
 				album: {
 					images: [{ url: './images/logo.jpg' }]
@@ -45,6 +45,7 @@ class Room extends Component {
 			progress: 0,
 			roomUsers: [],
 			roomHost: {},
+			roomSong: {},
 			alertShow: false
 		};
 	}
@@ -96,7 +97,7 @@ class Room extends Component {
 			console.log('Status update: ', message);
 		});
 
-		// Listen for the room's current users
+		// Listen for the room's current users in order to set host
 		// Then set the host of the room to the first person in the currentUsers array
 		socket.on('current users', currentUsers => {
 			this.setState({ roomUsers: currentUsers }, () => {
@@ -105,27 +106,16 @@ class Room extends Component {
 				// The first user in the usersArray is the roomHost. If the host leaves, the next person becomes the first in usersArray, becoming the roomHost
 				this.setState({ roomHost: this.state.roomUsers[0] }, () => {
 					console.log('Current host: ', this.state.roomHost.display_name);
-
-					this.emitHostSong();
 				});
 			});
 		});
 
-		// Listen for the host's current song upon joining the room
-		socket.on('current song', song => {
-			console.log("Host's current song: ", song.item.name, '-', song.item.artists[0].name);
-		});
-	};
-
-	// If you are the host, emit your current song to the room so new users have it when they join
-	emitHostSong = () => {
-		let socket = socketIOClient(ENDPOINT);
-		if (this.state.roomHost.id === this.state.user.id) {
-			socket.emit('host song', {
-				song: this.state.currentSong,
-				room: this.state.roomId
-			});
-		}
+		// Upon joining, listen for the room's current song
+		// Only the host sets the roomSong - any users who join get the host's song set to their roomSong
+		socket.on('room song', song => {
+			console.log('Room song: ', song.item.name);
+			this.setState({ roomSong: song });
+		})
 	};
 
 	// GETs track that is currently playing on the users playback queue (Spotify), sets the state with the returned data, and then updates the Play Queue to highlight the track currently playing on the queue
@@ -141,7 +131,11 @@ class Room extends Component {
 					item: data.item,
 					playbackQueueStatus: data.is_playing,
 					progress: data.progress_ms,
-					currentSong: data
+					userSong: data
+				}, () => {
+					// Set roomSong to the host's song every time getCurrentlyPlaying is called
+					this.setRoomSong();
+					console.log('The host is playing: ', this.state.roomSong);
 				});
 			})
 			.then(() => this.handleQueueRender())
@@ -150,6 +144,21 @@ class Room extends Component {
 					this.setState({ alertShow: true });
 				}
 			});
+	};
+
+	// The host sets the roomSong to what they are currently listening to
+	setRoomSong = () => {
+		// Object.keys checks if there are object properties - otherwise, an empty object causes errors if the host is not playing a song
+		if (this.state.user.id === this.state.roomHost.id && Object.keys(this.state.userSong).length > 0) {
+			this.setState({ roomSong: this.state.userSong }, () => {
+				let socket = socketIOClient(ENDPOINT);
+
+				socket.emit('host song', {
+					song: this.state.roomSong,
+					roomId: this.state.roomId
+				});
+			});
+		};
 	};
 
 	getRoomTracks = roomId => {

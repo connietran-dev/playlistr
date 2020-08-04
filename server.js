@@ -57,9 +57,10 @@ io.on('connect', socket => {
 		io.in(roomId).emit('current users', currentUsers);
 	});
 
-	// Listen for the host's current song, then emit that to the room for new users who join
-	socket.on('host song', ({ song, room }) => {
-		io.in(room).emit('current song', song);
+	// Emit the host's song as the entire room's song
+	// Does not emit to sender who is the host
+	socket.on('host song', ({ song, roomId }) => {
+		socket.to(roomId).emit('room song', song);
 	});
 
 	// When a socket disconnects, remove user from usersArray
