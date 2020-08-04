@@ -44,10 +44,6 @@ class RoomButtons extends Component {
 		}
 	};
 
-	// startNextTrack = token => {
-	// 	SpotifyAPI.playNextTrack(token).catch(err => console.log(err));
-	// };
-
 	syncQueueWithRoomAndJoin = roomId => {
 		API.getTracks(roomId)
 			.then(res => {
