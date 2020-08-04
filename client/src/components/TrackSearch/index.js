@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -40,6 +42,14 @@ class TrackSearch extends Component {
 		}).catch(err => console.log(err));
 	};
 
+	// Adds track to Room in DB
+	addTrackToRoom = (roomId, trackId, trackInfo) => {
+		axios.put(`/api/rooms/${roomId}`, {
+			info: trackInfo,
+			spotifyId: trackId
+		}).catch(err => console.log(err));
+	};
+
 	handleOnChange = e => {
 		this.setState({ trackInput: e.target.value });
 
@@ -60,10 +70,12 @@ class TrackSearch extends Component {
 	};
 
 	handleTrackSelection = e => {
-		// Takes in Room, Track Id and Track Info
-		this.props.addTrackToDisplayQueue(this.props.roomId, e.target.id, e.target.innerText);
+		this.addTrackToRoom(this.props.roomId, e.target.id, e.target.innerText);
+
+		this.props.getRoomTracks(this.props.roomId);
 
 		this.addTrackToPlaybackQueue(this.props.token, e.target.id);
+
 		this.props.getCurrentlyPlaying(this.props.token);
 
 		// Reset state of track input and hide the trackListDisplay

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
+import axios from 'axios';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -69,14 +70,17 @@ class Room extends Component {
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
-	};
+
+		// Queries DB for tracks added to current room
+		this.getRoomTracks(this.state.roomId);
+	}
 
 	componentWillUnmount() {
 		let socket = socketIOClient(ENDPOINT);
 
 		// Close connection when component unmounts
 		return () => socket.disconnect();
-	};
+	}
 
 	joinRoomSockets = () => {
 		// Connect to socket
@@ -94,7 +98,7 @@ class Room extends Component {
 
 		// Listen for the room's current users
 		// Then set the host of the room to the first person in the currentUsers array
-		socket.on('current users', (currentUsers) => {
+		socket.on('current users', currentUsers => {
 			this.setState({ roomUsers: currentUsers }, () => {
 				console.log('Users in room:', this.state.roomUsers);
 
@@ -124,23 +128,6 @@ class Room extends Component {
 		}
 	};
 
-	addTrackToDisplayQueue = (roomId, trackId, trackInfo) => {
-		let updatedTrackList = this.state.addedTracks;
-
-		console.log(this.state.item.id);
-
-		updatedTrackList.push({
-			room: roomId,
-			id: trackId,
-			info: trackInfo
-		});
-
-		this.setState({ addedTracks: updatedTrackList }, () => {
-			console.log('Added Tracks State:');
-			console.log(this.state.addedTracks);
-		});
-	};
-
 	// GETs track that is currently playing on the users playback queue (Spotify), sets the state with the returned data, and then updates the Play Queue to highlight the track currently playing on the queue
 	getCurrentlyPlaying = token => {
 		fetch('https://api.spotify.com/v1/me/player', {
@@ -165,6 +152,12 @@ class Room extends Component {
 			});
 	};
 
+	getRoomTracks = roomId => {
+		axios.get(`/api/rooms/${roomId}`).then(res => {
+			this.setState({ addedTracks: res.data.addedTracks });
+		});
+	};
+
 	// Using the state of addedTracks to conditionally render the Play Queue.
 	handleQueueRender = () => {
 		let addedTracks = this.state.addedTracks;
@@ -175,8 +168,13 @@ class Room extends Component {
 			return addedTracks.map(track => (
 				<ListGroup.Item
 					className="play-queue-item"
-					key={track.id}
-					variant={this.setVariant(track.id, this.state.item.id, 'warning', 'dark')}>
+					key={track.spotifyId}
+					variant={this.setVariant(
+						track.spotifyId,
+						this.state.item.id,
+						'warning',
+						'dark'
+					)}>
 					{track.info}
 				</ListGroup.Item>
 			));
@@ -207,7 +205,7 @@ class Room extends Component {
 							<TrackSearch
 								token={this.state.accessToken}
 								roomId={this.state.roomId}
-								addTrackToDisplayQueue={this.addTrackToDisplayQueue}
+								getRoomTracks={this.getRoomTracks}
 								getCurrentlyPlaying={this.getCurrentlyPlaying}
 								currentlyPlayingTrack={this.state.item}
 							/>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import hexGen from 'hex-generator';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -19,7 +20,7 @@ class RoomButtons extends Component {
 
 		this.state = {
 			joinRoomInput: '',
-			inputAlertDisplay: 'd-none',
+			inputAlertDisplay: false,
 			roomHex: roomHex
 		};
 	}
@@ -40,11 +41,15 @@ class RoomButtons extends Component {
 		}
 	};
 
-	// Handles Create Room button click
+	// Create Room button handler. Creates new Room in DB, then sets url.
 	handleCreateRoom = e => {
 		e.preventDefault();
 
-		this.setUrl(this.props.token, this.state.roomHex);
+		axios.post('/api/rooms', {
+			room_id: this.state.roomHex
+		})
+			.then(() => this.setUrl(this.props.token, this.state.roomHex))
+			.catch(err => console.log(err));
 	};
 
 	// Verifies input is 6 digits and uses setUrl
@@ -55,9 +60,9 @@ class RoomButtons extends Component {
 		if (this.state.joinRoomInput && this.state.joinRoomInput.length === 6)
 			this.setUrl(this.props.token, this.state.joinRoomInput);
 		else {
-			this.setState({ inputAlertDisplay: '' });
+			this.setState({ inputAlertDisplay: true });
 
-			setTimeout(() => this.setState({ inputAlertDisplay: 'd-none' }), 3000);
+			setTimeout(() => this.setState({ inputAlertDisplay: false }), 3000);
 		}
 	};
 
@@ -86,7 +91,10 @@ class RoomButtons extends Component {
 							/>
 						</InputGroup>
 					</Form>
-					<Alert variant="warning" className={this.state.inputAlertDisplay}>
+					<Alert
+						show={this.state.inputAlertDisplay}
+						variant="warning"
+						className={this.state.inputAlertDisplay}>
 						Please enter a valid Room ID
 					</Alert>
 				</Col>
