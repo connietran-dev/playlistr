@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import queryString from 'query-string';
-import axios from 'axios';
+
+import API from '../../utils/API';
+import SpotifyAPI from '../../utils/SpotifyAPI';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -57,15 +59,8 @@ class Room extends Component {
 	// The new user will see what the host is currently playing upon joining the room
 	// All users then need to see users already in the room
 	componentDidMount() {
-		fetch('https://api.spotify.com/v1/me', {
-			headers: {
-				Authorization: 'Bearer ' + this.state.accessToken
-			}
-		})
-			.then(res => res.json())
-			.then(data => {
-				this.setState({ user: data });
-			})
+		SpotifyAPI.getUserData(this.state.accessToken)
+			.then(res => this.setState({ user: res.data }))
 			.then(() => {
 				this.joinRoomSockets();
 			});
@@ -115,30 +110,29 @@ class Room extends Component {
 		socket.on('room song', song => {
 			console.log('Room song: ', song.item.name);
 			this.setState({ roomSong: song });
-		})
+		});
 	};
 
 	// GETs track that is currently playing on the users playback queue (Spotify), sets the state with the returned data, and then updates the Play Queue to highlight the track currently playing on the queue
 	getCurrentlyPlaying = token => {
-		fetch('https://api.spotify.com/v1/me/player', {
-			headers: {
-				Authorization: 'Bearer ' + token
-			}
-		})
-			.then(res => res.json())
-			.then(data => {
-				this.setState({
-					item: data.item,
-					playbackQueueStatus: data.is_playing,
-					progress: data.progress_ms,
-					userSong: data
-				}, () => {
-					// Set roomSong to the host's song every time getCurrentlyPlaying is called
-					this.setRoomSong();
-					console.log('The host is playing: ', this.state.roomSong);
-				});
+		SpotifyAPI.getUserQueueData(token)
+			.then(res => {
+				this.setState(
+					{
+						item: res.data.item,
+						playbackQueueStatus: res.data.is_playing,
+						progress: res.data.progress_ms,
+						userSong: res.data
+					},
+					() => {
+						// Set roomSong to the host's song every time getCurrentlyPlaying is called
+						this.setRoomSong();
+						console.log('The host is playing: ', this.state.roomSong);
+					}
+				);
 			})
 			.then(() => this.handleQueueRender())
+			.then(() => this.updatePlayedStatus())
 			.catch(err => {
 				if (err) {
 					this.setState({ alertShow: true });
@@ -158,13 +152,27 @@ class Room extends Component {
 					roomId: this.state.roomId
 				});
 			});
-		};
+		}
 	};
 
 	getRoomTracks = roomId => {
-		axios.get(`/api/rooms/${roomId}`).then(res => {
+		API.getTracks(roomId).then(res => {
 			this.setState({ addedTracks: res.data.addedTracks });
 		});
+	};
+
+	// Using timeout to determine when the track is done playing
+	// When time is up, we update track played status in DB and call getCurrently playing to begin the updating process again
+	updatePlayedStatus = () => {
+		let timeRemaining = this.state.item.duration_ms - this.state.progress;
+
+		let trackToUpdate = this.state.item.id;
+
+		setTimeout(() => {
+			API.updateTrackPlayedStatus(this.state.roomId, trackToUpdate).catch(err => console.log(err));
+
+			this.getCurrentlyPlaying(this.state.accessToken);
+		}, timeRemaining);
 	};
 
 	// Using the state of addedTracks to conditionally render the Play Queue.
@@ -177,7 +185,8 @@ class Room extends Component {
 			return addedTracks.map(track => (
 				<ListGroup.Item
 					className="play-queue-item"
-					key={track.spotifyId}
+					key={track._id}
+					id={track.spotifyId}
 					variant={this.setVariant(
 						track.spotifyId,
 						this.state.item.id,
