@@ -8,5 +8,8 @@ export default {
 	},
 	getTracks: roomId => {
 		return axios.get(`/api/rooms/${roomId}`);
+	},
+	updateTrackPlayedStatus: (roomId, trackId) => {
+		return axios.put(`/api/rooms/${roomId}/${trackId}`);
 	}
 };

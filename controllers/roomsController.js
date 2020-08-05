@@ -17,16 +17,32 @@ module.exports = {
 			.then(data => res.json(data))
 			.catch(err => res.status(422).json(err));
 	},
-	update: function (req, res) {
+	update: (req, res) => {
 		db.Room.findOne({ room_id: req.params.id })
 			.then(data => {
 				let currentTracks = data.addedTracks;
 
 				currentTracks.push(req.body);
 
-				db.Room.findByIdAndUpdate(data._id, data)
+				db.Room.updateOne({ _id: data._id }, data)
 					.then(result => res.json(result))
 					.catch(err => res.status(422).json(err));
+			})
+			.catch(err => res.status(422).json(err));
+	},
+	// Using Spotify track id as trackId
+	updatePlayedStatus: (req, res) => {
+		db.Room.findOne({ room_id: req.params.roomId })
+			.then(data => {
+				let updatedTrack = data.addedTracks.filter(
+					track => track.spotifyId == req.params.trackId
+				);
+
+				if (updatedTrack.length > 1) return;
+
+				updatedTrack[0].played = true;
+
+				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
 			})
 			.catch(err => res.status(422).json(err));
 	},
