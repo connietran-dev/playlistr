@@ -1,6 +1,6 @@
 .now-playing-img {
-	max-width: 50vmin;
-	max-height: 50vmin;
+	max-width: 40vmin;
+	max-height: 40vmin;
 	width: 100%;
 }
 
@@ -15,5 +15,5 @@
 }
 
 .play-queue h1 {
-	font-size: 5vw;
+	font-size: 3vw;
 }

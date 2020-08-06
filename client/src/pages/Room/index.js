@@ -214,9 +214,9 @@ class Room extends Component {
 	render() {
 		return (
 			<div>
-				<Container className="py-3">
+				<Container className="py-5 mt-2 mb-1">
 					<Row>
-						<Col xs={12} md={6}>
+						<Col xs={12} md={6} className="text-center">
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
 						<Col xs={12} md={6}>
@@ -232,9 +232,9 @@ class Room extends Component {
 				</Container>
 				<Container>
 					<Row>
-						<Col xs={6} md={6}>
+						<Col xs={6} md={6} className="text-center">
 							<img
-								className="now-playing-img"
+								className="now-playing-img mt-3"
 								src={this.state.item.album.images[0].url}
 								alt="Track album artwork"
 							/>
@@ -276,7 +276,7 @@ class Room extends Component {
 							/>
 						</Col>
 						<Col xs={12} sm={6} md={6}>
-							<Row className="pt-5">
+							<Row>
 								{this.state.roomUsers.map(user => (
 									<RoomUser
 										key={user.id}
