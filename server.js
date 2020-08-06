@@ -6,6 +6,7 @@ const express = require('express'),
 	mongoose = require('mongoose'),
 	routes = require('./routes'),
 	handlers = require('./handlers');
+const { KeyObject } = require('crypto');
 
 require('dotenv').config();
 
@@ -61,6 +62,11 @@ io.on('connect', socket => {
 	// Does not emit to sender who is the host
 	socket.on('host song', ({ song, roomId }) => {
 		socket.to(roomId).emit('room song', song);
+	});
+
+	// Emit play/pause/next actions to other users in room, exclude sender
+	socket.on('user action', ({ action, roomId }) => {
+		socket.to(roomId).emit('player action', action);
 	});
 
 	// When a socket disconnects, remove user from usersArray

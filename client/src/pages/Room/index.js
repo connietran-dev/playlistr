@@ -16,10 +16,7 @@ import RoomUser from '../../components/RoomUser';
 
 import './style.css';
 
-import apiUrl from '../../apiConfig';
-import socketIOClient from 'socket.io-client';
-
-const ENDPOINT = apiUrl;
+import { socket } from '../../utils/Socket';
 
 class Room extends Component {
 	constructor() {
@@ -54,15 +51,12 @@ class Room extends Component {
 
 	// When component mounts, app will connect to socket and user state will be set to response from API call. Then the playlist will be created.
 
-	// When the current user creates & joins the room, add them to the array of current users on the server (in handler.js)
-	// When another user joins the existing room, they're also added to the array
-	// The new user will see what the host is currently playing upon joining the room
-	// All users then need to see users already in the room
+	// When the current user joins room, add them to the array of current users on the server (in handler.js)
 	componentDidMount() {
 		SpotifyAPI.getUserData(this.state.accessToken)
 			.then(res => this.setState({ user: res.data }))
 			.then(() => {
-				this.joinRoomSockets();
+				this.mountRoomSockets();
 			});
 
 		this.getCurrentlyPlaying(this.state.accessToken);
@@ -72,20 +66,13 @@ class Room extends Component {
 	}
 
 	componentWillUnmount() {
-		let socket = socketIOClient(ENDPOINT);
-
 		// Close connection when component unmounts
 		return () => socket.disconnect();
 	}
 
-	joinRoomSockets = () => {
-		// Connect to socket
-		let socket = socketIOClient(ENDPOINT);
-
+	mountRoomSockets = () => {
 		// Upon connecting to socket, emit that the current user has joined current room
-		socket.on('connect', () => {
-			socket.emit('join room', this.state.roomId, this.state.user);
-		});
+		socket.emit('join room', this.state.roomId, this.state.user);
 
 		// Listen for status updates for when users join or leave room
 		socket.on('user status', message => {
@@ -93,22 +80,29 @@ class Room extends Component {
 		});
 
 		// Listen for the room's current users in order to set host
-		// Then set the host of the room to the first person in the currentUsers array
 		socket.on('current users', currentUsers => {
 			this.setState({ roomUsers: currentUsers }, () => {
 				console.log('Users in room:', this.state.roomUsers);
 
 				// The first user in the usersArray is the roomHost. If the host leaves, the next person becomes the first in usersArray, becoming the roomHost
 				this.setState({ roomHost: this.state.roomUsers[0] }, () => {
-					console.log('Current host: ', this.state.roomHost.display_name);
+					// console.log('Current host: ', this.state.roomHost.display_name);
 				});
 			});
 		});
 
-		// Upon joining, listen for the room's current song
-		// Only the host sets the roomSong - any users who join get the host's song set to their roomSong
+		// Listen if other users click play/pause/next
+		socket.on('player action', action => {
+			if (action === 'play' || action === 'pause') {
+				this.handlePlayPauseClick(action, this.state.accessToken);
+			} else if (action === 'next') {
+				this.handleNextClick(this.state.accessToken);
+			}
+		});
+
+		// Listen for the room's current song
 		socket.on('room song', song => {
-			console.log('Room song: ', song.item.name);
+			// console.log('Room song: ', song.item.name);
 			this.setState({ roomSong: song });
 		});
 	};
@@ -127,7 +121,7 @@ class Room extends Component {
 					() => {
 						// Set roomSong to the host's song every time getCurrentlyPlaying is called
 						this.setRoomSong();
-						console.log('The host is playing: ', this.state.roomSong);
+						// console.log('The host is playing: ', this.state.roomSong);
 					}
 				);
 			})
@@ -145,7 +139,7 @@ class Room extends Component {
 		// Object.keys checks if there are object properties - otherwise, an empty object causes errors if the host is not playing a song
 		if (this.state.user.id === this.state.roomHost.id && Object.keys(this.state.userSong).length > 0) {
 			this.setState({ roomSong: this.state.userSong }, () => {
-				let socket = socketIOClient(ENDPOINT);
+				// let socket = socketIOClient(ENDPOINT);
 
 				socket.emit('host song', {
 					song: this.state.roomSong,
@@ -197,6 +191,24 @@ class Room extends Component {
 				</ListGroup.Item>
 			));
 		}
+	};
+
+	// Emit to other users in room if you click play/pause/next
+	emitPlayerAction = action => {
+		socket.emit('user action', { action, roomId: this.state.roomId });
+	};
+
+	handlePlayPauseClick = (action, token) => {
+		SpotifyAPI.playPausePlayback(action, token)
+			.then(() => this.getCurrentlyPlaying(token))
+			.catch(err => console.log(err));
+	};
+
+	// POST that changes to next song in users playback. After track is changed, we GET current playback data to update displaying track data
+	handleNextClick = token => {
+		SpotifyAPI.nextPlaybackTrack(token)
+			.then(() => this.getCurrentlyPlaying(token))
+			.catch(err => console.log(err));
 	};
 
 	// Helper method that compares two id's and sets a variant based on result
@@ -272,6 +284,9 @@ class Room extends Component {
 								item={this.state.item}
 								isPlaying={this.state.isPlaying}
 								progress={this.state.progress}
+								emitPlayerAction={this.emitPlayerAction}
+								handlePlayPauseClick={this.handlePlayPauseClick}
+								handleNextClick={this.handleNextClick}
 								getCurrentlyPlaying={this.getCurrentlyPlaying}
 							/>
 						</Col>
