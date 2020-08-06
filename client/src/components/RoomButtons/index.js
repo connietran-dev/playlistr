@@ -10,6 +10,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Alert from 'react-bootstrap/Alert';
+import Spinner from 'react-bootstrap/Spinner';
 
 import './style.css';
 
@@ -22,6 +23,7 @@ class RoomButtons extends Component {
 		this.state = {
 			joinRoomInput: '',
 			inputAlertDisplay: false,
+			spinnerDisplay: 'd-none',
 			roomHex: roomHex
 		};
 	}
@@ -48,21 +50,24 @@ class RoomButtons extends Component {
 				// Creating an array of tracks that have yet to be played
 				let notPlayedTracks = res.data.addedTracks.filter(track => !track.played);
 
-				// Conditionally adding tracks to users playback queue -- setTimeout to ensure tracks are set in correct order
+				// Conditionally adding tracks to users playback queue -- setTimeout time is being multiplied by the index of the track in the array to ensure each API call waits for the previous call to finish.
 				if (notPlayedTracks.length) {
-					notPlayedTracks.map(track => {
-						return setTimeout(() => {
-							SpotifyAPI.addTrackToQueue(
-								this.props.token,
-								track.spotifyId
-							).catch(err => console.log(err));
-						}, 50);
+					notPlayedTracks.forEach((track, index) => {
+						setTimeout(() => {
+							SpotifyAPI.addTrackToQueue(this.props.token, track.spotifyId)
+								.then(response => console.log(response))
+								.catch(err => console.log(err));
+						}, index * 50);
 					});
-				} else return;
+				}
 			})
-			// After determining what to add to the users playback queue, set url and join the room
-			.then(() => this.setUrl(this.props.token, roomId))
 			.catch(err => console.log(err));
+
+		// Display spinner while API calls are being made leading up to the url being set to join room
+		this.setState({ spinnerDisplay: '' });
+
+		// Giving the Spotify API time to queue up all tracks before setting url to join the room
+		setTimeout(() => this.setUrl(this.props.token, roomId), 3000);
 	};
 
 	// Create Room button handler. Creates new Room in DB, then sets url.
@@ -102,7 +107,15 @@ class RoomButtons extends Component {
 								<button
 									className="join-room-btn"
 									onClick={this.handleJoinRoom}>
-									Join a Room
+									<Spinner
+										as="span"
+										animation="border"
+										size="sm"
+										role="status"
+										aria-hidden="true"
+										className={this.state.spinnerDisplay}
+									/>{' '}
+									<span> Join a Room</span>
 								</button>
 							</Link>
 
