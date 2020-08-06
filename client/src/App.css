@@ -10,7 +10,7 @@ body,
 
 /* Use viewport-relative units to cover page fully */
 body {
-  height: 100vh;
+  height: 90vh;
   width: 100vw;
 }
 
@@ -57,7 +57,7 @@ input {
   border-style: none;
   margin: 63px 10px 0 26px;
   height: 2rem;
-  width: 10rem;
+  width: 15rem;
   color: #171C20;
 }
 

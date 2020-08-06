@@ -9,7 +9,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
 import Alert from 'react-bootstrap/Alert';
 
 import './style.css';
@@ -27,7 +26,7 @@ class RoomButtons extends Component {
 		};
 	}
 
-	// // Helper function that set's the URL of the Room page when create room is interacted with
+	// Helper function that set's the URL of the Room page when create room is interacted with
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
 
@@ -107,10 +106,11 @@ class RoomButtons extends Component {
 								</button>
 							</Link>
 
-							<FormControl
-								className="room-input"
+							<input
+								className="room-input ml-2"
 								onChange={this.handleInputChange}
 								value={this.state.joinRoomInput}
+								placeholder="Room code"
 							/>
 						</InputGroup>
 					</Form>

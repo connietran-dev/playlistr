@@ -91,7 +91,7 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<Row>
+					<Row className="mb-4">
 						{this.state.playlists.map(playlist => (
 							<Playlist
 								key={playlist.id}
