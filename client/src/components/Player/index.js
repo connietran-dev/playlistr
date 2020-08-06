@@ -5,31 +5,6 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import './style.css';
 
 const Player = props => {
-	const handlePlayPauseClick = (action, token) => {
-		fetch(`https://api.spotify.com/v1/me/player/${action}`, {
-			method: 'PUT',
-			headers: {
-				Authorization: 'Bearer ' + token,
-				'Content-Type': 'application/json'
-			}
-		})
-			.then(() => props.getCurrentlyPlaying(props.token))
-			.catch(err => console.log(err));
-	};
-
-	// POST that changes to next song in users playback. After track is changed, we GET current playback data to update displaying track data
-	const handleNextClick = token => {
-		fetch('https://api.spotify.com/v1/me/player/next', {
-			method: 'POST',
-			headers: {
-				Authorization: 'Bearer ' + token,
-				'Content-Type': 'application/json'
-			}
-		})
-			.then(() => props.getCurrentlyPlaying(props.token))
-			.catch(err => console.log(err));
-	};
-
 	const calcSongProgress = () => (props.progress / props.item.duration_ms) * 100;
 
 	return (
@@ -50,16 +25,25 @@ const Player = props => {
 					type="button"
 					id="button_play"
 					className="btn"
-					onClick={() => handlePlayPauseClick('play', props.token)}>
+					onClick={() => {
+						props.handlePlayPauseClick('play', props.token);
+						props.emitPlayerAction('play');
+					}}>
 					<i className="fa fa-play fa-lg"></i>
 				</button>
 				<button
 					type="button"
 					className="btn"
-					onClick={() => handlePlayPauseClick('pause', props.token)}>
+					onClick={() => {
+						props.handlePlayPauseClick('pause', props.token);
+						props.emitPlayerAction('pause');
+					}}>
 					<i className="fa fa-pause fa-lg"></i>
 				</button>
-				<button type="button" className="btn" onClick={() => handleNextClick(props.token)}>
+				<button type="button" className="btn" onClick={() => {
+					props.handleNextClick(props.token);
+					props.emitPlayerAction('next');
+				}}>
 					<i className="fa fa-forward fa-lg"></i>
 				</button>
 			</div>
