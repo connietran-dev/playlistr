@@ -8,6 +8,8 @@ import Form from 'react-bootstrap/Form';
 
 import './style.css';
 
+import { socket } from '../../utils/Socket';
+
 class TrackSearch extends Component {
 	constructor(props) {
 		super(props);
@@ -33,21 +35,16 @@ class TrackSearch extends Component {
 			.catch(err => console.log(err));
 	};
 
-	addTrackToPlaybackQueue = (token, trackId) => {
-		fetch(`https://api.spotify.com/v1/me/player/queue?uri=spotify:track:${trackId}`, {
-			method: 'POST',
-			headers: {
-				Authorization: 'Bearer ' + token
-			}
-		}).catch(err => console.log(err));
-	};
-
 	// Adds track to Room in DB
 	addTrackToRoom = (roomId, trackId, trackInfo) => {
 		axios.put(`/api/rooms/${roomId}`, {
 			info: trackInfo,
 			spotifyId: trackId
 		}).catch(err => console.log(err));
+	};
+
+	emitNewTrackToRoom = (roomId, trackId) => {
+		socket.emit('add track', { trackId, roomId });
 	};
 
 	handleOnChange = e => {
@@ -71,10 +68,11 @@ class TrackSearch extends Component {
 
 	handleTrackSelection = e => {
 		this.addTrackToRoom(this.props.roomId, e.target.id, e.target.innerText);
+		this.emitNewTrackToRoom(this.props.roomId, e.target.id);
 
 		this.props.getRoomTracks(this.props.roomId);
 
-		this.addTrackToPlaybackQueue(this.props.token, e.target.id);
+		this.props.addTrackToPlaybackQueue(this.props.token, e.target.id);
 
 		this.props.getCurrentlyPlaying(this.props.token);
 

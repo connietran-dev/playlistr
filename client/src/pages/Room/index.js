@@ -100,6 +100,12 @@ class Room extends Component {
 			}
 		});
 
+		// Listen if a new track gets added to the Play Queue by another user
+		socket.on('new track', trackId => {
+			this.addTrackToPlaybackQueue(this.state.accessToken, trackId);
+			this.getRoomTracks(this.state.roomId);
+		});
+
 		// Listen for the room's current song
 		socket.on('room song', song => {
 			// console.log('Room song: ', song.item.name);
@@ -139,14 +145,17 @@ class Room extends Component {
 		// Object.keys checks if there are object properties - otherwise, an empty object causes errors if the host is not playing a song
 		if (this.state.user.id === this.state.roomHost.id && Object.keys(this.state.userSong).length > 0) {
 			this.setState({ roomSong: this.state.userSong }, () => {
-				// let socket = socketIOClient(ENDPOINT);
-
 				socket.emit('host song', {
 					song: this.state.roomSong,
 					roomId: this.state.roomId
 				});
 			});
 		}
+	};
+
+	addTrackToPlaybackQueue = (token, trackId) => {
+		SpotifyAPI.addTrackToQueue(token, trackId)
+			.catch(err => console.log(err));
 	};
 
 	getRoomTracks = roomId => {
@@ -228,9 +237,12 @@ class Room extends Component {
 			<div>
 				<Container className="py-5 mt-2 mb-1">
 					<Row>
+						{/* Current Room */}
 						<Col xs={12} md={6} className="text-center">
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
+
+						{/* Track Search */}
 						<Col xs={12} md={6}>
 							<TrackSearch
 								token={this.state.accessToken}
@@ -238,12 +250,14 @@ class Room extends Component {
 								getRoomTracks={this.getRoomTracks}
 								getCurrentlyPlaying={this.getCurrentlyPlaying}
 								currentlyPlayingTrack={this.state.item}
+								addTrackToPlaybackQueue={this.addTrackToPlaybackQueue}
 							/>
 						</Col>
 					</Row>
 				</Container>
 				<Container>
 					<Row>
+						{/* Album Image */}
 						<Col xs={6} md={6} className="text-center">
 							<img
 								className="now-playing-img mt-3"
@@ -251,6 +265,8 @@ class Room extends Component {
 								alt="Track album artwork"
 							/>
 						</Col>
+
+						{/* Play Queue */}
 						<Col xs={6} md={6}>
 							<div className="play-queue">
 								<h1>Play Queue</h1>
@@ -264,6 +280,7 @@ class Room extends Component {
 				</Container>
 				<Container>
 					<Row>
+						{/* Alert */}
 						<Col xs={12} sm={6} md={6}>
 							<Alert show={this.state.alertShow} variant="success">
 								<h5>
@@ -279,6 +296,8 @@ class Room extends Component {
 									</button>
 								</div>
 							</Alert>
+
+							{/* Music Player */}
 							<Player
 								token={this.state.accessToken}
 								item={this.state.item}
@@ -288,9 +307,11 @@ class Room extends Component {
 								handlePlayPauseClick={this.handlePlayPauseClick}
 								handleNextClick={this.handleNextClick}
 								getCurrentlyPlaying={this.getCurrentlyPlaying}
+								room={this.state.roomId}
 							/>
 						</Col>
 						<Col xs={12} sm={6} md={6}>
+							{/* User Avatars */}
 							<Row>
 								{this.state.roomUsers.map(user => (
 									<RoomUser

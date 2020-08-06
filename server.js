@@ -6,7 +6,6 @@ const express = require('express'),
 	mongoose = require('mongoose'),
 	routes = require('./routes'),
 	handlers = require('./handlers');
-const { KeyObject } = require('crypto');
 
 require('dotenv').config();
 
@@ -69,6 +68,11 @@ io.on('connect', socket => {
 		socket.to(roomId).emit('player action', action);
 	});
 
+	// If user adds new track to play queue, emit track to users in room, exclude sender
+	socket.on('add track', ({ trackId, roomId }) => {
+		socket.to(roomId).emit('new track', trackId);
+	});
+
 	// When a socket disconnects, remove user from usersArray
 	socket.on('disconnect', () => {
 		let user = handlers.removeUser(socket);
@@ -76,10 +80,8 @@ io.on('connect', socket => {
 		// If user existed and was removed, emit message that user left to clients in user's room, excluding sender
 		// Also emit current users in room
 		if (user) {
-
 			io.to(user.room).emit('user status', { text: `${user.display_name} has left the room ${user.room}` });
 			io.to(user.room).emit('current users', handlers.getUsersInRoom(user.room));
-
 		}
 
 		console.log('Client disconnected from server: ', socket.id);
