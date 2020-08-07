@@ -46,6 +46,44 @@ module.exports = {
 			})
 			.catch(err => res.status(422).json(err));
 	},
+	updateNowPlaying: (req, res) => {
+		db.Room.findOne({ room_id: req.params.roomId })
+			.then(data => {
+				let updatedTrack = data.addedTracks.filter(
+					track => track.spotifyId == req.params.trackId
+				);
+
+				let otherTracks = data.addedTracks.filter(
+					track => track.spotifyId !== req.params.trackId
+				);
+
+				// If track is not found, assume it's not part of play queue
+				if (updatedTrack.length === 0) return;
+
+				// Set current track to now playing and all other tracks to false
+				updatedTrack[0].nowPlaying = true;
+				otherTracks.map(track => track.nowPlaying = false);
+
+				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
+			})
+			.catch(err => res.status(422).json(err));
+	},
+	updateSongProgress: (req, res) => {
+		db.Room.findOne({ room_id: req.params.roomId })
+			.then(data => {
+				let updatedTrack = data.addedTracks.filter(
+					track => track.spotifyId == req.params.trackId
+				);
+
+				// If track is not found, assume it's not part of play queue
+				if (updatedTrack.length === 0) return;
+
+				updatedTrack[0].progress = req.params.progress;
+
+				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
+			})
+			.catch(err => res.status(422).json(err));
+	},
 	remove: function (req, res) {
 		db.Room.findOne({ _id: req.params.id })
 			.then(data => data.remove())

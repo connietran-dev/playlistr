@@ -12,6 +12,12 @@ export default {
 	updateTrackPlayedStatus: (roomId, trackId) => {
 		return axios.put(`/api/rooms/${roomId}/${trackId}`);
 	},
+	updateNowPlaying: (roomId, trackId) => {
+		return axios.put(`/api/rooms/${roomId}/playing/${trackId}`);
+	},
+	updateSongProgress: (roomId, trackId, progress) => {
+		return axios.put(`/api/rooms/${roomId}/progress/${trackId}/${progress}`);
+	},
 	addTrack: (roomId, trackId, trackInfo) => {
 		return axios.put(`/api/rooms/${roomId}`, {
 			info: trackInfo,

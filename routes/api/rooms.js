@@ -10,4 +10,10 @@ router.route('/:id').get(roomsController.findByName).put(roomsController.update)
 // ROUTE: /api/rooms/:roomId/:trackId
 router.route('/:roomId/:trackId').put(roomsController.updatePlayedStatus);
 
+// ROUTE: /api/rooms/playing/:trackId
+router.route('/:roomId/playing/:trackId').put(roomsController.updateNowPlaying);
+
+// ROUTE: /api/rooms/progress/:trackId/:progress
+router.route('/:roomId/progress/:trackId/:progress').put(roomsController.updateSongProgress);
+
 module.exports = router;
