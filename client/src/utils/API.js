@@ -11,5 +11,11 @@ export default {
 	},
 	updateTrackPlayedStatus: (roomId, trackId) => {
 		return axios.put(`/api/rooms/${roomId}/${trackId}`);
+	},
+	addTrack: (roomId, trackId, trackInfo) => {
+		return axios.put(`/api/rooms/${roomId}`, {
+			info: trackInfo,
+			spotifyId: trackId
+		});
 	}
 };

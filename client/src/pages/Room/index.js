@@ -117,22 +117,26 @@ class Room extends Component {
 	getCurrentlyPlaying = token => {
 		SpotifyAPI.getUserQueueData(token)
 			.then(res => {
-				this.setState(
-					{
-						item: res.data.item,
-						playbackQueueStatus: res.data.is_playing,
-						progress: res.data.progress_ms,
-						userSong: res.data
-					},
-					() => {
-						// Set roomSong to the host's song every time getCurrentlyPlaying is called
-						this.setRoomSong();
-						// console.log('The host is playing: ', this.state.roomSong);
-					}
-				);
+				if (res.status === 200) {
+					this.setState(
+						{
+							item: res.data.item,
+							playbackQueueStatus: res.data.is_playing,
+							progress: res.data.progress_ms,
+							userSong: res.data
+						},
+						() => {
+							// Set roomSong to the host's song every time getCurrentlyPlaying is called
+							this.setRoomSong();
+							console.log('The host is playing: ', this.state.roomSong);
+							this.handleQueueRender();
+							this.updatePlayedStatus();
+						}
+					);
+				} else if (res.status === 204) {
+					this.setState({ alertShow: true });
+				}
 			})
-			.then(() => this.handleQueueRender())
-			.then(() => this.updatePlayedStatus())
 			.catch(err => {
 				if (err) {
 					this.setState({ alertShow: true });
@@ -154,14 +158,17 @@ class Room extends Component {
 	};
 
 	addTrackToPlaybackQueue = (token, trackId) => {
-		SpotifyAPI.addTrackToQueue(token, trackId)
-			.catch(err => console.log(err));
+		SpotifyAPI.addTrackToQueue(token, trackId).catch(err => {
+			console.log('Track not added to Queue');
+		});
 	};
 
 	getRoomTracks = roomId => {
-		API.getTracks(roomId).then(res => {
-			this.setState({ addedTracks: res.data.addedTracks });
-		});
+		API.getTracks(roomId)
+			.then(res => {
+				this.setState({ addedTracks: res.data.addedTracks });
+			})
+			.catch(err => console.log(err));
 	};
 
 	// Using timeout to determine when the track is done playing

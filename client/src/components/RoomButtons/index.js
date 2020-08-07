@@ -57,7 +57,7 @@ class RoomButtons extends Component {
 							SpotifyAPI.addTrackToQueue(this.props.token, track.spotifyId)
 								.then(response => console.log(response))
 								.catch(err => console.log(err));
-						}, index * 50);
+						}, index * 200);
 					});
 				}
 			})
@@ -67,7 +67,7 @@ class RoomButtons extends Component {
 		this.setState({ spinnerDisplay: '' });
 
 		// Giving the Spotify API time to queue up all tracks before setting url to join the room
-		setTimeout(() => this.setUrl(this.props.token, roomId), 3000);
+		setTimeout(() => this.setUrl(this.props.token, roomId), 4000);
 	};
 
 	// Create Room button handler. Creates new Room in DB, then sets url.
