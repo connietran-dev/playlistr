@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
@@ -9,6 +8,8 @@ import Form from 'react-bootstrap/Form';
 import './style.css';
 
 import { socket } from '../../utils/Socket';
+import SpotifyAPI from '../../utils/SpotifyAPI';
+import API from '../../utils/API';
 
 class TrackSearch extends Component {
 	constructor(props) {
@@ -24,23 +25,10 @@ class TrackSearch extends Component {
 	}
 
 	// Takes in a track name and sets state of filteredTracks array
-	querySpotifyTracks = track => {
-		fetch(`https://api.spotify.com/v1/search?q=${track}&type=track&limit=20`, {
-			headers: {
-				Authorization: 'Bearer ' + this.props.token
-			}
-		})
-			.then(res => res.json())
-			.then(data => this.setState({ filteredTracks: data.tracks.items }))
+	querySpotifyTracks = (token, track) => {
+		SpotifyAPI.trackSearch(token, track)
+			.then(res => this.setState({ filteredTracks: res.data.tracks.items }))
 			.catch(err => console.log(err));
-	};
-
-	// Adds track to Room in DB
-	addTrackToRoom = (roomId, trackId, trackInfo) => {
-		axios.put(`/api/rooms/${roomId}`, {
-			info: trackInfo,
-			spotifyId: trackId
-		}).catch(err => console.log(err));
 	};
 
 	emitNewTrackToRoom = (roomId, trackId) => {
@@ -59,7 +47,7 @@ class TrackSearch extends Component {
 
 		// Conditionally handle submit button click if there is input to search. Else statement gives ability to collapse the dropdown.
 		if (this.state.trackInput) {
-			this.querySpotifyTracks(this.state.trackInput);
+			this.querySpotifyTracks(this.props.token, this.state.trackInput);
 			this.setState({ trackInput: '', trackListDisplay: '', searchBtnIcon: 'fa fa-chevron-up' });
 		} else {
 			this.setState({ trackListDisplay: 'd-none', searchBtnIcon: 'fa fa-search' });
@@ -67,7 +55,8 @@ class TrackSearch extends Component {
 	};
 
 	handleTrackSelection = e => {
-		this.addTrackToRoom(this.props.roomId, e.target.id, e.target.innerText);
+		API.addTrack(this.props.roomId, e.target.id, e.target.innerText).catch(err => console.log(err));
+
 		this.emitNewTrackToRoom(this.props.roomId, e.target.id);
 
 		this.props.getRoomTracks(this.props.roomId);
