@@ -55,11 +55,11 @@ class TrackSearch extends Component {
 	};
 
 	handleTrackSelection = e => {
-		API.addTrack(this.props.roomId, e.target.id, e.target.innerText).catch(err => console.log(err));
+		API.addTrack(this.props.roomId, e.target.id, e.target.innerText)
+			.then(() => this.props.setRoomTracks(this.props.roomId))
+			.catch(err => console.log(err));
 
 		this.emitNewTrackToRoom(this.props.roomId, e.target.id);
-
-		this.props.getRoomTracks(this.props.roomId);
 
 		this.props.addTrackToPlaybackQueue(this.props.token, e.target.id);
 
