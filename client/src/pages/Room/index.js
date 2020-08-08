@@ -62,7 +62,7 @@ class Room extends Component {
 		this.getCurrentlyPlaying(this.state.accessToken);
 
 		// Queries DB for tracks added to current room
-		this.getRoomTracks(this.state.roomId);
+		this.setRoomTracks(this.state.roomId);
 	}
 
 	componentWillUnmount() {
@@ -103,7 +103,7 @@ class Room extends Component {
 		// Listen if a new track gets added to the Play Queue by another user
 		socket.on('new track', trackId => {
 			this.addTrackToPlaybackQueue(this.state.accessToken, trackId);
-			this.getRoomTracks(this.state.roomId);
+			this.setRoomTracks(this.state.roomId);
 		});
 
 		// Listen for the room's current song
@@ -117,26 +117,24 @@ class Room extends Component {
 	getCurrentlyPlaying = token => {
 		SpotifyAPI.getUserQueueData(token)
 			.then(res => {
-				if (res.status === 200) {
-					this.setState(
-						{
-							item: res.data.item,
-							playbackQueueStatus: res.data.is_playing,
-							progress: res.data.progress_ms,
-							userSong: res.data
-						},
-						() => {
-							// Set roomSong to the host's song every time getCurrentlyPlaying is called
-							this.setRoomSong();
-							console.log('The host is playing: ', this.state.roomSong);
-							this.handleQueueRender();
-							this.updatePlayedStatus();
-						}
-					);
-				} else if (res.status === 204) {
-					this.setState({ alertShow: true });
-				}
+				if (res.status === 204) throw new Error('Error');
+
+				this.setState(
+					{
+						item: res.data.item,
+						playbackQueueStatus: res.data.is_playing,
+						progress: res.data.progress_ms,
+						userSong: res.data
+					},
+					() => {
+						// Set roomSong to the host's song every time getCurrentlyPlaying is called
+						this.setRoomSong();
+						console.log('The host is playing: ', this.state.roomSong);
+					}
+				);
 			})
+			// .then(() => this.handleQueueRender())
+			.then(() => this.updatePlayedStatus())
 			.catch(err => {
 				if (err) {
 					this.setState({ alertShow: true });
@@ -163,7 +161,7 @@ class Room extends Component {
 		});
 	};
 
-	getRoomTracks = roomId => {
+	setRoomTracks = roomId => {
 		API.getTracks(roomId)
 			.then(res => {
 				this.setState({ addedTracks: res.data.addedTracks });
@@ -179,7 +177,9 @@ class Room extends Component {
 		let trackToUpdate = this.state.item.id;
 
 		setTimeout(() => {
-			API.updateTrackPlayedStatus(this.state.roomId, trackToUpdate).catch(err => console.log(err));
+			API.updateTrackPlayedStatus(this.state.roomId, trackToUpdate).catch(err => {
+				if (err) console.log(err.message);
+			});
 
 			this.getCurrentlyPlaying(this.state.accessToken);
 		}, timeRemaining);
@@ -223,8 +223,14 @@ class Room extends Component {
 	// POST that changes to next song in users playback. After track is changed, we GET current playback data to update displaying track data
 	handleNextClick = token => {
 		SpotifyAPI.nextPlaybackTrack(token)
+			.then(() => API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id))
 			.then(() => this.getCurrentlyPlaying(token))
-			.catch(err => console.log(err));
+			.catch(err => {
+				if (err) {
+					this.getCurrentlyPlaying(token);
+					console.log(err.message);
+				}
+			});
 	};
 
 	// Helper method that compares two id's and sets a variant based on result
@@ -254,7 +260,7 @@ class Room extends Component {
 							<TrackSearch
 								token={this.state.accessToken}
 								roomId={this.state.roomId}
-								getRoomTracks={this.getRoomTracks}
+								setRoomTracks={this.setRoomTracks}
 								getCurrentlyPlaying={this.getCurrentlyPlaying}
 								currentlyPlayingTrack={this.state.item}
 								addTrackToPlaybackQueue={this.addTrackToPlaybackQueue}
