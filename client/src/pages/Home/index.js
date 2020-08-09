@@ -8,11 +8,14 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
+import Carousel from 'react-bootstrap/Carousel';
 
 import Playlist from '../../components/Playlist';
 import RoomButtons from '../../components/RoomButtons';
+import CarouselSlide from '../../components/CarouselSlide';
 
 import './style.css';
+
 import SpotifyAPI from '../../utils/SpotifyAPI';
 import API from '../../utils/API';
 
@@ -27,7 +30,8 @@ class Home extends Component {
 			accessToken: '',
 			selectedPlaylist: '',
 			showAlert: false,
-			spinnerClass: 'd-none'
+			spinnerClass: 'd-none',
+			slides: []
 		};
 	}
 
@@ -38,32 +42,24 @@ class Home extends Component {
 		this.setState({ accessToken: token });
 
 		// Fetch user data
-		fetch('https://api.spotify.com/v1/me', {
-			headers: {
-				Authorization: 'Bearer ' + token
-			}
-		})
-			.then(res => res.json())
-			.then(data => {
-				console.log(data);
+		SpotifyAPI.getUserData(token)
+			.then(res => {
+				console.log(res.data);
 				this.setState({
-					user: data,
-					userImage: data.images[0].url
+					user: res.data,
+					userImage: res.data.images[0].url
 				});
 			});
 
 		// Fetch playlists
-		fetch('https://api.spotify.com/v1/me/playlists?limit=8', {
-			headers: { Authorization: 'Bearer ' + token }
-		})
-			.then(res => res.json())
-			.then(playlistData => {
-				let playlists = playlistData.items;
+		SpotifyAPI.getUserPlaylists(token, 50)
+			.then(res => {
+				let playlists = res.data.items;
 				// If playlist image is undefined, create placeholder image
 				playlists.map(item => {
 					if (item.images[0] === undefined) {
 						return item.images.push({
-							url: 'https://via.placeholder.com/200'
+							url: './images/logo.jpg'
 						});
 					} else {
 						return item.images;
@@ -71,7 +67,35 @@ class Home extends Component {
 				});
 				this.setState({ playlists: playlists });
 			});
-	}
+
+		SpotifyAPI.getUserPlaylists(token, 50)
+			.then(res => {
+				let playlists = res.data.items;
+				let allSlides = [];
+				let numSlides = (playlists.length / 8);
+
+				for (let slideIndex = 0; slideIndex < numSlides; slideIndex++) {
+					let currentSlide = [];
+
+					for (let itemIndex = 0; itemIndex < 8; itemIndex++) {
+						let playlist = playlists[itemIndex];
+						currentSlide.push(playlist);
+					};
+
+					playlists.splice(0, 8);
+
+					allSlides.push(currentSlide);
+				};
+
+				console.log(allSlides);
+
+				this.setState({ slides: allSlides }, () => {
+					this.state.slides.map(slide => {
+						console.log(slide);
+					})
+				});
+			});
+	};
 
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
@@ -199,7 +223,16 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<Row className="mb-4">
+					<Row>
+						<Carousel>
+							{this.state.slides.map(slide => (
+								<CarouselSlide 
+									playlists={this.state.slides}
+								/>
+							))}
+						</Carousel>
+					</Row>
+					{/* <Row className="mb-4 d-flex align-self-center">
 						{this.state.playlists.map(playlist => (
 							<Playlist
 								key={playlist.id}
@@ -210,7 +243,7 @@ class Home extends Component {
 								handlePlaylistClick={this.handlePlaylistClick}
 							/>
 						))}
-					</Row>
+					</Row> */}
 				</Container>
 				<Container>
 					<RoomButtons token={this.state.accessToken} setUrl={this.setUrl} />
