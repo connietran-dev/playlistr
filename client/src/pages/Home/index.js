@@ -12,7 +12,6 @@ import Carousel from 'react-bootstrap/Carousel';
 
 import Playlist from '../../components/Playlist';
 import RoomButtons from '../../components/RoomButtons';
-import CarouselSlide from '../../components/CarouselSlide';
 
 import './style.css';
 
@@ -51,11 +50,12 @@ class Home extends Component {
 				});
 			});
 
-		// Fetch playlists
+		// Fetch playlists & map 8 to each carousel slide - 50 is the max limit to fetch
 		SpotifyAPI.getUserPlaylists(token, 50)
 			.then(res => {
 				let playlists = res.data.items;
-				// If playlist image is undefined, create placeholder image
+
+				// If playlist image is undefined, use placeholder image
 				playlists.map(item => {
 					if (item.images[0] === undefined) {
 						return item.images.push({
@@ -65,12 +65,8 @@ class Home extends Component {
 						return item.images;
 					}
 				});
-				this.setState({ playlists: playlists });
-			});
 
-		SpotifyAPI.getUserPlaylists(token, 50)
-			.then(res => {
-				let playlists = res.data.items;
+				// Create array of slides with 8 playlists per slide
 				let allSlides = [];
 				let numSlides = (playlists.length / 8);
 
@@ -79,21 +75,16 @@ class Home extends Component {
 
 					for (let itemIndex = 0; itemIndex < 8; itemIndex++) {
 						let playlist = playlists[itemIndex];
-						currentSlide.push(playlist);
+						if (playlist !== undefined) currentSlide.push(playlist);
 					};
 
+					// Remove first 8 playlists from array in order to add next 8 playlists to next slide, etc.
 					playlists.splice(0, 8);
 
 					allSlides.push(currentSlide);
 				};
 
-				console.log(allSlides);
-
-				this.setState({ slides: allSlides }, () => {
-					this.state.slides.map(slide => {
-						console.log(slide);
-					})
-				});
+				this.setState({ slides: allSlides });
 			});
 	};
 
@@ -173,7 +164,7 @@ class Home extends Component {
 			<div>
 				<Container>
 					<Row className="top-banner">
-						<Col xs={12} md={2} className="text-center">
+						<Col xs={12} md={3} className="text-center">
 							<Image
 								roundedCircle
 								src={this.state.userImage}
@@ -181,20 +172,16 @@ class Home extends Component {
 							/>
 							<p className="user-name">{this.state.user.display_name}</p>
 						</Col>
-						<Col xs={12} md={7}>
-							<h1 className="top-banner">
+						<Col xs={12} md={9} className="d-flex justify-content-center align-items-center">
+							<h1 className="home-banner">
 								Welcome to{' '}
 								<span className="welcome-brand">Playlistr</span>
 							</h1>
 						</Col>
-						<Col xs={12} md={2} className="float-right">
-							<input placeholder="Search" />
-							<i className="fa fa-search" aria-hidden="true"></i>
-						</Col>
 					</Row>
 					<Row>
 						<Col>
-							<div className="playlist-alert">
+							<div className="playlist-alert d-flex align-items-center">
 								<Alert
 									variant="dark"
 									show={this.state.showAlert}
@@ -224,26 +211,30 @@ class Home extends Component {
 				</Container>
 				<Container>
 					<Row>
-						<Carousel>
+						<Carousel
+							className="mb-2"
+							interval={11000}
+							indicators={false}
+						>
 							{this.state.slides.map(slide => (
-								<CarouselSlide 
-									playlists={this.state.slides}
-								/>
+								<Carousel.Item>
+									<Container>
+										<Row>
+											{slide.map(playlist =>
+												<Playlist
+													key={playlist.id}
+													playlistId={playlist.id}
+													image={playlist.images[0].url}
+													link={playlist.owner.external_urls.spotify}
+													name={playlist.name}
+													handlePlaylistClick={this.handlePlaylistClick}
+												/>)}
+										</Row>
+									</Container>
+								</Carousel.Item>
 							))}
 						</Carousel>
 					</Row>
-					{/* <Row className="mb-4 d-flex align-self-center">
-						{this.state.playlists.map(playlist => (
-							<Playlist
-								key={playlist.id}
-								playlistId={playlist.id}
-								image={playlist.images[0].url}
-								link={playlist.owner.external_urls.spotify}
-								name={playlist.name}
-								handlePlaylistClick={this.handlePlaylistClick}
-							/>
-						))}
-					</Row> */}
 				</Container>
 				<Container>
 					<RoomButtons token={this.state.accessToken} setUrl={this.setUrl} />

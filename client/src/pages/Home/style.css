@@ -1,5 +1,6 @@
-h1.top-banner {
+h1.home-banner {
 	color: #646a74;
+	font-size: 3.5rem;
 }
 
 .welcome-brand {
@@ -18,9 +19,17 @@ h1.top-banner {
 	margin: 0 0 18px;
 }
 
+.carousel {
+	width: 1140px;
+	height: 440px;
+	margin: auto;
+}
+
 .playlist-alert {
-	width: 100%;
+	width: 50%;
 	position: absolute;
+	left: 25%;
+	top: 100px;
 	z-index: 1;
 }
 
