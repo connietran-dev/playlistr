@@ -61,6 +61,10 @@ input {
   color: #171C20;
 }
 
+.profile-pic {
+	height: 6.75rem;
+}
+
 
 /* Branding - Brand Elements */
 
@@ -73,7 +77,6 @@ input {
 
 .brand-logo {
   height: 6rem;
-  margin: 26px;
 }
 
 .backdrop {

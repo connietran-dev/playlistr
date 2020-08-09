@@ -45,9 +45,9 @@ io.on('connect', socket => {
 		// Then subscribe (join) the user's socket to a channel for the room
 		socket.join(roomId);
 
-		// And emit the user just joined to all users in the room
-		io.in(roomId).emit('user status', {
-			text: `${user.display_name} has joined room ${roomId}`,
+		// And emit the user just joined to all users in the room, excluding sender
+		socket.to(roomId).emit('user status', {
+			text: `${user.display_name} joined...`,
 			roomId,
 			user
 		});
@@ -80,7 +80,7 @@ io.on('connect', socket => {
 		// If user existed and was removed, emit message that user left to clients in user's room, excluding sender
 		// Also emit current users in room
 		if (user) {
-			io.to(user.room).emit('user status', { text: `${user.display_name} has left the room ${user.room}` });
+			io.to(user.room).emit('user status', { text: `${user.display_name} left...` });
 			io.to(user.room).emit('current users', handlers.getUsersInRoom(user.room));
 		}
 

@@ -8,9 +8,8 @@ h1.home-banner {
 	font-weight: 600;
 }
 
-.profile-pic {
-	height: 6.75rem;
-	margin: 20px 0 9px;
+.home.profile-pic {
+	margin: 30px 0 9px;
 }
 
 .user-name {
@@ -19,7 +18,7 @@ h1.home-banner {
 	margin: 0 0 18px;
 }
 
-.carousel {
+.home-carousel {
 	width: 1140px;
 	height: 440px;
 	margin: auto;
