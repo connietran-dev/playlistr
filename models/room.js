@@ -19,6 +19,15 @@ const RoomSchema = new Schema({
 			played: {
 				type: Boolean,
 				default: false
+			},
+			progress: {
+				type: Number,
+				default: 0,
+				required: false
+			},
+			nowPlaying: {
+				type: Boolean,
+				default: false
 			}
 		}
 	]
