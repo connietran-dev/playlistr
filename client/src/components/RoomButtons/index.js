@@ -18,31 +18,13 @@ class RoomButtons extends Component {
 	constructor(props) {
 		super(props);
 
-		let roomHex = hexGen(24); // Output: 6 character hex
-
 		this.state = {
 			joinRoomInput: '',
 			inputAlertDisplay: false,
 			spinnerDisplay: 'd-none',
-			roomHex: roomHex
+			roomHex: hexGen(24) // Output: 6 character hex
 		};
 	}
-
-	// Helper function that set's the URL of the Room page when create room is interacted with
-	setUrl = (accessToken, hex) => {
-		let homeUrl = window.location.href;
-
-		console.log(accessToken);
-		console.log(hex);
-
-		if (homeUrl === `http://localhost:3000/home?access_token=${accessToken}`) {
-			window.location.href = `http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`;
-		}
-
-		if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
-			window.location.href = `http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`;
-		}
-	};
 
 	syncQueueWithRoomAndJoin = roomId => {
 		API.getTracks(roomId)
@@ -67,7 +49,7 @@ class RoomButtons extends Component {
 		this.setState({ spinnerDisplay: '' });
 
 		// Giving the Spotify API time to queue up all tracks before setting url to join the room
-		setTimeout(() => this.setUrl(this.props.token, roomId), 4000);
+		setTimeout(() => this.props.setUrl(this.props.token, roomId), 4000);
 	};
 
 	// Create Room button handler. Creates new Room in DB, then sets url.
@@ -75,11 +57,10 @@ class RoomButtons extends Component {
 		e.preventDefault();
 
 		API.createRoom(this.state.roomHex)
-			.then(() => this.setUrl(this.props.token, this.state.roomHex))
+			.then(() => this.props.setUrl(this.props.token, this.state.roomHex))
 			.catch(err => console.log(err));
 	};
 
-	// Verifies input is 6 digits and uses setUrl
 	handleJoinRoom = e => {
 		e.preventDefault();
 

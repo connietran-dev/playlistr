@@ -56,5 +56,14 @@ export default {
 				Authorization: 'Bearer ' + token
 			}
 		});
+	},
+	getPlaylistTracks: (token, playlistId) => {
+		return axios({
+			method: 'GET',
+			url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+			headers: {
+				Authorization: 'Bearer ' + token
+			}
+		});
 	}
 };
