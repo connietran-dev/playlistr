@@ -8,11 +8,13 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
+import Carousel from 'react-bootstrap/Carousel';
 
 import Playlist from '../../components/Playlist';
 import RoomButtons from '../../components/RoomButtons';
 
 import './style.css';
+
 import SpotifyAPI from '../../utils/SpotifyAPI';
 import API from '../../utils/API';
 
@@ -27,7 +29,8 @@ class Home extends Component {
 			accessToken: '',
 			selectedPlaylist: '',
 			showAlert: false,
-			spinnerClass: 'd-none'
+			spinnerClass: 'd-none',
+			slides: []
 		};
 	}
 
@@ -38,40 +41,52 @@ class Home extends Component {
 		this.setState({ accessToken: token });
 
 		// Fetch user data
-		fetch('https://api.spotify.com/v1/me', {
-			headers: {
-				Authorization: 'Bearer ' + token
-			}
-		})
-			.then(res => res.json())
-			.then(data => {
-				console.log(data);
+		SpotifyAPI.getUserData(token)
+			.then(res => {
+				console.log(res.data);
 				this.setState({
-					user: data,
-					userImage: data.images[0].url
+					user: res.data,
+					userImage: res.data.images[0].url
 				});
 			});
 
-		// Fetch playlists
-		fetch('https://api.spotify.com/v1/me/playlists?limit=8', {
-			headers: { Authorization: 'Bearer ' + token }
-		})
-			.then(res => res.json())
-			.then(playlistData => {
-				let playlists = playlistData.items;
-				// If playlist image is undefined, create placeholder image
+		// Fetch playlists & map 8 to each carousel slide - 50 is the max limit to fetch
+		SpotifyAPI.getUserPlaylists(token, 50)
+			.then(res => {
+				let playlists = res.data.items;
+
+				// If playlist image is undefined, use placeholder image
 				playlists.map(item => {
 					if (item.images[0] === undefined) {
 						return item.images.push({
-							url: 'https://via.placeholder.com/200'
+							url: './images/logo.jpg'
 						});
 					} else {
 						return item.images;
 					}
 				});
-				this.setState({ playlists: playlists });
+
+				// Create array of slides with 8 playlists per slide
+				let allSlides = [];
+				let numSlides = (playlists.length / 8);
+
+				for (let slideIndex = 0; slideIndex < numSlides; slideIndex++) {
+					let currentSlide = [];
+
+					for (let itemIndex = 0; itemIndex < 8; itemIndex++) {
+						let playlist = playlists[itemIndex];
+						if (playlist !== undefined) currentSlide.push(playlist);
+					};
+
+					// Remove first 8 playlists from array in order to add next 8 playlists to next slide, etc.
+					playlists.splice(0, 8);
+
+					allSlides.push(currentSlide);
+				};
+
+				this.setState({ slides: allSlides });
 			});
-	}
+	};
 
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
@@ -149,7 +164,7 @@ class Home extends Component {
 			<div>
 				<Container>
 					<Row className="top-banner">
-						<Col xs={12} md={2} className="text-center">
+						<Col xs={12} md={3} className="text-center">
 							<Image
 								roundedCircle
 								src={this.state.userImage}
@@ -157,20 +172,16 @@ class Home extends Component {
 							/>
 							<p className="user-name">{this.state.user.display_name}</p>
 						</Col>
-						<Col xs={12} md={7}>
-							<h1 className="top-banner">
+						<Col xs={12} md={9} className="d-flex justify-content-center align-items-center">
+							<h1 className="home-banner">
 								Welcome to{' '}
 								<span className="welcome-brand">Playlistr</span>
 							</h1>
 						</Col>
-						<Col xs={12} md={2} className="float-right">
-							<input placeholder="Search" />
-							<i className="fa fa-search" aria-hidden="true"></i>
-						</Col>
 					</Row>
 					<Row>
 						<Col>
-							<div className="playlist-alert">
+							<div className="playlist-alert d-flex align-items-center">
 								<Alert
 									variant="dark"
 									show={this.state.showAlert}
@@ -199,17 +210,30 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<Row className="mb-4">
-						{this.state.playlists.map(playlist => (
-							<Playlist
-								key={playlist.id}
-								playlistId={playlist.id}
-								image={playlist.images[0].url}
-								link={playlist.owner.external_urls.spotify}
-								name={playlist.name}
-								handlePlaylistClick={this.handlePlaylistClick}
-							/>
-						))}
+					<Row>
+						<Carousel
+							className="mb-2"
+							interval={11000}
+							indicators={false}
+						>
+							{this.state.slides.map(slide => (
+								<Carousel.Item>
+									<Container>
+										<Row>
+											{slide.map(playlist =>
+												<Playlist
+													key={playlist.id}
+													playlistId={playlist.id}
+													image={playlist.images[0].url}
+													link={playlist.owner.external_urls.spotify}
+													name={playlist.name}
+													handlePlaylistClick={this.handlePlaylistClick}
+												/>)}
+										</Row>
+									</Container>
+								</Carousel.Item>
+							))}
+						</Carousel>
 					</Row>
 				</Container>
 				<Container>

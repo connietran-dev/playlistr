@@ -10,6 +10,15 @@ export default {
 			}
 		});
 	},
+	getUserPlaylists: (token, limit) => {
+		return axios({
+			method: 'GET',
+			url: `https://api.spotify.com/v1/me/playlists?limit=${limit}`,
+			headers: {
+				Authorization: 'Bearer ' + token
+			}
+		})
+	},
 	getUserQueueData: token => {
 		return axios({
 			method: 'GET',

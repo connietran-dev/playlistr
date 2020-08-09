@@ -1,8 +1,15 @@
 .user-playlist {
 	text-decoration: none;
 	color: #121111;
+	min-height: 220px;
+	min-width: 200px;
 }
 
 .user-playlist img:hover {
 	cursor: pointer;
+}
+
+.playlist-name {
+	font-size: 14px;
+	max-width: 200px;
 }
