@@ -8,6 +8,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
+import Image from 'react-bootstrap/Image';
+import Carousel from 'react-bootstrap/Carousel';
 
 import TrackSearch from '../../components/TrackSearch';
 import Player from '../../components/Player';
@@ -45,7 +47,9 @@ class Room extends Component {
 			roomUsers: [],
 			roomHost: {},
 			roomSong: {},
-			alertShow: false
+			alertShow: false,
+			statusMsg: '',
+			slides: []
 		};
 	}
 
@@ -63,26 +67,25 @@ class Room extends Component {
 
 		// Queries DB for tracks added to current room
 		this.setRoomTracks(this.state.roomId);
-	}
+	};
 
 	componentWillUnmount() {
 		// Close connection when component unmounts
 		return () => socket.disconnect();
-	}
+	};
 
 	mountRoomSockets = () => {
 		// Upon connecting to socket, emit that the current user has joined current room
 		socket.emit('join room', this.state.roomId, this.state.user);
 
 		// Listen for status updates for when users join or leave room
-		socket.on('user status', message => {
-			console.log('Status update: ', message);
-		});
+		socket.on('user status', message => this.displayStatusMessage(message));
 
 		// Listen for the room's current users in order to set host
 		socket.on('current users', currentUsers => {
 			this.setState({ roomUsers: currentUsers }, () => {
 				console.log('Users in room:', this.state.roomUsers);
+				this.renderAvatarSlides();
 
 				// The first user in the usersArray is the roomHost. If the host leaves, the next person becomes the first in usersArray, becoming the roomHost
 				this.setState({ roomHost: this.state.roomUsers[0] }, () => {
@@ -129,7 +132,7 @@ class Room extends Component {
 					() => {
 						// Set roomSong to the host's song every time getCurrentlyPlaying is called
 						this.setRoomSong();
-						console.log('The host is playing: ', this.state.roomSong);
+						// console.log('The host is playing: ', this.state.roomSong);
 					}
 				);
 			})
@@ -190,7 +193,7 @@ class Room extends Component {
 		let addedTracks = this.state.addedTracks;
 
 		if (!addedTracks.length) {
-			return <p>Add a track to get started...</p>;
+			return <p className="queue-help">Add a track to get started...</p>;
 		} else {
 			return addedTracks.map(track => (
 				<ListGroup.Item
@@ -245,13 +248,51 @@ class Room extends Component {
 		this.setState({ alertShow: false });
 	};
 
+	// Set statusMsg to display, then remove message after timeout
+	displayStatusMessage = message => {
+		this.setState({ statusMsg: message.text }, () => {
+			setTimeout(() => {
+				this.setState({ statusMsg: '' })
+			}, 1800);
+		});
+	};
+
+	renderAvatarSlides = () => {
+		let currentUsers = [...this.state.roomUsers];
+
+		// Create array of slides with 3 user avatars per slide
+		let allSlides = [];
+		let numSlides = (currentUsers.length / 3);
+
+		for (let slideIndex = 0; slideIndex < numSlides; slideIndex++) {
+			let currentSlide = [];
+
+			for (let itemIndex = 0; itemIndex < 3; itemIndex++) {
+				let user = currentUsers[itemIndex];
+				if (typeof user != 'undefined') currentSlide.push(user);
+			};
+
+			// Remove first 3 users from array in order to add next 3 user to next slide, etc.
+			currentUsers.splice(0, 3);
+
+			allSlides.push(currentSlide);
+		};
+
+		this.setState({ slides: allSlides });
+	};
+
 	render() {
 		return (
 			<div>
-				<Container className="py-5 mt-2 mb-1">
+				<Container className="pt-5 pb-4">
 					<Row>
+						{/* Logo */}
+						<Col xs={12} md={2} className="text-center">
+							<Image roundedCircle className="brand-logo" src="./images/logo.jpg" />
+						</Col>
+
 						{/* Current Room */}
-						<Col xs={12} md={6} className="text-center">
+						<Col xs={12} md={4}>
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
 
@@ -273,7 +314,7 @@ class Room extends Component {
 						{/* Album Image */}
 						<Col xs={6} md={6} className="text-center">
 							<img
-								className="now-playing-img mt-3"
+								className="now-playing-img"
 								src={this.state.item.album.images[0].url}
 								alt="Track album artwork"
 							/>
@@ -326,14 +367,31 @@ class Room extends Component {
 						<Col xs={12} sm={6} md={6}>
 							{/* User Avatars */}
 							<Row>
-								{this.state.roomUsers.map(user => (
-									<RoomUser
-										key={user.id}
-										user={user}
-										avatar={user.images[0].url}
-										name={user.display_name}
-									/>
-								))}
+								<Carousel
+									className="room-carousel"
+									interval={7000}
+									indicators={false}
+								>
+									{this.state.slides.map(slide => (
+										<Carousel.Item>
+											<Container>
+												<Row>
+													{slide.map(user => (
+														<RoomUser
+															key={user.id}
+															user={user}
+															avatar={user.images[0].url}
+															name={user.display_name}
+														/>
+													))}
+												</Row>
+											</Container>
+										</Carousel.Item>
+									))}
+								</Carousel>
+							</Row>
+							<Row>
+								<p className="status-msg">{this.state.statusMsg}</p>
 							</Row>
 						</Col>
 					</Row>

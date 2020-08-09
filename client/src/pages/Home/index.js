@@ -168,7 +168,7 @@ class Home extends Component {
 							<Image
 								roundedCircle
 								src={this.state.userImage}
-								className="profile-pic"
+								className="home profile-pic"
 							/>
 							<p className="user-name">{this.state.user.display_name}</p>
 						</Col>
@@ -212,7 +212,7 @@ class Home extends Component {
 				<Container>
 					<Row>
 						<Carousel
-							className="mb-2"
+							className="mb-2 home-carousel"
 							interval={11000}
 							indicators={false}
 						>

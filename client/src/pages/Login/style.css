@@ -17,3 +17,7 @@
     background-position: 40% 85%;
     opacity: 0.96;
 }
+
+.login.brand-logo {
+  margin: 26px;
+}
