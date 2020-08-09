@@ -1,19 +1,30 @@
 h1.top-banner {
-    color: #646a74;
+	color: #646a74;
 }
 
 .welcome-brand {
-    color: white;
-    font-weight: 600;
+	color: white;
+	font-weight: 600;
 }
 
 .profile-pic {
-    height: 6.75rem;
-    margin: 20px 0 9px;
+	height: 6.75rem;
+	margin: 20px 0 9px;
 }
 
 .user-name {
-    color: #FED402;
-    opacity: 0.98;
-    margin: 0 0 18px;
+	color: #fed402;
+	opacity: 0.98;
+	margin: 0 0 18px;
+}
+
+.playlist-alert {
+	width: 100%;
+	position: absolute;
+	z-index: 1;
+}
+
+.playlist-alert button {
+	margin: 0;
+	/* padding: 0; */
 }
