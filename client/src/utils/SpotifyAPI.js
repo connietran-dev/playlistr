@@ -69,7 +69,7 @@ export default {
 	getPlaylistTracks: (token, playlistId) => {
 		return axios({
 			method: 'GET',
-			url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+			url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`,
 			headers: {
 				Authorization: 'Bearer ' + token
 			}

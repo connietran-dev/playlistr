@@ -28,7 +28,8 @@ class Home extends Component {
 			playlists: [],
 			accessToken: '',
 			selectedPlaylist: '',
-			showAlert: false,
+			openSpotifyAlert: false,
+			playlistAlert: false,
 			spinnerClass: 'd-none',
 			slides: []
 		};
@@ -40,6 +41,8 @@ class Home extends Component {
 
 		this.setState({ accessToken: token });
 
+		this.setState({ spinnerClass: 'd-none' });
+
 		// Fetch user data
 		SpotifyAPI.getUserData(token)
 			.then(res => {
@@ -49,6 +52,8 @@ class Home extends Component {
 					userImage: res.data.images[0].url
 				});
 			});
+
+		this.verifySpotifyIsActive(token);
 
 		// Fetch playlists & map 8 to each carousel slide - 50 is the max limit to fetch
 		SpotifyAPI.getUserPlaylists(token, 50)
@@ -86,8 +91,22 @@ class Home extends Component {
 
 				this.setState({ slides: allSlides });
 			});
+	}
+
+	// Verifies Spotify app is open and playing a track
+	verifySpotifyIsActive = token => {
+		SpotifyAPI.getUserQueueData(token)
+			.then(res => {
+				if (!res.data.is_playing)
+					throw new Error('Error: Please open Spotify and play a track.');
+				else if (res.data.is_playing) this.setState({ openSpotifyAlert: false });
+			})
+			.catch(err => {
+				if (err) this.setState({ openSpotifyAlert: true });
+			});
 	};
 
+	// Redirects user to a Room passing along the token and room id in the url
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
 
@@ -104,11 +123,11 @@ class Home extends Component {
 	};
 
 	handlePlaylistClick = e => {
-		if (!this.state.showAlert) {
-			this.setState({ showAlert: true });
+		if (!this.state.playlistAlert) {
+			this.setState({ playlistAlert: true });
 			this.setState({ selectedPlaylist: e.target.id });
 		} else {
-			this.setState({ showAlert: false });
+			this.setState({ playlistAlert: false });
 		}
 	};
 
@@ -117,6 +136,7 @@ class Home extends Component {
 		e.preventDefault();
 
 		let roomHex = hexGen(24);
+		let timeoutLength = 0;
 
 		// Create room with generated hex -- 422 response sent to catch
 		API.createRoom(roomHex)
@@ -130,6 +150,9 @@ class Home extends Component {
 						return res.data.items;
 					})
 					.then(data => {
+						// Sets the time needed to POST playlist data properly before redirecting
+						timeoutLength = data.length * 300;
+
 						// Add tracks to user's playback queue and Room in DB -- allowing enough time for tracks to be added to both in the correct order
 						data.forEach((item, index) => {
 							let trackInfo = `${item.track.name} - ${item.track.artists[0].name}`;
@@ -147,16 +170,21 @@ class Home extends Component {
 									.catch(err => console.log(err));
 							}, index * 300);
 						});
+					})
+					.then(() => {
+						console.log(timeoutLength);
+						this.setState({ spinnerClass: '' });
+
+						//	Set URL after all POSTs have completed
+						setTimeout(
+							() => this.setUrl(this.state.accessToken, roomHex),
+							timeoutLength + 300
+						);
 					});
 			})
 			.catch(err => {
 				if (err) console.log(err.message);
 			});
-
-		this.setState({ spinnerClass: '' });
-
-		// Giving time for tracks to be added to users playback queue and Room in RB
-		setTimeout(() => this.setUrl(this.state.accessToken, roomHex), 4000);
 	};
 
 	render() {
@@ -182,9 +210,27 @@ class Home extends Component {
 					<Row>
 						<Col>
 							<div className="playlist-alert d-flex align-items-center">
+								{/* Open Spotify Alert */}
 								<Alert
 									variant="dark"
-									show={this.state.showAlert}
+									show={this.state.openSpotifyAlert}>
+									<p>
+										Please open Spotify and play a track to
+										get started.
+									</p>
+									<button
+										onClick={() =>
+											this.verifySpotifyIsActive(
+												this.state.accessToken
+											)
+										}>
+										Ready
+									</button>
+								</Alert>
+								{/* Create Room with Playlist Alert */}
+								<Alert
+									variant="dark"
+									show={this.state.playlistAlert}
 									onClose={this.handlePlaylistClick}
 									dismissible>
 									<p>
