@@ -19,9 +19,9 @@
 }
 
 .player-buttons button {
-	color: limegreen;
+	color: #fed402;
 }
 
 .player-buttons button:hover {
-	background-color: limegreen;
+	background-color: #fed402;
 }

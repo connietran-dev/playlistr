@@ -88,51 +88,56 @@ class RoomButtons extends Component {
 
 	render() {
 		return (
-			<Row>
-				<Col md={6} xs={8}>
-					<Form className="join-room-form">
-						<InputGroup>
-							<Link to="/room">
-								<button
-									className="join-room-btn"
-									onClick={this.handleJoinRoom}>
-									<Spinner
-										as="span"
-										animation="border"
-										size="sm"
-										role="status"
-										aria-hidden="true"
-										className={this.state.spinnerDisplay}
-									/>{' '}
-									<span> Join a Room</span>
-								</button>
-							</Link>
+			<div>
+				<Row>
+					<Col md={8} xs={12}>
+						<Form>
+							<InputGroup>
+								<Link to="/room">
+									<button
+										className="join-room-btn"
+										onClick={this.handleJoinRoom}>
+										<Spinner
+											as="span"
+											animation="border"
+											size="sm"
+											role="status"
+											aria-hidden="true"
+											className={this.state.spinnerDisplay}
+										/>{' '}
+										<span> Join a Room</span>
+									</button>
+								</Link>
 
-							<input
-								className="room-input ml-2"
-								onChange={this.handleInputChange}
-								value={this.state.joinRoomInput}
-								placeholder="Room code"
-							/>
-						</InputGroup>
-					</Form>
-					<Alert
-						show={this.state.inputAlertDisplay}
-						variant="warning"
-						className={this.state.inputAlertDisplay}>
-						Please enter a valid Room ID
+								<input
+									className="room-input ml-2"
+									onChange={this.handleInputChange}
+									value={this.state.joinRoomInput}
+									placeholder="Room code"
+								/>
+							</InputGroup>
+						</Form>
+						<Alert
+							show={this.state.inputAlertDisplay}
+							variant="warning"
+							className={this.state.inputAlertDisplay}>
+							Please enter a valid Room ID
 					</Alert>
-				</Col>
-				<Col md={6} xs={4}>
-					<Link to="/room">
-						<button
-							onClick={this.handleCreateRoom}
-							className="float-right join-room-btn">
-							Create a Room
+					</Col>
+					<Col md={4} xs={12}>
+						<Link to="/room">
+							<button
+								onClick={this.handleCreateRoom}
+								className="float-right join-room-btn">
+								Create a Room
 						</button>{' '}
-					</Link>
-				</Col>
-			</Row>
+						</Link>
+					</Col>
+
+				</Row>
+
+			</div>
+
 		);
 	}
 }

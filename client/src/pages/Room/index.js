@@ -36,7 +36,7 @@ class Room extends Component {
 			userSong: {},
 			item: {
 				album: {
-					images: [{ url: './images/logo.jpg' }]
+					images: [{ url: './images/playlistr-yellow-logo.png' }]
 				},
 				name: '',
 				artists: [{ name: '' }],
@@ -288,7 +288,7 @@ class Room extends Component {
 					<Row>
 						{/* Logo */}
 						<Col xs={12} md={2} className="text-center">
-							<Image roundedCircle className="brand-logo" src="./images/logo.jpg" />
+							<Image className="brand-logo" src="./images/icons/playlistr-yellow-icon.png" />
 						</Col>
 
 						{/* Current Room */}
@@ -297,7 +297,7 @@ class Room extends Component {
 						</Col>
 
 						{/* Track Search */}
-						<Col xs={12} md={6}>
+						<Col className="track-search-container" xs={12} md={6}>
 							<TrackSearch
 								token={this.state.accessToken}
 								roomId={this.state.roomId}

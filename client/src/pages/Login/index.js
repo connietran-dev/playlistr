@@ -16,7 +16,7 @@ function Login() {
                 <Col>
                     <div className="backdrop login text-center">
                         <h1 className="brand-name">Playlistr</h1>
-                        <Image roundedCircle className="login brand-logo" src="./images/logo.jpg" />
+                        <Image className="login brand-logo" src="./images/icons/playlistr-black-icon.png" />
                     </div>
                 </Col>
             </Row>
