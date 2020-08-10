@@ -27,29 +27,37 @@ class RoomButtons extends Component {
 	}
 
 	syncQueueWithRoomAndJoin = roomId => {
+		let timeoutLength = 0;
+
 		API.getTracks(roomId)
 			.then(res => {
 				// Creating an array of tracks that have yet to be played
 				let notPlayedTracks = res.data.addedTracks.filter(track => !track.played);
 
-				// Conditionally adding tracks to users playback queue -- setTimeout time is being multiplied by the index of the track in the array to ensure each API call waits for the previous call to finish.
-				if (notPlayedTracks.length) {
-					notPlayedTracks.forEach((track, index) => {
+				return notPlayedTracks;
+			})
+			.then(data => {
+				timeoutLength = data.length * 300 + 300; // Adding an additional 300 ms to allow final POST to complete
+
+				// Conditionally adding tracks to users playback queue -- setTimeout time is being multiplied by the index of the track in the array to ensure each API call allows enough time for the previous call to finish.
+				if (data.length) {
+					data.forEach((track, index) => {
 						setTimeout(() => {
 							SpotifyAPI.addTrackToQueue(this.props.token, track.spotifyId)
 								.then(response => console.log(response))
 								.catch(err => console.log(err));
-						}, index * 200);
+						}, index * 300);
 					});
-				}
+				} else return;
+			})
+			.then(() => {
+				// Display spinner while API calls are being made leading up to the url being set to join room
+				this.setState({ spinnerDisplay: '' });
+
+				// Giving the Spotify API time to queue up all tracks before setting url to join the room
+				setTimeout(() => this.props.setUrl(this.props.token, roomId), timeoutLength);
 			})
 			.catch(err => console.log(err));
-
-		// Display spinner while API calls are being made leading up to the url being set to join room
-		this.setState({ spinnerDisplay: '' });
-
-		// Giving the Spotify API time to queue up all tracks before setting url to join the room
-		setTimeout(() => this.props.setUrl(this.props.token, roomId), 4000);
 	};
 
 	// Create Room button handler. Creates new Room in DB, then sets url.
