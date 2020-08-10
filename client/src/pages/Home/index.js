@@ -151,7 +151,7 @@ class Home extends Component {
 					})
 					.then(data => {
 						// Sets the time needed to POST playlist data properly before redirecting
-						timeoutLength = data.length * 300;
+						timeoutLength = data.length * 300 + 300;
 
 						// Add tracks to user's playback queue and Room in DB -- allowing enough time for tracks to be added to both in the correct order
 						data.forEach((item, index) => {
@@ -178,7 +178,7 @@ class Home extends Component {
 						//	Set URL after all POSTs have completed
 						setTimeout(
 							() => this.setUrl(this.state.accessToken, roomHex),
-							timeoutLength + 300
+							timeoutLength
 						);
 					});
 			})

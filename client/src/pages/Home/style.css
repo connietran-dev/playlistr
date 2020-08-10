@@ -4,7 +4,7 @@ h1.home-banner {
 }
 
 .welcome-brand {
-	color: white;
+	color: #ffffff;
 	font-weight: 600;
 }
 
@@ -34,5 +34,4 @@ h1.home-banner {
 
 .playlist-alert button {
 	margin: 0;
-	/* padding: 0; */
 }
