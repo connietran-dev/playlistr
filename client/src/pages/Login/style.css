@@ -1,23 +1,84 @@
 .login-div {
-    margin: 50px auto;
-    padding: 60px 40px;
-    width: 60vw;
-    height: 25vh;
-    background-color: #ffffff;
-    border-radius: 15px;
-    color: #171c20;
-    opacity: 0.90;
+	margin: 50px auto;
+	padding: 60px 40px;
+	width: 60vw;
+	height: 25vh;
+	background-color: #ffffff;
+	border-radius: 15px;
+	color: #171c20;
+	opacity: 0.9;
 }
 
 .login.backdrop {
-    padding: 78px;
-    background: url('/images/yellow-backdrop.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: 40% 85%;
-    opacity: 0.96;
+	padding: 78px;
+	background: url('/images/yellow-backdrop.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 40% 85%;
+	opacity: 0.96;
 }
 
 .login.brand-logo {
-  margin: 26px;
+	margin: 26px;
+}
+
+@media (max-width: 1024px) {
+	.login.backdrop {
+		padding: 200px;
+	}
+
+	.login-div {
+		height: 160px;
+		padding: 40px;
+	}
+}
+
+@media (max-width: 768px) {
+	.login.backdrop {
+		padding: 100px;
+	}
+
+	.login-div {
+		height: 180px;
+		padding: 30px;
+	}
+}
+
+@media (max-width: 460px) {
+	.login.backdrop {
+		padding: 40px;
+	}
+
+	.login-div {
+		height: 160px;
+		padding: 20px;
+	}
+}
+
+@media (max-width: 360px) {
+	.login-div {
+		height: 185px;
+	}
+}
+
+@media (max-width: 320px) {
+	.login.backdrop {
+		padding: 20px;
+	}
+
+	.login-div {
+		height: 160px;
+		padding: 8px;
+	}
+}
+
+@media (max-width: 280px) {
+	.login.backdrop {
+		padding: 0;
+	}
+
+	.login-div {
+		height: 175px;
+		padding: 5px;
+	}
 }

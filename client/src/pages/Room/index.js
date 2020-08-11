@@ -123,7 +123,7 @@ class Room extends Component {
 	displayStatusMessage = message => {
 		this.setState({ statusMsg: message }, () => {
 			setTimeout(() => {
-				this.setState({ statusMsg: '' })
+				this.setState({ statusMsg: '' });
 			}, 2000);
 		});
 	};
@@ -298,10 +298,12 @@ class Room extends Component {
 					<Row>
 						{/* Logo */}
 						<Col xs={12} md={2} className="text-center">
-							<Image
-								className="brand-logo"
-								src="./images/icons/playlistr-yellow-icon.png"
-							/>
+							<a href={`/home?access_token=${this.state.accessToken}`}>
+								<Image
+									className="brand-logo"
+									src="./images/icons/playlistr-yellow-icon.png"
+								/>
+							</a>
 						</Col>
 
 						{/* Current Room */}

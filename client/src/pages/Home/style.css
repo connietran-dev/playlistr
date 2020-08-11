@@ -20,8 +20,9 @@ h1.home-banner {
 
 .home-carousel {
 	width: 1140px;
-	height: 440px;
+	height: 100%;
 	margin: auto;
+	padding-bottom: 10%;
 }
 
 .playlist-alert {
@@ -36,9 +37,67 @@ h1.home-banner {
 	margin: 0;
 }
 
+@media (max-width: 1199px) {
+	h1.home-banner {
+		font-size: 48px;
+	}
+}
+
+@media (max-width: 768px) {
+	h1.home-banner {
+		font-size: 30px;
+	}
+}
+
 @media (max-width: 460px) {
+	h1.home-banner {
+		font-size: 38px;
+	}
+
 	.home-carousel {
 		height: 100%;
 		padding-bottom: 20%;
+	}
+}
+
+@media (max-width: 450px) {
+	h1.home-banner {
+		font-size: 37px;
+	}
+}
+
+@media (max-width: 414px) {
+	h1.home-banner {
+		font-size: 34px;
+	}
+}
+
+@media (max-width: 411px) {
+	h1.home-banner {
+		font-size: 33px;
+	}
+}
+
+@media (max-width: 375px) {
+	h1.home-banner {
+		font-size: 30px;
+	}
+}
+
+@media (max-width: 360px) {
+	h1.home-banner {
+		font-size: 29px;
+	}
+}
+
+@media (max-width: 320px) {
+	h1.home-banner {
+		font-size: 25px;
+	}
+}
+
+@media (max-width: 280px) {
+	h1.home-banner {
+		font-size: 21px;
 	}
 }
