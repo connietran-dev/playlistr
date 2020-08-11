@@ -64,13 +64,19 @@ io.on('connect', socket => {
 	});
 
 	// Emit play/pause/next actions to other users in room, exclude sender
-	socket.on('user action', ({ action, roomId }) => {
-		socket.to(roomId).emit('player action', action);
+	socket.on('user action', ({ action, roomId, user }) => {
+		socket.to(roomId).emit('player action', {
+			action,
+			message: `${user.display_name} clicked ${action}...`
+		});
 	});
 
 	// If user adds new track to play queue, emit track to users in room, exclude sender
-	socket.on('add track', ({ trackId, roomId }) => {
-		socket.to(roomId).emit('new track', trackId);
+	socket.on('add track', ({ trackId, roomId, user }) => {
+		socket.to(roomId).emit('new track', {
+			trackId,
+			message: `${user.display_name} added a track...`
+		});
 	});
 
 	// When a socket disconnects, remove user from usersArray

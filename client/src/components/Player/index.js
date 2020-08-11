@@ -27,7 +27,7 @@ const Player = props => {
 					className="btn"
 					onClick={() => {
 						props.handlePlayPauseClick('play', props.token);
-						props.emitPlayerAction('play');
+						props.emitPlayerAction('play', props.user);
 					}}>
 					<i className="fa fa-play fa-lg"></i>
 				</button>
@@ -36,13 +36,13 @@ const Player = props => {
 					className="btn"
 					onClick={() => {
 						props.handlePlayPauseClick('pause', props.token);
-						props.emitPlayerAction('pause');
+						props.emitPlayerAction('pause', props.user);
 					}}>
 					<i className="fa fa-pause fa-lg"></i>
 				</button>
 				<button type="button" className="btn" onClick={() => {
 					props.handleNextClick(props.token);
-					props.emitPlayerAction('next');
+					props.emitPlayerAction('next', props.user);
 				}}>
 					<i className="fa fa-forward fa-lg"></i>
 				</button>
