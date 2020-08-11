@@ -31,8 +31,8 @@ class TrackSearch extends Component {
 			.catch(err => console.log(err));
 	};
 
-	emitNewTrackToRoom = (roomId, trackId) => {
-		socket.emit('add track', { trackId, roomId });
+	emitNewTrackToRoom = (roomId, trackId, user) => {
+		socket.emit('add track', { trackId, roomId, user });
 	};
 
 	handleOnChange = e => {
@@ -59,7 +59,7 @@ class TrackSearch extends Component {
 			.then(() => this.props.setRoomTracks(this.props.roomId))
 			.catch(err => console.log(err));
 
-		this.emitNewTrackToRoom(this.props.roomId, e.target.id);
+		this.emitNewTrackToRoom(this.props.roomId, e.target.id, this.props.user);
 
 		this.props.addTrackToPlaybackQueue(this.props.token, e.target.id);
 

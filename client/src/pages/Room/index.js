@@ -79,7 +79,7 @@ class Room extends Component {
 		socket.emit('join room', this.state.roomId, this.state.user);
 
 		// Listen for status updates for when users join or leave room
-		socket.on('user status', message => this.displayStatusMessage(message));
+		socket.on('user status', ({ text }) => this.displayStatusMessage(text));
 
 		// Listen for the room's current users in order to set host
 		socket.on('current users', currentUsers => {
@@ -95,24 +95,36 @@ class Room extends Component {
 		});
 
 		// Listen if other users click play/pause/next
-		socket.on('player action', action => {
+		socket.on('player action', ({ action, message }) => {
 			if (action === 'play' || action === 'pause') {
 				this.handlePlayPauseClick(action, this.state.accessToken);
+				this.displayStatusMessage(message);
 			} else if (action === 'next') {
 				this.handleNextClick(this.state.accessToken);
+				this.displayStatusMessage(message);
 			}
 		});
 
 		// Listen if a new track gets added to the Play Queue by another user
-		socket.on('new track', trackId => {
+		socket.on('new track', ({ trackId, message }) => {
 			this.addTrackToPlaybackQueue(this.state.accessToken, trackId);
 			this.setRoomTracks(this.state.roomId);
+			this.displayStatusMessage(message);
 		});
 
 		// Listen for the room's current song
 		socket.on('room song', song => {
 			// console.log('Room song: ', song.item.name);
 			this.setState({ roomSong: song });
+		});
+	};
+
+	// Set statusMsg to display, then remove message after timeout
+	displayStatusMessage = message => {
+		this.setState({ statusMsg: message }, () => {
+			setTimeout(() => {
+				this.setState({ statusMsg: '' })
+			}, 2000);
 		});
 	};
 
@@ -213,8 +225,8 @@ class Room extends Component {
 	};
 
 	// Emit to other users in room if you click play/pause/next
-	emitPlayerAction = action => {
-		socket.emit('user action', { action, roomId: this.state.roomId });
+	emitPlayerAction = (action, user) => {
+		socket.emit('user action', { action, user, roomId: this.state.roomId });
 	};
 
 	handlePlayPauseClick = (action, token) => {
@@ -253,15 +265,6 @@ class Room extends Component {
 		this.getCurrentlyPlaying(this.state.accessToken);
 
 		this.setState({ alertShow: false });
-	};
-
-	// Set statusMsg to display, then remove message after timeout
-	displayStatusMessage = message => {
-		this.setState({ statusMsg: message.text }, () => {
-			setTimeout(() => {
-				this.setState({ statusMsg: '' });
-			}, 1800);
-		});
 	};
 
 	renderAvatarSlides = () => {
@@ -311,6 +314,7 @@ class Room extends Component {
 							<TrackSearch
 								token={this.state.accessToken}
 								roomId={this.state.roomId}
+								user={this.state.user}
 								setRoomTracks={this.setRoomTracks}
 								getCurrentlyPlaying={this.getCurrentlyPlaying}
 								currentlyPlayingTrack={this.state.item}
@@ -367,6 +371,7 @@ class Room extends Component {
 								item={this.state.item}
 								isPlaying={this.state.isPlaying}
 								progress={this.state.progress}
+								user={this.state.user}
 								emitPlayerAction={this.emitPlayerAction}
 								handlePlayPauseClick={this.handlePlayPauseClick}
 								handleNextClick={this.handleNextClick}
@@ -379,7 +384,7 @@ class Room extends Component {
 							<Row>
 								<Carousel
 									className="room-carousel"
-									interval={7000}
+									interval={3500}
 									indicators={false}>
 									{this.state.slides.map(slide => (
 										<Carousel.Item>
