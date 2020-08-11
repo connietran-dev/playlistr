@@ -269,7 +269,7 @@ class Home extends Component {
 							interval={5000}
 							indicators={false}>
 							{this.state.slides.map(slide => (
-								<Carousel.Item>
+								<Carousel.Item key={this.state.slides.indexOf(slide)}>
 									<Container>
 										<Row>
 											{slide.map(playlist => (
