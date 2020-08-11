@@ -15,8 +15,7 @@
 }
 
 .play-queue-list {
-	/* height: 60vmin; */
-	max-height: 34vmin;
+	max-height: 33vmin;
 	overflow-y: auto;
 }
 
@@ -38,4 +37,102 @@
 
 .status-msg {
 	font-style: italic;
+}
+
+@media (max-width: 768px) {
+	.room-title h1 {
+		font-size: 3rem;
+	}
+
+	.play-queue-list {
+		font-size: 1rem;
+	}
+
+	.play-queue h1 {
+		font-size: 2.5rem;
+	}
+}
+
+@media (max-width: 460px) {
+	.room-title h1 {
+		font-size: 2.4rem;
+	}
+
+	.play-queue-list {
+		max-height: 32.3vmin;
+		font-size: 0.63rem;
+	}
+
+	.play-queue h1 {
+		font-size: 1.5rem;
+	}
+}
+
+@media (max-width: 414px) {
+	.room-title h1 {
+		font-size: 2.14rem;
+	}
+
+	.play-queue-list {
+		max-height: 31.2vmin;
+	}
+}
+
+@media (max-width: 411px) {
+	.room-title h1 {
+		font-size: 2.12rem;
+	}
+
+	.play-queue-list {
+		max-height: 31.3vmin;
+		font-size: 0.5rem;
+	}
+}
+
+@media (max-width: 375px) {
+	.room-title h1 {
+		font-size: 1.92rem;
+	}
+
+	.play-queue-list {
+		max-height: 30.6vmin;
+	}
+}
+
+@media (max-width: 360px) {
+	.room-title h1 {
+		font-size: 1.83rem;
+	}
+
+	.play-queue-list {
+		max-height: 30vmin;
+	}
+}
+
+@media (max-width: 320px) {
+	.room-title h1 {
+		font-size: 1.61rem;
+	}
+
+	.play-queue-list {
+		max-height: 29.8vmin;
+	}
+
+	.play-queue h1 {
+		font-size: 1.4rem;
+	}
+}
+
+@media (max-width: 280px) {
+	.room-title h1 {
+		font-size: 1.4rem;
+	}
+
+	.play-queue-list {
+		max-height: 29vmin;
+	}
+
+	.play-queue h1 {
+		font-size: 1.15rem;
+	}
 }

@@ -227,8 +227,7 @@ class Room extends Component {
 	handleNextClick = token => {
 		SpotifyAPI.nextPlaybackTrack(token)
 			.then(() =>
-				API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id)
-				.catch(err => {
+				API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id).catch(err => {
 					if (err)
 						throw new Error(
 							'DB Error: Unable to update a track not associated with the Room.'
@@ -303,7 +302,7 @@ class Room extends Component {
 						</Col>
 
 						{/* Current Room */}
-						<Col xs={12} md={4}>
+						<Col className="room-title" xs={12} md={4}>
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
 

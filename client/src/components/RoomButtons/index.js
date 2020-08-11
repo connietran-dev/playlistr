@@ -89,7 +89,7 @@ class RoomButtons extends Component {
 	render() {
 		return (
 			<div>
-				<Row>
+				<Row className="fixed-bottom room-buttons-container">
 					<Col md={8} xs={12}>
 						<Form>
 							<InputGroup>
@@ -103,7 +103,10 @@ class RoomButtons extends Component {
 											size="sm"
 											role="status"
 											aria-hidden="true"
-											className={this.state.spinnerDisplay}
+											className={
+												this.state
+													.spinnerDisplay
+											}
 										/>{' '}
 										<span> Join a Room</span>
 									</button>
@@ -122,22 +125,19 @@ class RoomButtons extends Component {
 							variant="warning"
 							className={this.state.inputAlertDisplay}>
 							Please enter a valid Room ID
-					</Alert>
+						</Alert>
 					</Col>
 					<Col md={4} xs={12}>
 						<Link to="/room">
 							<button
 								onClick={this.handleCreateRoom}
-								className="float-right join-room-btn">
+								className="float-right create-room-btn">
 								Create a Room
-						</button>{' '}
+							</button>{' '}
 						</Link>
 					</Col>
-
 				</Row>
-
 			</div>
-
 		);
 	}
 }
