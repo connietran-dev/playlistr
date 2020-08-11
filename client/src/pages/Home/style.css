@@ -35,3 +35,10 @@ h1.home-banner {
 .playlist-alert button {
 	margin: 0;
 }
+
+@media (max-width: 460px) {
+	.home-carousel {
+		height: 100%;
+		padding-bottom: 20%;
+	}
+}

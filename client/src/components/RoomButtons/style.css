@@ -1,5 +1,59 @@
+.room-buttons-container {
+	padding: 5%;
+}
+
 .join-room-btn,
 .room-input,
 .create-room-btn {
 	margin: 0;
+}
+
+@media (max-width: 460px) {
+	.room-buttons-container {
+		background-color: #171c20;
+	}
+	.room-input {
+		width: 69%;
+	}
+	.create-room-btn {
+		width: 100%;
+		margin-top: 1%;
+		align-content: center;
+	}
+}
+
+@media (max-width: 450px) {
+	.room-input {
+		width: 68%;
+	}
+}
+
+@media (max-width: 414px) {
+	.room-input {
+		width: 65%;
+	}
+}
+
+@media (max-width: 375px) {
+	.room-input {
+		width: 62%;
+	}
+}
+
+@media (max-width: 360px) {
+	.room-input {
+		width: 60%;
+	}
+}
+
+@media (max-width: 320px) {
+	.room-input {
+		width: 55%;
+	}
+}
+
+@media (max-width: 280px) {
+	.room-input {
+		width: 49%;
+	}
 }

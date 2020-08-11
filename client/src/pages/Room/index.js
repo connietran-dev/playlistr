@@ -67,12 +67,12 @@ class Room extends Component {
 
 		// Queries DB for tracks added to current room
 		this.setRoomTracks(this.state.roomId);
-	};
+	}
 
 	componentWillUnmount() {
 		// Close connection when component unmounts
 		return () => socket.disconnect();
-	};
+	}
 
 	mountRoomSockets = () => {
 		// Upon connecting to socket, emit that the current user has joined current room
@@ -120,7 +120,7 @@ class Room extends Component {
 	getCurrentlyPlaying = token => {
 		SpotifyAPI.getUserQueueData(token)
 			.then(res => {
-				if (res.status === 204) throw new Error('Error');
+				if (res.status === 204) throw new Error('Error: User playback queue inactive.');
 
 				this.setState(
 					{
@@ -132,15 +132,15 @@ class Room extends Component {
 					() => {
 						// Set roomSong to the host's song every time getCurrentlyPlaying is called
 						this.setRoomSong();
-						// console.log('The host is playing: ', this.state.roomSong);
 					}
 				);
 			})
-			// .then(() => this.handleQueueRender())
+			.then(() => this.handleQueueRender())
 			.then(() => this.updatePlayedStatus())
 			.catch(err => {
 				if (err) {
 					this.setState({ alertShow: true });
+					console.log(err.message);
 				}
 			});
 	};
@@ -160,7 +160,7 @@ class Room extends Component {
 
 	addTrackToPlaybackQueue = (token, trackId) => {
 		SpotifyAPI.addTrackToQueue(token, trackId).catch(err => {
-			console.log('Track not added to Queue');
+			if (err) console.log('Error: Unable to add track to playback queue.');
 		});
 	};
 
@@ -226,7 +226,14 @@ class Room extends Component {
 	// POST that changes to next song in users playback. After track is changed, we GET current playback data to update displaying track data
 	handleNextClick = token => {
 		SpotifyAPI.nextPlaybackTrack(token)
-			.then(() => API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id))
+			.then(() =>
+				API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id).catch(err => {
+					if (err)
+						throw new Error(
+							'DB Error: Unable to update a track not associated with the Room.'
+						);
+				})
+			)
 			.then(() => this.getCurrentlyPlaying(token))
 			.catch(err => {
 				if (err) {
@@ -252,7 +259,7 @@ class Room extends Component {
 	displayStatusMessage = message => {
 		this.setState({ statusMsg: message.text }, () => {
 			setTimeout(() => {
-				this.setState({ statusMsg: '' })
+				this.setState({ statusMsg: '' });
 			}, 1800);
 		});
 	};
@@ -262,7 +269,7 @@ class Room extends Component {
 
 		// Create array of slides with 3 user avatars per slide
 		let allSlides = [];
-		let numSlides = (currentUsers.length / 3);
+		let numSlides = currentUsers.length / 3;
 
 		for (let slideIndex = 0; slideIndex < numSlides; slideIndex++) {
 			let currentSlide = [];
@@ -270,13 +277,13 @@ class Room extends Component {
 			for (let itemIndex = 0; itemIndex < 3; itemIndex++) {
 				let user = currentUsers[itemIndex];
 				if (typeof user != 'undefined') currentSlide.push(user);
-			};
+			}
 
 			// Remove first 3 users from array in order to add next 3 user to next slide, etc.
 			currentUsers.splice(0, 3);
 
 			allSlides.push(currentSlide);
-		};
+		}
 
 		this.setState({ slides: allSlides });
 	};
@@ -288,11 +295,14 @@ class Room extends Component {
 					<Row>
 						{/* Logo */}
 						<Col xs={12} md={2} className="text-center">
-							<Image className="brand-logo" src="./images/icons/playlistr-yellow-icon.png" />
+							<Image
+								className="brand-logo"
+								src="./images/icons/playlistr-yellow-icon.png"
+							/>
 						</Col>
 
 						{/* Current Room */}
-						<Col xs={12} md={4}>
+						<Col className="room-title" xs={12} md={4}>
 							<h1>Current Room: {this.state.roomId} </h1>
 						</Col>
 
@@ -370,20 +380,31 @@ class Room extends Component {
 								<Carousel
 									className="room-carousel"
 									interval={7000}
-									indicators={false}
-								>
+									indicators={false}>
 									{this.state.slides.map(slide => (
 										<Carousel.Item>
 											<Container>
 												<Row>
-													{slide.map(user => (
-														<RoomUser
-															key={user.id}
-															user={user}
-															avatar={user.images[0].url}
-															name={user.display_name}
-														/>
-													))}
+													{slide.map(
+														user => (
+															<RoomUser
+																key={
+																	user.id
+																}
+																user={
+																	user
+																}
+																avatar={
+																	user
+																		.images[0]
+																		.url
+																}
+																name={
+																	user.display_name
+																}
+															/>
+														)
+													)}
 												</Row>
 											</Container>
 										</Carousel.Item>

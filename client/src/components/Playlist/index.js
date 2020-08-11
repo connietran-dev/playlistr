@@ -7,8 +7,8 @@ import './style.css';
 
 const Playlist = props => {
 	return (
-		<Col xs={6} md={3} className="d-flex justify-content-end">
-			<div className="user-playlist" onClick={props.handlePlaylistClick}>
+		<Col xs={6} md={3} className="d-flex justify-content-center">
+			<div className="user-playlist text-center" onClick={props.handlePlaylistClick}>
 				<Image
 					rounded
 					id={props.playlistId}
@@ -17,7 +17,7 @@ const Playlist = props => {
 					height={150}
 					alt={props.name}
 				/>
-				<p className="playlist-name text-white mt-2">{props.name}</p>
+				<p className="playlist-name mt-2">{props.name}</p>
 			</div>
 		</Col>
 	);
