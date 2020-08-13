@@ -21,7 +21,8 @@ class RoomButtons extends Component {
 		this.state = {
 			joinRoomInput: '',
 			inputAlertDisplay: false,
-			spinnerDisplay: 'd-none',
+			joinSpinnerDisplay: 'd-none',
+			createSpinnerDisplay: 'd-none',
 			roomHex: hexGen(24) // Output: 6 character hex
 		};
 	}
@@ -52,10 +53,13 @@ class RoomButtons extends Component {
 			})
 			.then(() => {
 				// Display spinner while API calls are being made leading up to the url being set to join room
-				this.setState({ spinnerDisplay: '' });
+				this.setState({ joinSpinnerDisplay: '' });
 
 				// Giving the Spotify API time to queue up all tracks before setting url to join the room
-				setTimeout(() => this.props.setUrl(this.props.token, roomId), timeoutLength);
+				setTimeout(() => {
+					this.props.setUrl(this.props.token, roomId);
+					this.setState({ joinSpinnerDisplay: 'd-none' });
+				}, timeoutLength);
 			})
 			.catch(err => console.log(err));
 	};
@@ -64,9 +68,15 @@ class RoomButtons extends Component {
 	handleCreateRoom = e => {
 		e.preventDefault();
 
+		this.setState({ createSpinnerDisplay: '' });
+
 		API.createRoom(this.state.roomHex)
-			.then(() => this.props.setUrl(this.props.token, this.state.roomHex))
-			.catch(err => console.log(err));
+		.catch(err => console.log(err));
+
+		setTimeout(() => {
+			this.props.setUrl(this.props.token, this.state.roomHex);
+			this.setState({ createSpinnerDisplay: 'd-none' });
+		}, 2000);
 	};
 
 	handleJoinRoom = e => {
@@ -105,7 +115,7 @@ class RoomButtons extends Component {
 											aria-hidden="true"
 											className={
 												this.state
-													.spinnerDisplay
+													.joinSpinnerDisplay
 											}
 										/>{' '}
 										<span> Join a Room</span>
@@ -132,7 +142,15 @@ class RoomButtons extends Component {
 							<button
 								onClick={this.handleCreateRoom}
 								className="float-right create-room-btn">
-								Create a Room
+								<Spinner
+									as="span"
+									animation="border"
+									size="sm"
+									role="status"
+									aria-hidden="true"
+									className={this.state.createSpinnerDisplay}
+								/>{' '}
+								<span>Create a Room</span>
 							</button>{' '}
 						</Link>
 					</Col>
