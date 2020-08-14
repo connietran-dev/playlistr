@@ -108,15 +108,14 @@ class Home extends Component {
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
 
-		console.log(accessToken);
-		console.log(hex);
-
 		if (homeUrl === `http://localhost:3000/home?access_token=${accessToken}`) {
-			window.location.href = `http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`;
-		}
-
-		if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
-			window.location.href = `http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`;
+			window.location.replace(
+				`http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`
+			);
+		} else if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
+			window.location.replace(
+				`http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`
+			);
 		}
 	};
 
