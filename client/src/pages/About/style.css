@@ -1,0 +1,5 @@
+.jumbotron {
+    background: url('/images/yellow-backdrop.jpg');
+    background-size: cover;
+    height: 100vh;
+  }
