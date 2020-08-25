@@ -36,7 +36,12 @@ class Room extends Component {
 			userSong: {},
 			item: {
 				album: {
-					images: [{ url: './images/playlistr-yellow-logo.png' }]
+					images: [
+						{
+							url:
+								'./images/playlistr-yellow-logo.png'
+						}
+					]
 				},
 				name: '',
 				artists: [{ name: '' }],
@@ -79,25 +84,36 @@ class Room extends Component {
 		socket.emit('join room', this.state.roomId, this.state.user);
 
 		// Listen for status updates for when users join or leave room
-		socket.on('user status', ({ text }) => this.displayStatusMessage(text));
+		socket.on('user status', ({ text }) =>
+			this.displayStatusMessage(text)
+		);
 
 		// Listen for the room's current users in order to set host
 		socket.on('current users', currentUsers => {
 			this.setState({ roomUsers: currentUsers }, () => {
-				console.log('Users in room:', this.state.roomUsers);
+				console.log(
+					'Users in room:',
+					this.state.roomUsers
+				);
 				this.renderAvatarSlides();
 
 				// The first user in the usersArray is the roomHost. If the host leaves, the next person becomes the first in usersArray, becoming the roomHost
-				this.setState({ roomHost: this.state.roomUsers[0] }, () => {
-					// console.log('Current host: ', this.state.roomHost.display_name);
-				});
+				this.setState(
+					{ roomHost: this.state.roomUsers[0] },
+					() => {
+						// console.log('Current host: ', this.state.roomHost.display_name);
+					}
+				);
 			});
 		});
 
 		// Listen if other users click play/pause/next
 		socket.on('player action', ({ action, message }) => {
 			if (action === 'play' || action === 'pause') {
-				this.handlePlayPauseClick(action, this.state.accessToken);
+				this.handlePlayPauseClick(
+					action,
+					this.state.accessToken
+				);
 				this.displayStatusMessage(message);
 			} else if (action === 'next') {
 				this.handleNextClick(this.state.accessToken);
@@ -107,7 +123,10 @@ class Room extends Component {
 
 		// Listen if a new track gets added to the Play Queue by another user
 		socket.on('new track', ({ trackId, message }) => {
-			this.addTrackToPlaybackQueue(this.state.accessToken, trackId);
+			this.addTrackToPlaybackQueue(
+				this.state.accessToken,
+				trackId
+			);
 			this.setRoomTracks(this.state.roomId);
 			this.displayStatusMessage(message);
 		});
@@ -132,12 +151,16 @@ class Room extends Component {
 	getCurrentlyPlaying = token => {
 		SpotifyAPI.getUserQueueData(token)
 			.then(res => {
-				if (res.status === 204) throw new Error('Error: User playback queue inactive.');
+				if (res.status === 204)
+					throw new Error(
+						'Error: User playback queue inactive.'
+					);
 
 				this.setState(
 					{
 						item: res.data.item,
-						playbackQueueStatus: res.data.is_playing,
+						playbackQueueStatus:
+							res.data.is_playing,
 						progress: res.data.progress_ms,
 						userSong: res.data
 					},
@@ -160,7 +183,10 @@ class Room extends Component {
 	// The host sets the roomSong to what they are currently listening to
 	setRoomSong = () => {
 		// Object.keys checks if there are object properties - otherwise, an empty object causes errors if the host is not playing a song
-		if (this.state.user.id === this.state.roomHost.id && Object.keys(this.state.userSong).length > 0) {
+		if (
+			this.state.user.id === this.state.roomHost.id &&
+			Object.keys(this.state.userSong).length > 0
+		) {
 			this.setState({ roomSong: this.state.userSong }, () => {
 				socket.emit('host song', {
 					song: this.state.roomSong,
@@ -172,14 +198,19 @@ class Room extends Component {
 
 	addTrackToPlaybackQueue = (token, trackId) => {
 		SpotifyAPI.addTrackToQueue(token, trackId).catch(err => {
-			if (err) console.log('Error: Unable to add track to playback queue.');
+			if (err)
+				console.log(
+					'Error: Unable to add track to playback queue.'
+				);
 		});
 	};
 
 	setRoomTracks = roomId => {
 		API.getTracks(roomId)
 			.then(res => {
-				this.setState({ addedTracks: res.data.addedTracks });
+				this.setState({
+					addedTracks: res.data.addedTracks
+				});
 			})
 			.catch(err => console.log(err));
 	};
@@ -187,12 +218,16 @@ class Room extends Component {
 	// Using timeout to determine when the track is done playing
 	// When time is up, we update track played status in DB and call getCurrently playing to begin the updating process again
 	updatePlayedStatus = () => {
-		let timeRemaining = this.state.item.duration_ms - this.state.progress;
+		let timeRemaining =
+			this.state.item.duration_ms - this.state.progress;
 
 		let trackToUpdate = this.state.item.id;
 
 		setTimeout(() => {
-			API.updateTrackPlayedStatus(this.state.roomId, trackToUpdate).catch(err => {
+			API.updateTrackPlayedStatus(
+				this.state.roomId,
+				trackToUpdate
+			).catch(err => {
 				if (err) console.log(err.message);
 			});
 
@@ -205,7 +240,11 @@ class Room extends Component {
 		let addedTracks = this.state.addedTracks;
 
 		if (!addedTracks.length) {
-			return <p className="queue-help">Add a track to get started...</p>;
+			return (
+				<p className="queue-help">
+					Add a track to get started...
+				</p>
+			);
 		} else {
 			return addedTracks.map(track => (
 				<ListGroup.Item
@@ -226,7 +265,11 @@ class Room extends Component {
 
 	// Emit to other users in room if you click play/pause/next
 	emitPlayerAction = (action, user) => {
-		socket.emit('user action', { action, user, roomId: this.state.roomId });
+		socket.emit('user action', {
+			action,
+			user,
+			roomId: this.state.roomId
+		});
 	};
 
 	handlePlayPauseClick = (action, token) => {
@@ -239,7 +282,10 @@ class Room extends Component {
 	handleNextClick = token => {
 		SpotifyAPI.nextPlaybackTrack(token)
 			.then(() =>
-				API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id).catch(err => {
+				API.updateTrackPlayedStatus(
+					this.state.roomId,
+					this.state.item.id
+				).catch(err => {
 					if (err)
 						throw new Error(
 							'DB Error: Unable to update a track not associated with the Room.'
@@ -279,7 +325,8 @@ class Room extends Component {
 
 			for (let itemIndex = 0; itemIndex < 3; itemIndex++) {
 				let user = currentUsers[itemIndex];
-				if (typeof user != 'undefined') currentSlide.push(user);
+				if (typeof user != 'undefined')
+					currentSlide.push(user);
 			}
 
 			// Remove first 3 users from array in order to add next 3 user to next slide, etc.
@@ -297,8 +344,12 @@ class Room extends Component {
 				<Container className="pt-5 pb-4">
 					<Row>
 						{/* Logo */}
-						<Col xs={12} md={2} className="text-center">
-							<a href={`/home?access_token=${this.state.accessToken}`}>
+						<Col
+							xs={12}
+							md={2}
+							className="text-center">
+							<a
+								href={`/home?access_token=${this.state.accessToken}`}>
 								<Image
 									className="brand-logo"
 									src="./images/icons/playlistr-yellow-icon.png"
@@ -307,20 +358,58 @@ class Room extends Component {
 						</Col>
 
 						{/* Current Room */}
-						<Col className="room-title" xs={12} md={4}>
-							<h1>Current Room: {this.state.roomId} </h1>
+						<Col
+							className="room-title"
+							xs={12}
+							md={4}>
+							<h1>
+								Current Room:{' '}
+								{
+									this
+										.state
+										.roomId
+								}{' '}
+							</h1>
 						</Col>
 
 						{/* Track Search */}
-						<Col className="track-search-container" xs={12} md={6}>
+						<Col
+							className="track-search-container"
+							xs={12}
+							md={6}>
 							<TrackSearch
-								token={this.state.accessToken}
-								roomId={this.state.roomId}
-								user={this.state.user}
-								setRoomTracks={this.setRoomTracks}
-								getCurrentlyPlaying={this.getCurrentlyPlaying}
-								currentlyPlayingTrack={this.state.item}
-								addTrackToPlaybackQueue={this.addTrackToPlaybackQueue}
+								token={
+									this
+										.state
+										.accessToken
+								}
+								roomId={
+									this
+										.state
+										.roomId
+								}
+								user={
+									this
+										.state
+										.user
+								}
+								setRoomTracks={
+									this
+										.setRoomTracks
+								}
+								getCurrentlyPlaying={
+									this
+										.getCurrentlyPlaying
+								}
+								currentlyPlayingTrack={
+									this
+										.state
+										.item
+								}
+								addTrackToPlaybackQueue={
+									this
+										.addTrackToPlaybackQueue
+								}
 							/>
 						</Col>
 					</Row>
@@ -328,10 +417,20 @@ class Room extends Component {
 				<Container>
 					<Row>
 						{/* Album Image */}
-						<Col xs={6} md={6} className="text-center">
+						<Col
+							xs={6}
+							md={6}
+							className="text-center">
 							<img
 								className="now-playing-img"
-								src={this.state.item.album.images[0].url}
+								src={
+									this
+										.state
+										.item
+										.album
+										.images[0]
+										.url
+								}
 								alt="Track album artwork"
 							/>
 						</Col>
@@ -339,7 +438,10 @@ class Room extends Component {
 						{/* Play Queue */}
 						<Col xs={6} md={6}>
 							<div className="play-queue">
-								<h1>Play Queue</h1>
+								<h1>
+									Play
+									Queue
+								</h1>
 
 								<ListGroup className="play-queue-list">
 									{this.handleQueueRender()}
@@ -352,15 +454,29 @@ class Room extends Component {
 					<Row>
 						{/* Alert */}
 						<Col xs={12} sm={6} md={6}>
-							<Alert show={this.state.alertShow} variant="success">
+							<Alert
+								show={
+									this
+										.state
+										.alertShow
+								}
+								variant="success">
 								<h5>
-									Please open the Spotify App and play a track to
-									get started.
+									Please
+									open the
+									Spotify
+									App and
+									play a
+									track to
+									get
+									started.
 								</h5>
 
 								<div className="d-flex justify-content-end">
 									<button
-										onClick={() => this.handleAlertClick()}
+										onClick={() =>
+											this.handleAlertClick()
+										}
 										variant="outline-success">
 										Ready
 									</button>
@@ -369,16 +485,52 @@ class Room extends Component {
 
 							{/* Music Player */}
 							<Player
-								token={this.state.accessToken}
-								item={this.state.item}
-								isPlaying={this.state.isPlaying}
-								progress={this.state.progress}
-								user={this.state.user}
-								emitPlayerAction={this.emitPlayerAction}
-								handlePlayPauseClick={this.handlePlayPauseClick}
-								handleNextClick={this.handleNextClick}
-								getCurrentlyPlaying={this.getCurrentlyPlaying}
-								room={this.state.roomId}
+								token={
+									this
+										.state
+										.accessToken
+								}
+								item={
+									this
+										.state
+										.item
+								}
+								isPlaying={
+									this
+										.state
+										.isPlaying
+								}
+								progress={
+									this
+										.state
+										.progress
+								}
+								user={
+									this
+										.state
+										.user
+								}
+								emitPlayerAction={
+									this
+										.emitPlayerAction
+								}
+								handlePlayPauseClick={
+									this
+										.handlePlayPauseClick
+								}
+								handleNextClick={
+									this
+										.handleNextClick
+								}
+								getCurrentlyPlaying={
+									this
+										.getCurrentlyPlaying
+								}
+								room={
+									this
+										.state
+										.roomId
+								}
 							/>
 						</Col>
 						<Col xs={12} sm={6} md={6}>
@@ -386,40 +538,55 @@ class Room extends Component {
 							<Row>
 								<Carousel
 									className="room-carousel"
-									interval={3500}
-									indicators={false}>
-									{this.state.slides.map(slide => (
-										<Carousel.Item>
-											<Container>
-												<Row>
-													{slide.map(
-														user => (
-															<RoomUser
-																key={
-																	user.id
-																}
-																user={
-																	user
-																}
-																avatar={
-																	user
-																		.images[0]
-																		.url
-																}
-																name={
-																	user.display_name
-																}
-															/>
-														)
-													)}
-												</Row>
-											</Container>
-										</Carousel.Item>
-									))}
+									interval={
+										3500
+									}
+									indicators={
+										false
+									}>
+									{this.state.slides.map(
+										slide => (
+											<Carousel.Item
+												key={this.state.slides.indexOf(
+													slide
+												)}>
+												<Container>
+													<Row>
+														{slide.map(
+															user => (
+																<RoomUser
+																	key={
+																		user.id
+																	}
+																	user={
+																		user
+																	}
+																	avatar={
+																		user
+																			.images[0]
+																			.url
+																	}
+																	name={
+																		user.display_name
+																	}
+																/>
+															)
+														)}
+													</Row>
+												</Container>
+											</Carousel.Item>
+										)
+									)}
 								</Carousel>
 							</Row>
 							<Row>
-								<p className="status-msg">{this.state.statusMsg}</p>
+								<p className="status-msg">
+									{
+										this
+											.state
+											.statusMsg
+									}
+								</p>
 							</Row>
 						</Col>
 					</Row>
