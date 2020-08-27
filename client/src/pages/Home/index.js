@@ -30,6 +30,7 @@ class Home extends Component {
 			selectedPlaylist: '',
 			openSpotifyAlert: false,
 			playlistAlert: false,
+			joinRoomAlert: false,
 			spinnerClass: 'd-none',
 			slides: []
 		};
@@ -97,10 +98,16 @@ class Home extends Component {
 			.then(res => {
 				if (!res.data.is_playing)
 					throw new Error('Error: Please open Spotify and play a track.');
-				else if (res.data.is_playing) this.setState({ openSpotifyAlert: false });
+				else if (res.data.is_playing)
+					this.setState({
+						openSpotifyAlert: false
+					});
 			})
 			.catch(err => {
-				if (err) this.setState({ openSpotifyAlert: true });
+				if (err)
+					this.setState({
+						openSpotifyAlert: true
+					});
 			});
 	};
 
@@ -169,8 +176,9 @@ class Home extends Component {
 						});
 					})
 					.then(() => {
-						console.log(timeoutLength);
-						this.setState({ spinnerClass: '' });
+						this.setState({
+							spinnerClass: ''
+						});
 
 						//	Set URL after all POSTs have completed
 						setTimeout(
@@ -182,6 +190,13 @@ class Home extends Component {
 			.catch(err => {
 				if (err) console.log(err.message);
 			});
+	};
+
+	// Sets boolean value of joinRoomAlert state based on current state
+	setJoinRoomAlert = () => {
+		this.state.joinRoomAlert
+			? this.setState({ joinRoomAlert: false })
+			: this.setState({ joinRoomAlert: true });
 	};
 
 	render() {
@@ -258,6 +273,23 @@ class Home extends Component {
 									</button>
 								</Alert>
 							</div>
+							<div className="playlist-alert d-flex align-items-center text-center">
+								{/* Join Room Sync Alert */}
+								<Alert
+									variant="dark"
+									show={this.state.joinRoomAlert}
+									className="shadow-lg">
+									<h5>Syncing your Spotify queue with Room...</h5>
+									<Spinner
+										className="text-center"
+										as="span"
+										animation="border"
+										size="lg"
+										role="status"
+										aria-hidden="true"
+									/>{' '}
+								</Alert>
+							</div>
 						</Col>
 					</Row>
 				</Container>
@@ -307,7 +339,11 @@ class Home extends Component {
 					</Row>
 				</Container>
 				<Container>
-					<RoomButtons token={this.state.accessToken} setUrl={this.setUrl} />
+					<RoomButtons
+						token={this.state.accessToken}
+						setUrl={this.setUrl}
+						setJoinRoomAlert={this.setJoinRoomAlert}
+					/>
 				</Container>
 			</div>
 		);

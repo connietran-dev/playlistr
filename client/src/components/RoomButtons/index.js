@@ -10,7 +10,6 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Alert from 'react-bootstrap/Alert';
-import Spinner from 'react-bootstrap/Spinner';
 
 import './style.css';
 
@@ -21,8 +20,6 @@ class RoomButtons extends Component {
 		this.state = {
 			joinRoomInput: '',
 			inputAlertDisplay: false,
-			joinSpinnerDisplay: 'd-none',
-			createSpinnerDisplay: 'd-none',
 			roomHex: hexGen(24) // Output: 6 character hex
 		};
 	}
@@ -52,13 +49,13 @@ class RoomButtons extends Component {
 				} else return;
 			})
 			.then(() => {
-				// Display spinner while API calls are being made leading up to the url being set to join room
-				this.setState({ joinSpinnerDisplay: '' });
+				// Display Join Room alert/spinner while API calls are being made leading up to the url being set to join room
+				this.props.setJoinRoomAlert();
 
 				// Giving the Spotify API time to queue up all tracks before setting url to join the room
 				setTimeout(() => {
 					this.props.setUrl(this.props.token, roomId);
-					this.setState({ joinSpinnerDisplay: 'd-none' });
+					this.props.setJoinRoomAlert();
 				}, timeoutLength);
 			})
 			.catch(err => console.log(err));
@@ -68,15 +65,9 @@ class RoomButtons extends Component {
 	handleCreateRoom = e => {
 		e.preventDefault();
 
-		this.setState({ createSpinnerDisplay: '' });
-
 		API.createRoom(this.state.roomHex)
-		.catch(err => console.log(err));
-
-		setTimeout(() => {
-			this.props.setUrl(this.props.token, this.state.roomHex);
-			this.setState({ createSpinnerDisplay: 'd-none' });
-		}, 2000);
+			.then(() => this.props.setUrl(this.props.token, this.state.roomHex))
+			.catch(err => console.log(err));
 	};
 
 	handleJoinRoom = e => {
@@ -107,18 +98,7 @@ class RoomButtons extends Component {
 									<button
 										className="join-room-btn"
 										onClick={this.handleJoinRoom}>
-										<Spinner
-											as="span"
-											animation="border"
-											size="sm"
-											role="status"
-											aria-hidden="true"
-											className={
-												this.state
-													.joinSpinnerDisplay
-											}
-										/>{' '}
-										<span> Join a Room</span>
+										Join a Room
 									</button>
 								</Link>
 
@@ -142,16 +122,8 @@ class RoomButtons extends Component {
 							<button
 								onClick={this.handleCreateRoom}
 								className="float-right create-room-btn">
-								<Spinner
-									as="span"
-									animation="border"
-									size="sm"
-									role="status"
-									aria-hidden="true"
-									className={this.state.createSpinnerDisplay}
-								/>{' '}
-								<span>Create a Room</span>
-							</button>{' '}
+								Create a Room
+							</button>
 						</Link>
 					</Col>
 				</Row>
