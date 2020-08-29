@@ -1,8 +1,10 @@
 # Playlistr
 
 <div align="center">
-    <img src="./readme/playlistr-landing.png" alt="Playlistr IMAGE" width="60%" />
+    <img src="./readme/playlistr-landing.png" alt="Playlistr IMAGE" width="75%" />
 </div>
+
+## Description
 
 **Playlistr** is an app for live, group music listening on Spotify. 
 
@@ -35,7 +37,7 @@ To find out more about the inspiration behind this project, check out our pitch 
 
 ## Technologies
 
-<img src="./readme/Playlistr-tech-stack.png" alt="Playlistr tech stack" width="50%"/>
+<img src="./readme/playlistr-tech-stack.png" alt="Playlistr tech stack" width="60%"/>
 
 Playlistr was built using the following technologies:
 
@@ -48,7 +50,7 @@ Playlistr was built using the following technologies:
 
 ## Methodology
 
-<img src="./readme/playlistr-app-flow.png" alt="Playlistr IMAGE" width="50%"/>
+<img src="./readme/playlistr-app-flow.png" alt="Playlistr IMAGE" width="60%"/>
 
 ### Authentication
 
@@ -73,8 +75,8 @@ Feel free to submit any features you'd like to see via the Issues section of thi
 * Connie Tran, [@connietran-dev](https://github.com/connietran-dev)
 
 <div align="center">
-    <img src="./readme/john-herman.png" alt="John Herman, web developer" width="450"/>
-    <img src="./readme/connie-tran.png" alt="Connie Tran, web developer" width="450"/>
+    <img src="./readme/john-herman.png" alt="John Herman, web developer" width="40%"/>
+    <img src="./readme/connie-tran.png" alt="Connie Tran, web developer" width="40%"/>
 </div>
 
 
