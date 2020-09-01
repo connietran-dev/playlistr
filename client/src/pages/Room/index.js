@@ -282,7 +282,7 @@ class Room extends Component {
 			.then(() =>
 				API.updateTrackPlayedStatus(
 					this.state.roomId,
-					`this.state.item`.id
+					this.state.item.id
 				).catch(err => {
 					if (err)
 						throw new Error(
