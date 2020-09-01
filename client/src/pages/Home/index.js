@@ -30,6 +30,7 @@ class Home extends Component {
 			selectedPlaylist: '',
 			openSpotifyAlert: false,
 			playlistAlert: false,
+			playlistProgressAlert: false,
 			joinRoomAlert: false,
 			spinnerClass: 'd-none',
 			slides: []
@@ -180,16 +181,28 @@ class Home extends Component {
 							spinnerClass: ''
 						});
 
-						//	Set URL after all POSTs have completed
+						console.log('Setting timeout for room:', roomHex);
+
+						//	Set URL after all POSTs have completed - 1.75x for debugging
 						setTimeout(
-							() => this.setUrl(this.state.accessToken, roomHex),
-							timeoutLength
+							() => {
+								console.log('CREATING ROOM AFTER TIMEOUT:', roomHex);
+								this.setUrl(this.state.accessToken, roomHex);
+							},
+							timeoutLength * 1.75
 						);
 					});
 			})
 			.catch(err => {
 				if (err) console.log(err.message);
 			});
+	};
+
+	// Sets boolean value of playlistProgressAlert state based on current state
+	setPlaylistProgress = () => {
+		this.state.playlistProgressAlert
+			? this.setState({ playlistProgressAlert: false })
+			: this.setState({ playlistProgressAlert: true });
 	};
 
 	// Sets boolean value of joinRoomAlert state based on current state
@@ -204,6 +217,8 @@ class Home extends Component {
 			<div>
 				<Container>
 					<Row className="top-banner">
+
+						{/* Profile Image */}
 						<Col xs={12} sm={12} md={3} lg={2} className="text-center">
 							<Image
 								roundedCircle
@@ -212,6 +227,8 @@ class Home extends Component {
 							/>
 							<p className="user-name">{this.state.user.display_name}</p>
 						</Col>
+
+						{/* Welcome to Playlistr Banner */}
 						<Col
 							xs={12}
 							sm={12}
@@ -258,7 +275,11 @@ class Home extends Component {
 										Are you sure you want to start a room
 										with this playlist?
 									</p>
-									<button onClick={this.createPlaylistRoom}>
+									<button onClick={event => {
+										this.createPlaylistRoom(event);
+										this.setPlaylistProgress();	// Displays playlist progress spinner
+										this.setState({ playlistAlert: false }); // Closes "Are you sure?" modal
+									}}>
 										<Spinner
 											as="span"
 											animation="border"
@@ -271,6 +292,23 @@ class Home extends Component {
 										/>{' '}
 										<span> Create Room</span>
 									</button>
+								</Alert>
+							</div>
+							<div className="playlist-alert d-flex align-items-center text-center">
+								{/* Creating Room from Playlist Alert */}
+								<Alert
+									variant="dark"
+									show={this.state.playlistProgressAlert}
+									className="shadow-lg">
+									<h5>Creating room from playlist...</h5>
+									<Spinner
+										className="text-center"
+										as="span"
+										animation="border"
+										size="lg"
+										role="status"
+										aria-hidden="true"
+									/>{' '}
 								</Alert>
 							</div>
 							<div className="playlist-alert d-flex align-items-center text-center">
@@ -293,6 +331,8 @@ class Home extends Component {
 						</Col>
 					</Row>
 				</Container>
+
+				{/* Playlist Carousel */}
 				<Container>
 					<Row>
 						<Carousel
@@ -338,6 +378,8 @@ class Home extends Component {
 						</Carousel>
 					</Row>
 				</Container>
+
+				{/* Room Buttons */}
 				<Container>
 					<RoomButtons
 						token={this.state.accessToken}

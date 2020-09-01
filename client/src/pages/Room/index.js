@@ -64,9 +64,7 @@ class Room extends Component {
 	componentDidMount() {
 		SpotifyAPI.getUserData(this.state.accessToken)
 			.then(res => this.setState({ user: res.data }))
-			.then(() => {
-				this.mountRoomSockets();
-			});
+			.then(() => this.mountRoomSockets());
 
 		this.getCurrentlyPlaying(this.state.accessToken);
 
@@ -401,11 +399,11 @@ class Room extends Component {
 									this
 										.getCurrentlyPlaying
 								}
-								currentlyPlayingTrack={
-									this
-										.state
-										.item
-								}
+								// currentlyPlayingTrack={
+								// 	this
+								// 		.state
+								// 		.item
+								// }
 								addTrackToPlaybackQueue={
 									this
 										.addTrackToPlaybackQueue

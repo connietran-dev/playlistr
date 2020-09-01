@@ -29,6 +29,7 @@ class RoomButtons extends Component {
 
 		API.getTracks(roomId)
 			.then(res => {
+				console.log('getTracks Mongo response:', res);
 				// Creating an array of tracks that have yet to be played
 				let notPlayedTracks = res.data.addedTracks.filter(track => !track.played);
 
@@ -52,8 +53,12 @@ class RoomButtons extends Component {
 				// Display Join Room alert/spinner while API calls are being made leading up to the url being set to join room
 				this.props.setJoinRoomAlert();
 
+				console.log('Setting timeout to join room:', roomId);
+
 				// Giving the Spotify API time to queue up all tracks before setting url to join the room
 				setTimeout(() => {
+					console.log('JOINING EXISTING ROOM URL:', roomId);
+					
 					this.props.setUrl(this.props.token, roomId);
 					this.props.setJoinRoomAlert();
 				}, timeoutLength);
