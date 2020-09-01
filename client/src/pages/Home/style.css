@@ -20,15 +20,21 @@ h1.home-banner {
 
 .home-carousel {
 	width: 1140px;
-	height: 100%;
-	margin: auto;
-	padding-bottom: 10%;
+	min-height: 450px;
+	margin: 10px auto;
+	padding: 0;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+	padding-bottom: 30px;
+	width: 4%;
 }
 
 .playlist-alert {
 	width: 50%;
 	position: absolute;
-	left: 25%;
+	left: 30%;
 	top: 100px;
 	z-index: 1;
 }

@@ -1,7 +1,7 @@
 # Playlistr
 
 <div align="center">
-    <img src="./readme/playlistr-landing.png" alt="Playlistr IMAGE" width="75%" />
+    <img src="./readme/playlistr-landing.png" alt="Playlistr Landing Page" width="75%" />
 </div>
 
 ## Description
@@ -20,12 +20,11 @@ To participate, sign in with your Spotify Premium account, and check out Playlis
 
 https://playlistr-io.herokuapp.com
 
-To see the real-time magic happen, invite your friends for a group listening session or check out our demo here: 
+You can create a room and queue up songs from one of your Spotify playlists. You can then use Playlistr to control the music while listening on Spotify. 
 
-YOUTUBE LINK
+Invite friends to your room with the room code to listen together and see the real-time magic happen. 
 
-
-To find out more about the inspiration behind this project, check out our pitch deck here: [Playlistr Pitch Deck](https://drive.google.com/file/d/1nG980MIZ5lKGJ5p5CUeHgqalULPHr56s/view?usp=sharing)  
+<video src="./readme/playlistr-demo.mp4" alt="Gif showing demo of Playlistr" width="60%" />
 
 ## Table of Contents
 
@@ -79,6 +78,7 @@ Feel free to submit any features you'd like to see via the Issues section of thi
     <img src="./readme/connie-tran.png" alt="Connie Tran, web developer" width="40%"/>
 </div>
 
+To find out more about the inspiration behind this project, check out our pitch deck here: [Playlistr Pitch Deck](https://drive.google.com/file/d/1nG980MIZ5lKGJ5p5CUeHgqalULPHr56s/view?usp=sharing)  
 
 ### Credits
 

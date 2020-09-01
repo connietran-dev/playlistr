@@ -64,9 +64,7 @@ class Room extends Component {
 	componentDidMount() {
 		SpotifyAPI.getUserData(this.state.accessToken)
 			.then(res => this.setState({ user: res.data }))
-			.then(() => {
-				this.mountRoomSockets();
-			});
+			.then(() => this.mountRoomSockets());
 
 		this.getCurrentlyPlaying(this.state.accessToken);
 
@@ -284,7 +282,7 @@ class Room extends Component {
 			.then(() =>
 				API.updateTrackPlayedStatus(
 					this.state.roomId,
-					this.state.item.id
+					`this.state.item`.id
 				).catch(err => {
 					if (err)
 						throw new Error(
@@ -401,11 +399,11 @@ class Room extends Component {
 									this
 										.getCurrentlyPlaying
 								}
-								currentlyPlayingTrack={
-									this
-										.state
-										.item
-								}
+								// currentlyPlayingTrack={
+								// 	this
+								// 		.state
+								// 		.item
+								// }
 								addTrackToPlaybackQueue={
 									this
 										.addTrackToPlaybackQueue
