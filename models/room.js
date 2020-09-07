@@ -6,6 +6,10 @@ const RoomSchema = new Schema({
 		type: String,
 		required: true
 	},
+	time: {
+		type: Date,
+		default: Date.now
+	},
 	addedTracks: [
 		{
 			info: {

@@ -20,7 +20,7 @@ class RoomButtons extends Component {
 		this.state = {
 			joinRoomInput: '',
 			inputAlertDisplay: false,
-			roomHex: hexGen(24) // Output: 6 character hex
+			roomHex: hexGen(16) // Output: 4 character hex
 		};
 	}
 
@@ -58,7 +58,7 @@ class RoomButtons extends Component {
 				// Giving the Spotify API time to queue up all tracks before setting url to join the room
 				setTimeout(() => {
 					console.log('JOINING EXISTING ROOM URL:', roomId);
-					
+
 					this.props.setUrl(this.props.token, roomId);
 					this.props.setJoinRoomAlert();
 				}, timeoutLength);
@@ -79,7 +79,7 @@ class RoomButtons extends Component {
 		e.preventDefault();
 
 		// Verifies a user has put in a 6 digit room id
-		if (this.state.joinRoomInput && this.state.joinRoomInput.length === 6) {
+		if (this.state.joinRoomInput && this.state.joinRoomInput.length === 4) {
 			this.syncQueueWithRoomAndJoin(this.state.joinRoomInput);
 		} else {
 			this.setState({ inputAlertDisplay: true });
