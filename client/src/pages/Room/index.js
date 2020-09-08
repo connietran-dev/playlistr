@@ -154,9 +154,26 @@ class Room extends Component {
 			.then(() => this.handleQueueRender())
 			.then(() => this.updatePlayedStatus())
 			.catch(err => {
+				// Catching any error that results from trying to get the users current playback info by displaying an Alert and setting item state to an object with no data except our logo to serve as the image URL
 				if (err) {
 					this.setState({ alertShow: true });
 					console.log(err.message);
+
+					this.setState({
+						item: {
+							album: {
+								images: [
+									{
+										url:
+											'./images/playlistr-yellow-logo.png'
+									}
+								]
+							},
+							name: '',
+							artists: [{ name: '' }],
+							duration_ms: 0
+						}
+					});
 				}
 			});
 	};
@@ -199,7 +216,7 @@ class Room extends Component {
 
 		setTimeout(() => {
 			API.updateTrackPlayedStatus(this.state.roomId, trackToUpdate).catch(err => {
-				if (err) console.log(err.message);
+				if (err) console.log('Error: Unable to update a track not associated with the Room');
 			});
 
 			this.getCurrentlyPlaying(this.state.accessToken);
@@ -252,7 +269,7 @@ class Room extends Component {
 				API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id).catch(err => {
 					if (err)
 						throw new Error(
-							'DB Error: Unable to update a track not associated with the Room.'
+							'Error: Unable to update a track not associated with the Room.'
 						);
 				})
 			)
