@@ -67,7 +67,7 @@ class Room extends Component {
 			.then(res => {
 				let currentUser = res.data;
 				
-				if (res.data.images[0].url === undefined) {
+				if (res.data.images[0] === undefined) {
 					let defaultImage = [];
 					defaultImage.push('./images/logo.jpg');
 					currentUser = {
