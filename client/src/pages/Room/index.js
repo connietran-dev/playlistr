@@ -64,7 +64,22 @@ class Room extends Component {
 	// When the current user joins room, add them to the array of current users on the server (in handler.js)
 	componentDidMount() {
 		SpotifyAPI.getUserData(this.state.accessToken)
-			.then(res => this.setState({ user: res.data }))
+			.then(res => {
+				let currentUser = res.data;
+				
+				if (!res.data.images[0].url) {
+					let defaultImage = [];
+					defaultImage.push('./images/logo.jpg');
+					currentUser = {
+						...currentUser,
+						images: defaultImage
+					}
+				}
+				
+				console.log('currentUser:', currentUser);
+
+				this.setState({ user: currentUser })
+			})
 			.then(() => this.mountRoomSockets());
 
 		this.getCurrentlyPlaying(this.state.accessToken);

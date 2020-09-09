@@ -48,9 +48,18 @@ class Home extends Component {
 		// Fetch user data
 		SpotifyAPI.getUserData(token).then(res => {
 			console.log(res.data);
+
+			let profilePicture = '';
+			if (res.data.images[0].url) {
+				profilePicture = res.data.images[0].url;
+			} else {
+				profilePicture = './images/logo.jpg';
+			};
+			console.log('profilePicture: ', profilePicture);
+
 			this.setState({
 				user: res.data,
-				userImage: res.data.images[0].url
+				userImage: profilePicture
 			});
 		});
 
@@ -115,12 +124,16 @@ class Home extends Component {
 	// Redirects user to a Room passing along the token and room id in the url
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
+		console.log('homeUrl:', homeUrl);
+		console.log('accessToken:', accessToken);
 
 		if (homeUrl === `http://localhost:3000/home?access_token=${accessToken}`) {
+			console.log('Redirecting to development music room...');
 			window.location.replace(
 				`http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`
 			);
 		} else if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
+			console.log('Redirecting to production music room...');
 			window.location.replace(
 				`http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`
 			);
@@ -183,13 +196,13 @@ class Home extends Component {
 
 						console.log('Setting timeout for room:', roomHex);
 
-						//	Set URL after all POSTs have completed - 1.75x for debugging
+						//	Set URL after all POSTs have completed
 						setTimeout(
 							() => {
 								console.log('CREATING ROOM AFTER TIMEOUT:', roomHex);
 								this.setUrl(this.state.accessToken, roomHex);
 							},
-							timeoutLength * 1.75
+							timeoutLength
 						);
 					});
 			})
