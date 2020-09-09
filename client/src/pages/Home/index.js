@@ -50,11 +50,12 @@ class Home extends Component {
 			console.log(res.data);
 
 			let profilePicture = '';
-			if (res.data.images[0].url) {
-				profilePicture = res.data.images[0].url;
-			} else {
+			if (res.data.images[0].url === undefined) {
 				profilePicture = './images/logo.jpg';
-			};
+			} else {
+				profilePicture = res.data.images[0].url;
+			}
+
 			console.log('profilePicture: ', profilePicture);
 
 			this.setState({
