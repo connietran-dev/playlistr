@@ -66,15 +66,17 @@ class Room extends Component {
 		SpotifyAPI.getUserData(this.state.accessToken)
 			.then(res => {
 				let currentUser = res.data;
-				
+
+				// If user has undefined profile picture, use Playlistr logo instead
 				if (res.data.images[0] === undefined) {
-					let defaultImage = [];
-					defaultImage.push('./images/logo.jpg');
+					let newImages = [];
+					let defaultImage = { url: './images/logo.jpg' };
+					newImages.push(defaultImage);
 					currentUser = {
 						...currentUser,
 						images: defaultImage
 					}
-				}
+				};
 
 				console.log('currentUser:', currentUser);
 
@@ -428,8 +430,7 @@ class Room extends Component {
 						<Col xs={12} sm={6} md={6}>
 							<Alert show={this.state.alertShow} variant="success">
 								<h5>
-									Please open the Spotify App and play a track to
-									get started.
+									Open Spotify and play a track to be in sync with the Room
 								</h5>
 
 								<div className="d-flex justify-content-end">

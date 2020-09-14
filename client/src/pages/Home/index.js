@@ -261,8 +261,7 @@ class Home extends Component {
 									variant="dark"
 									show={this.state.openSpotifyAlert}>
 									<p>
-										Please open Spotify and play a track to
-										get started.
+										Open Spotify and play a track to add songs to your queue upon joining a Room
 									</p>
 									<button
 										onClick={() =>
