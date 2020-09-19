@@ -430,11 +430,12 @@ class Room extends Component {
 						<Col xs={12} sm={6} md={6}>
 							<Alert show={this.state.alertShow} variant="success">
 								<h5>
-									Open Spotify and play a track to be in sync with the Room
+									To sync with the Room, open Spotify & play a track
 								</h5>
 
 								<div className="d-flex justify-content-end">
 									<button
+										className="alert-button"
 										onClick={() => this.handleAlertClick()}
 										variant="outline-success">
 										Ready

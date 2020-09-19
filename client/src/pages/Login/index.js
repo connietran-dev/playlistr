@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -35,6 +36,11 @@ function Login() {
 						</button>
 					</div>
 				</Col>
+			</Row>
+			<Row>
+				<p className="copyright-text">
+					Copyright © 2020 All Rights Reserved by{" "}<Link to="/about" className="about-link">Playlistr</Link>
+				</p>
 			</Row>
 		</Container>
 	);

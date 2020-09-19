@@ -22,6 +22,11 @@
 	margin: 26px;
 }
 
+.copyright-text {
+	margin: 6vh auto 0;
+	font-size: 0.80rem;
+}
+
 @media (max-width: 1024px) {
 	.login.backdrop {
 		padding: 200px;

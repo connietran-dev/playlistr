@@ -1,5 +1,45 @@
-.jumbotron {
+.about-bg {
     background: url('/images/yellow-backdrop.jpg');
+    background-repeat: no-repeat;
     background-size: cover;
+    background-position: 40% 85%;
+	  opacity: 0.96;
     height: 100vh;
+    padding: 7.5vh 0 0;
   }
+
+.about-card {
+  background-color: rgba(24, 24, 24, 0.65);
+  min-height: 80vh;
+  padding: 40px 8px;
+}
+
+.about-brand {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  font-size: 2.5rem;
+  color:white;
+}
+
+img.about-brand {
+  height: 4rem;
+  margin: 1rem 0 2rem;
+}
+
+.about-link {
+  color: #FED402;
+}
+
+.about-link:hover {
+  color: black;
+  text-decoration: none;
+}
+
+.about-text {
+  min-width: 45vw;
+  margin: 3vh 8vw 18vh;
+}
+
+.about.copyright-text {
+	margin: 5vh auto -5vh;
+}

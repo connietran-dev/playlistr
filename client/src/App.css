@@ -47,6 +47,10 @@ button {
   border-radius: 8px;
 }
 
+.alert-button {
+	margin: 0;
+}
+
 button:hover {
   background-color: #171C20;
   color: white;
@@ -69,7 +73,7 @@ input {
 /* Branding - Brand Elements */
 
 .brand-name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   font-weight: 800;
   font-size: 4rem;
   color: #2c2f33;
