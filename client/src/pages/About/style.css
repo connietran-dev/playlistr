@@ -1,45 +1,117 @@
 .about-bg {
-    background: url('/images/yellow-backdrop.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: 40% 85%;
-	  opacity: 0.96;
-    height: 100vh;
-    padding: 7.5vh 0 0;
-  }
+	background: url('/images/yellow-backdrop.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 40% 85%;
+	opacity: 0.96;
+	height: 100vh;
+	padding: 7.5vh 0 0;
+}
 
 .about-card {
-  background-color: rgba(24, 24, 24, 0.65);
-  min-height: 80vh;
-  padding: 40px 8px;
+	background-color: rgba(24, 24, 24, 0.65);
+	min-height: 80vh;
+	padding: 40px 8px;
 }
 
 .about-brand {
-  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
-  font-weight: 800;
-  font-size: 2.5rem;
-  color:white;
+	font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+	font-weight: 800;
+	font-size: 2.5rem;
+	color: white;
 }
 
 img.about-brand {
-  height: 4rem;
-  margin: 1rem 0 2rem;
+	height: 4rem;
+	margin: 1rem 0 2rem;
 }
 
 .about-link {
-  color: #FED402;
+	color: #fed402;
 }
 
 .about-link:hover {
-  color: black;
-  text-decoration: none;
+	color: black;
+	text-decoration: none;
 }
 
 .about-text {
-  min-width: 45vw;
-  margin: 3vh 8vw 18vh;
+	min-width: 45vw;
+	margin: 3vh 8vw 18vh;
 }
 
 .about.copyright-text {
 	margin: 5vh auto -5vh;
+}
+
+/* iPad Pro */
+@media (max-width: 1024px) {
+	.about-card {
+		width: 80%;
+	}
+
+	.about-brand {
+		font-size: 4rem;
+	}
+
+	.about-text {
+		font-size: 1.6rem;
+		margin-bottom: 10vh;
+	}
+}
+
+/* iPad */
+@media (max-width: 768px) {
+	.about-brand {
+		font-size: 2rem;
+	}
+
+	.about-text {
+		font-size: 1.4rem;
+		margin-bottom: 2vh;
+	}
+}
+
+/* Surface Duo */
+@media (max-width: 540px) {
+	.about-brand {
+		font-size: 1.5rem;
+	}
+
+	.about-text {
+		font-size: 0.8rem;
+	}
+}
+
+/* iPhone 6/7/8/X */
+@media (max-width: 375px) {
+	.about-text {
+		margin: 3vh 3vw 5vh 3vw;
+	}
+
+	.about.copyright-text {
+		font-size: 0.6rem;
+	}
+}
+
+/* Galaxy S5 */
+@media (max-width: 360px) {
+	.about-text {
+		font-size: 0.6rem;
+		margin-bottom: 4vh;
+	}
+}
+
+/* iPhone 5/SE */
+@media (max-width: 320px) {
+	.about-text {
+		margin: 2vh 2vw;
+	}
+}
+
+/* Galaxy Fold */
+@media (max-width: 280px) {
+	.about.copyright-text {
+		font-size: 8px;
+	}
 }
