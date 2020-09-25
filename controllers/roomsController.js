@@ -12,7 +12,6 @@ module.exports = {
 			.catch(err => res.status(422).json(err));
 	},
 	create: (req, res) => {
-		console.log(req.body);
 		db.Room.create(req.body)
 			.then(data => res.json(data))
 			.catch(err => res.status(422).json(err));
@@ -62,7 +61,7 @@ module.exports = {
 
 				// Set current track to now playing and all other tracks to false
 				updatedTrack[0].nowPlaying = true;
-				otherTracks.map(track => track.nowPlaying = false);
+				otherTracks.map(track => (track.nowPlaying = false));
 
 				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
 			})
