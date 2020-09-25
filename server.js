@@ -34,6 +34,8 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 io.on('connect', socket => {
+	console.log('Client connected to server: ', socket.id);
+
 	// After user is connected, then joins room
 	socket.on('join room', (roomId, user) => {
 		// Utilize handler to add user
@@ -86,7 +88,11 @@ io.on('connect', socket => {
 			io.to(user.room).emit('user status', { text: `${user.display_name} left...` });
 			io.to(user.room).emit('current users', handlers.getUsersInRoom(user.room));
 		}
+
+		console.log('Client disconnected from server: ', socket.id);
 	});
 });
+
+console.log(`Listening on port ${port}.`);
 
 server.listen(port);
