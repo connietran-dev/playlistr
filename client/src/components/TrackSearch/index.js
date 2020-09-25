@@ -54,19 +54,24 @@ class TrackSearch extends Component {
 		}
 	};
 
-	handleTrackSelection = e => {
-		API.addTrack(this.props.roomId, e.target.id, e.target.innerText)
-			.then(() => this.props.setRoomTracks(this.props.roomId))
-			.catch(err => console.log(err));
+	handleTrackSelection = async e => {
+		try {
+			await e.persist(); // Removes synthetic event from the pool and allows references to the event
+			await API.addTrack(this.props.roomId, e.target.id, e.target.innerText);
+			await this.props.setRoomTracks(this.props.roomId);
+			await this.emitNewTrackToRoom(this.props.roomId, e.target.id, this.props.user);
+			await this.props.addTrackToPlaybackQueue(this.props.token, e.target.id);
+			await this.props.getCurrentlyPlaying(this.props.token);
+		} catch (err) {
+			console.log(err);
+		}
 
-		this.emitNewTrackToRoom(this.props.roomId, e.target.id, this.props.user);
-
-		this.props.addTrackToPlaybackQueue(this.props.token, e.target.id);
-
-		this.props.getCurrentlyPlaying(this.props.token);
-
-		// Reset state of track input and hide the trackListDisplay
-		this.setState({ trackInput: '', trackListDisplay: 'd-none', searchBtnIcon: 'fa fa-search' });
+		// Reset trackInput, hides trackListDisplay
+		this.setState({
+			trackInput: '',
+			trackListDisplay: 'd-none',
+			searchBtnIcon: 'fa fa-search'
+		});
 	};
 
 	render() {
