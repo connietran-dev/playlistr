@@ -146,7 +146,7 @@ class Home extends Component {
 	createPlaylistRoom = e => {
 		e.preventDefault();
 
-		let roomHex = hexGen(24);
+		let roomHex = hexGen(16); // Output: 4 character hex
 		let timeoutLength = 0;
 
 		// Create room with generated hex -- 422 response sent to catch
