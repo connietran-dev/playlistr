@@ -47,16 +47,12 @@ class Home extends Component {
 
 		// Fetch user data
 		SpotifyAPI.getUserData(token).then(res => {
-			console.log(res.data);
-
 			let profilePicture = '';
 			if (res.data.images[0] === undefined) {
 				profilePicture = './images/logo.jpg';
 			} else {
 				profilePicture = res.data.images[0].url;
 			}
-
-			console.log('profilePicture: ', profilePicture);
 
 			this.setState({
 				user: res.data,
@@ -125,16 +121,12 @@ class Home extends Component {
 	// Redirects user to a Room passing along the token and room id in the url
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
-		console.log('homeUrl:', homeUrl);
-		console.log('accessToken:', accessToken);
 
 		if (homeUrl === `http://localhost:3000/home?access_token=${accessToken}`) {
-			console.log('Redirecting to development music room...');
 			window.location.replace(
 				`http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`
 			);
 		} else if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
-			console.log('Redirecting to production music room...');
 			window.location.replace(
 				`http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`
 			);
@@ -177,16 +169,16 @@ class Home extends Component {
 							let trackInfo = `${item.track.name} - ${item.track.artists[0].name}`;
 
 							setTimeout(() => {
-								API.addTrack(roomHex, item.track.id, trackInfo)
-									.then(() => console.log('Added to Room in DB'))
-									.catch(err => console.log(err));
+								API.addTrack(
+									roomHex,
+									item.track.id,
+									trackInfo
+								).catch(err => console.log(err));
 
 								SpotifyAPI.addTrackToQueue(
 									this.state.accessToken,
 									item.track.id
-								)
-									.then(() => console.log('Added to Queue'))
-									.catch(err => console.log(err));
+								).catch(err => console.log(err));
 							}, index * 300);
 						});
 					})
@@ -195,16 +187,10 @@ class Home extends Component {
 							spinnerClass: ''
 						});
 
-						console.log('Setting timeout for room:', roomHex);
-
 						//	Set URL after all POSTs have completed
-						setTimeout(
-							() => {
-								console.log('CREATING ROOM AFTER TIMEOUT:', roomHex);
-								this.setUrl(this.state.accessToken, roomHex);
-							},
-							timeoutLength
-						);
+						setTimeout(() => {
+							this.setUrl(this.state.accessToken, roomHex);
+						}, timeoutLength);
 					});
 			})
 			.catch(err => {
@@ -231,7 +217,6 @@ class Home extends Component {
 			<div>
 				<Container>
 					<Row className="top-banner">
-
 						{/* Profile Image */}
 						<Col xs={12} sm={12} md={3} lg={2} className="text-center">
 							<Image
@@ -261,9 +246,10 @@ class Home extends Component {
 									variant="dark"
 									show={this.state.openSpotifyAlert}>
 									<p>
-										To queue up songs when joining a Room, open Spotify & play a track
+										To queue up songs when joining a Room,
+										open Spotify & play a track
 									</p>
-									<button 
+									<button
 										className="alert-button"
 										onClick={() =>
 											this.verifySpotifyIsActive(
@@ -289,11 +275,14 @@ class Home extends Component {
 										Are you sure you want to start a room
 										with this playlist?
 									</p>
-									<button onClick={event => {
-										this.createPlaylistRoom(event);
-										this.setPlaylistProgress();	// Displays playlist progress spinner
-										this.setState({ playlistAlert: false }); // Closes "Are you sure?" modal
-									}}>
+									<button
+										onClick={event => {
+											this.createPlaylistRoom(event);
+											this.setPlaylistProgress(); // Displays playlist progress spinner
+											this.setState({
+												playlistAlert: false
+											}); // Closes "Are you sure?" modal
+										}}>
 										<Spinner
 											as="span"
 											animation="border"

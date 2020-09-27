@@ -75,12 +75,10 @@ class Room extends Component {
 					currentUser = {
 						...currentUser,
 						images: defaultImage
-					}
-				};
+					};
+				}
 
-				console.log('currentUser:', currentUser);
-
-				this.setState({ user: currentUser })
+				this.setState({ user: currentUser });
 			})
 			.then(() => this.mountRoomSockets());
 
@@ -105,13 +103,10 @@ class Room extends Component {
 		// Listen for the room's current users in order to set host
 		socket.on('current users', currentUsers => {
 			this.setState({ roomUsers: currentUsers }, () => {
-				console.log('Users in room:', this.state.roomUsers);
 				this.renderAvatarSlides();
 
 				// The first user in the usersArray is the roomHost. If the host leaves, the next person becomes the first in usersArray, becoming the roomHost
-				this.setState({ roomHost: this.state.roomUsers[0] }, () => {
-					// console.log('Current host: ', this.state.roomHost.display_name);
-				});
+				this.setState({ roomHost: this.state.roomUsers[0] });
 			});
 		});
 
@@ -135,7 +130,6 @@ class Room extends Component {
 
 		// Listen for the room's current song
 		socket.on('room song', song => {
-			// console.log('Room song: ', song.item.name);
 			this.setState({ roomSong: song });
 		});
 	};
@@ -430,7 +424,8 @@ class Room extends Component {
 						<Col xs={12} sm={6} md={6}>
 							<Alert show={this.state.alertShow} variant="success">
 								<h5>
-									To sync with the Room, open Spotify & play a track
+									To sync with the Room, open Spotify & play a
+									track
 								</h5>
 
 								<div className="d-flex justify-content-end">

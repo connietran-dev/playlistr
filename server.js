@@ -38,7 +38,6 @@ io.on('connect', socket => {
 
 	// After user is connected, then joins room
 	socket.on('join room', (roomId, user) => {
-
 		// Utilize handler to add user
 		handlers.addUser(roomId, user, socket);
 
@@ -95,4 +94,5 @@ io.on('connect', socket => {
 });
 
 console.log(`Listening on port ${port}.`);
+
 server.listen(port);
