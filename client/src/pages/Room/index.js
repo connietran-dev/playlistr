@@ -223,13 +223,8 @@ class Room extends Component {
 	updatePlayedStatus = () => {
 		let timeRemaining = this.state.item.duration_ms - this.state.progress;
 
-		let trackToUpdate = this.state.item.id;
-
 		setTimeout(() => {
-			API.updateTrackPlayedStatus(this.state.roomId, trackToUpdate).catch(err => {
-				if (err) console.log('Error: Unable to update a track not associated with the Room');
-			});
-
+			this.handleNextTrack(this.state.roomId, this.state.item.id);
 			this.getCurrentlyPlaying(this.state.accessToken);
 		}, timeRemaining);
 	};
@@ -273,24 +268,28 @@ class Room extends Component {
 			.catch(err => console.log(err));
 	};
 
-	// POST that changes to next song in users playback. After track is changed, we GET current playback data to update displaying track data
 	handleNextClick = token => {
-		SpotifyAPI.nextPlaybackTrack(token)
-			.then(() =>
-				API.updateTrackPlayedStatus(this.state.roomId, this.state.item.id).catch(err => {
-					if (err)
-						throw new Error(
-							'Error: Unable to update a track not associated with the Room.'
-						);
-				})
-			)
-			.then(() => this.getCurrentlyPlaying(token))
-			.catch(err => {
-				if (err) {
-					this.getCurrentlyPlaying(token);
-					console.log(err.message);
-				}
-			});
+		// POST that changes to next song in users Spotify playback
+		SpotifyAPI.nextPlaybackTrack(token).then(() =>
+			this.handleNextTrack(this.state.roomId, this.state.item.id)
+		);
+
+		// Allowing time for Spotify API to update what's currently playing after making post to play next song
+		setTimeout(() => this.getCurrentlyPlaying(token), 1000);
+	};
+
+	// Verifies track is associated with DB before updating track's instance in DB
+	handleNextTrack = (roomId, trackId) => {
+		API.getTracks(roomId).then(res => {
+			let trackToUpdate = res.data.addedTracks.filter(
+				track => !track.played && track.spotifyId === trackId
+			); // Array of tracks yet to be played that match id of track currently in state
+
+			if (trackToUpdate.length > 0) {
+				// Updating first track in array to allow duplicate tracks to remain unplayed
+				API.updateTrackPlayedStatus(roomId, trackToUpdate[0].spotifyId);
+			} else return;
+		});
 	};
 
 	// Helper method that compares two id's and sets a variant based on result

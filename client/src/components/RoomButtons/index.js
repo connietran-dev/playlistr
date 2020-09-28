@@ -59,7 +59,12 @@ class RoomButtons extends Component {
 					this.props.setJoinRoomAlert();
 				}, timeoutLength);
 			})
-			.catch(err => console.log(err));
+			.catch(err => {
+				if (err) {
+					this.setState({ inputAlertDisplay: true });
+					setTimeout(() => this.setState({ inputAlertDisplay: false }), 3000);
+				}
+			});
 	};
 
 	// Create Room button handler. Creates new Room in DB, then sets url.
