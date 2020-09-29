@@ -70,11 +70,11 @@ class Room extends Component {
 				// If user has undefined profile picture, use Playlistr logo instead
 				if (res.data.images[0] === undefined) {
 					let newImages = [];
-					let defaultImage = { url: './images/logo.jpg' };
+					let defaultImage = { url: './images/icons/playlistr-icon.png' };
 					newImages.push(defaultImage);
 					currentUser = {
 						...currentUser,
-						images: defaultImage
+						images: newImages
 					};
 				}
 
