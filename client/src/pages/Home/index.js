@@ -49,7 +49,7 @@ class Home extends Component {
 		SpotifyAPI.getUserData(token).then(res => {
 			let profilePicture = '';
 			if (res.data.images[0] === undefined) {
-				profilePicture = './images/logo.jpg';
+				profilePicture = './images/icons/playlistr-yellow-icon.png';
 			} else {
 				profilePicture = res.data.images[0].url;
 			}
@@ -70,7 +70,7 @@ class Home extends Component {
 			playlists.map(item => {
 				if (item.images[0] === undefined) {
 					return item.images.push({
-						url: './images/logo.jpg'
+						url: './images/icons/playlistr-icon.png'
 					});
 				} else {
 					return item.images;
