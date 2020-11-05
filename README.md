@@ -18,6 +18,8 @@ After signing in with your Spotify Premium account, you can create a room to lis
 
 Once your friends join, everyone can add tracks to a shared queue and listen to the same songs. You and your friends can play the song, pause the song, or skip to the next song for everyone in the room - all in real-time.
 
+**Check out a demo of Playlistr here:** https://youtu.be/4XF5diFnSIc
+
 ## Join Playlistr
 
 To participate, sign in with your Spotify Premium account, and check out Playlistr here: 
