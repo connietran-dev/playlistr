@@ -12,6 +12,12 @@
 
 Build a queue of songs with friends, listen to the queue of tracks together, and control the music for the entire room - all in real-time.
 
+
+<div align="center">
+    <img src="./readme/playlistr-demo-gif.gif" alt="Playlistr Landing Page" width="80%" />
+    </a>
+</div>
+
 Playlistr is built with React, socket.io, Node, Express and MongoDB to give users the real-time ability to add tracks to a shared queue and the ability to play, pause, & skip to the next track.
 
 After signing in with your Spotify Premium account, you can create a room to listen to music with friends. Then queue up one of your Spotify playlists or search Spotify to add new tracks for the entire room. 
