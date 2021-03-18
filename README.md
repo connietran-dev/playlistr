@@ -18,7 +18,11 @@ After signing in with your Spotify Premium account, you can create a room to lis
 
 Once your friends join, everyone can add tracks to a shared queue and listen to the same songs. You and your friends can play the song, pause the song, or skip to the next song for everyone in the room - all in real-time.
 
-**Check out a demo of Playlistr here:** https://youtu.be/4XF5diFnSIc
+<figure class="video_container">
+  <iframe src="https://www.youtube.com/embed/4XF5diFnSIc" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
+
+**Check out a walkthrough demo of Playlistr here:** https://youtu.be/4XF5diFnSIc
 
 ## Join Playlistr
 
@@ -29,8 +33,6 @@ https://playlistr-io.herokuapp.com
 You can create a room and queue up songs from one of your Spotify playlists. Or you can search Spotify to search for songs to add to your shared queue. You can then use Playlistr to control the music while listening on Spotify.
 
 Invite friends to listen in your room together by sharing your room code and see the real-time magic happen. 
-
-<!-- <video src="./readme/playlistr-demo.mp4" alt="Gif showing demo of Playlistr" width="60%" /> -->
 
 ## Table of Contents
 
@@ -84,4 +86,4 @@ To find out more about the inspiration behind this project and some frequently a
 * https://unsplash.com - Banner images
 * https://slidesgo.com/ - Pitch deck
 
-Copyright (c) [2020] [John Herman, Connie Tran]
+Copyright (c) [2021] [John Herman, Connie Tran]
