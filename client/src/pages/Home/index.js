@@ -32,7 +32,7 @@ class Home extends Component {
 			playlistAlert: false,
 			playlistProgressAlert: false,
 			joinRoomAlert: false,
-			spinnerClass: 'd-none',
+			spinnerDisplay: false,
 			slides: []
 		};
 	}
@@ -43,16 +43,15 @@ class Home extends Component {
 
 		this.setState({ accessToken: token });
 
-		this.setState({ spinnerClass: 'd-none' });
+		if (this.props.spinnerDisplay) this.setState({ spinnerDisplay: false });
 
 		// Fetch user data
 		SpotifyAPI.getUserData(token).then(res => {
 			let profilePicture = '';
-			if (res.data.images[0] === undefined) {
-				profilePicture = './images/icons/playlistr-yellow-icon.png';
-			} else {
-				profilePicture = res.data.images[0].url;
-			}
+
+			!res.data.images[0]
+				? (profilePicture = './images/icons/playlistr-yellow-icon.png')
+				: (profilePicture = res.data.images[0].url);
 
 			this.setState({
 				user: res.data,
@@ -68,7 +67,7 @@ class Home extends Component {
 
 			// If playlist image is undefined, use placeholder image
 			playlists.map(item => {
-				if (item.images[0] === undefined) {
+				if (!item.images[0]) {
 					return item.images.push({
 						url: './images/icons/playlistr-icon.png'
 					});
@@ -103,18 +102,19 @@ class Home extends Component {
 	verifySpotifyIsActive = token => {
 		SpotifyAPI.getUserQueueData(token)
 			.then(res => {
-				if (!res.data.is_playing)
+				if (!res.data.is_playing) {
 					throw new Error('Error: Please open Spotify and play a track.');
-				else if (res.data.is_playing)
+				} else {
 					this.setState({
 						openSpotifyAlert: false
 					});
+				}
 			})
 			.catch(err => {
-				if (err)
-					this.setState({
-						openSpotifyAlert: true
-					});
+				this.setState({
+					openSpotifyAlert: true
+				});
+				console.log('Error:', err);
 			});
 	};
 
@@ -122,15 +122,16 @@ class Home extends Component {
 	setUrl = (accessToken, hex) => {
 		let homeUrl = window.location.href;
 
-		if (homeUrl === `http://localhost:3000/home?access_token=${accessToken}`) {
-			window.location.replace(
-				`http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`
-			);
-		} else if (homeUrl === `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`) {
-			window.location.replace(
-				`http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`
-			);
-		}
+		homeUrl === `http://localhost:3000/home?access_token=${accessToken}`
+			? window.location.replace(
+					`http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`
+			  )
+			: homeUrl ===
+			  `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`
+			? window.location.replace(
+					`http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`
+			  )
+			: console.log('URL Error');
 	};
 
 	handlePlaylistClick = e => {
@@ -143,59 +144,33 @@ class Home extends Component {
 	};
 
 	// Creates room containing user's playlist
-	createPlaylistRoom = e => {
-		e.preventDefault();
+	createPlaylistRoom = async () => {
+		try {
+			const roomHex = hexGen(16);
+			const playlist = await SpotifyAPI.getPlaylistTracks(
+				this.state.accessToken,
+				this.state.selectedPlaylist
+			);
 
-		let roomHex = hexGen(16); // Output: 4 character hex
-		let timeoutLength = 0;
+			await API.createRoom(roomHex);
 
-		// Create room with generated hex -- 422 response sent to catch
-		API.createRoom(roomHex)
-			.then(res => {
-				if (res.status === 422) throw new Error('Error');
-			})
-			.then(() => {
-				// GET all tracks on the playlist
-				SpotifyAPI.getPlaylistTracks(this.state.accessToken, this.state.selectedPlaylist)
-					.then(res => {
-						return res.data.items;
-					})
-					.then(data => {
-						// Sets the time needed to POST playlist data properly before redirecting
-						timeoutLength = data.length * 300 + 300;
+			for await (const trackObj of playlist.data.items) {
+				let trackInfo = `${trackObj.track.name} - ${trackObj.track.artists[0].name}`;
 
-						// Add tracks to user's playback queue and Room in DB -- allowing enough time for tracks to be added to both in the correct order
-						data.forEach((item, index) => {
-							let trackInfo = `${item.track.name} - ${item.track.artists[0].name}`;
+				await API.addTrack(roomHex, trackObj.track.id, trackInfo);
+				await SpotifyAPI.addTrackToQueue(
+					this.state.accessToken,
+					trackObj.track.id
+				);
+			}
 
-							setTimeout(() => {
-								API.addTrack(
-									roomHex,
-									item.track.id,
-									trackInfo
-								).catch(err => console.log(err));
-
-								SpotifyAPI.addTrackToQueue(
-									this.state.accessToken,
-									item.track.id
-								).catch(err => console.log(err));
-							}, index * 300);
-						});
-					})
-					.then(() => {
-						this.setState({
-							spinnerClass: ''
-						});
-
-						//	Set URL after all POSTs have completed
-						setTimeout(() => {
-							this.setUrl(this.state.accessToken, roomHex);
-						}, timeoutLength);
-					});
-			})
-			.catch(err => {
-				if (err) console.log(err.message);
+			this.setState({
+				spinnerDisplay: true
 			});
+			this.setUrl(this.state.accessToken, roomHex);
+		} catch (err) {
+			console.log('Error:', err);
+		}
 	};
 
 	// Sets boolean value of playlistProgressAlert state based on current state
@@ -235,26 +210,21 @@ class Home extends Component {
 							lg={7}
 							className="d-flex justify-content-center align-items-center">
 							<h1 className="home-banner">
-								Welcome to{' '}
-								<span className="welcome-brand">Playlistr</span>
+								Welcome to <span className="welcome-brand">Playlistr</span>
 							</h1>
 						</Col>
 						<Col xs={12} md={3} lg={3}>
 							<div className="d-flex align-items-center">
 								{/* Inactive Spotify Alert */}
-								<Alert
-									variant="dark"
-									show={this.state.openSpotifyAlert}>
+								<Alert variant="dark" show={this.state.openSpotifyAlert}>
 									<p>
-										To queue up songs when joining a Room,
-										open Spotify & play a track
+										To queue up songs when joining a Room, open Spotify & play a
+										track
 									</p>
 									<button
 										className="alert-button"
 										onClick={() =>
-											this.verifySpotifyIsActive(
-												this.state.accessToken
-											)
+											this.verifySpotifyIsActive(this.state.accessToken)
 										}>
 										Ready
 									</button>
@@ -272,27 +242,26 @@ class Home extends Component {
 									onClose={this.handlePlaylistClick}
 									dismissible>
 									<p>
-										Are you sure you want to start a room
-										with this playlist?
+										Are you sure you want to start a room with this playlist?
 									</p>
 									<button
-										onClick={event => {
-											this.createPlaylistRoom(event);
+										onClick={() => {
+											this.createPlaylistRoom();
 											this.setPlaylistProgress(); // Displays playlist progress spinner
 											this.setState({
 												playlistAlert: false
 											}); // Closes "Are you sure?" modal
 										}}>
-										<Spinner
-											as="span"
-											animation="border"
-											size="sm"
-											role="status"
-											aria-hidden="true"
-											className={
-												this.state.spinnerClass
-											}
-										/>{' '}
+										{this.state.spinnerDisplay ? (
+											<Spinner
+												as="span"
+												animation="border"
+												size="sm"
+												role="status"
+												aria-hidden="true"
+											/>
+										) : null}
+
 										<span> Create Room</span>
 									</button>
 								</Alert>
@@ -348,30 +317,12 @@ class Home extends Component {
 										<Row>
 											{slide.map(playlist => (
 												<Playlist
-													key={
-														playlist.id
-													}
-													playlistId={
-														playlist.id
-													}
-													image={
-														playlist
-															.images[0]
-															.url
-													}
-													link={
-														playlist
-															.owner
-															.external_urls
-															.spotify
-													}
-													name={
-														playlist.name
-													}
-													handlePlaylistClick={
-														this
-															.handlePlaylistClick
-													}
+													key={playlist.id}
+													playlistId={playlist.id}
+													image={playlist.images[0].url}
+													link={playlist.owner.external_urls.spotify}
+													name={playlist.name}
+													handlePlaylistClick={this.handlePlaylistClick}
 												/>
 											))}
 										</Row>
