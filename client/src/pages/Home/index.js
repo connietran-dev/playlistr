@@ -17,6 +17,7 @@ import './style.css';
 
 import SpotifyAPI from '../../utils/SpotifyAPI';
 import API from '../../utils/API';
+import { Link } from 'react-router-dom';
 
 class Home extends Component {
 	constructor() {
@@ -33,18 +34,45 @@ class Home extends Component {
 			playlistProgressAlert: false,
 			joinRoomAlert: false,
 			spinnerDisplay: false,
-			slides: []
+			slides: [],
+			centerAlert: {
+				show: false,
+				spinner: false,
+				title: '',
+				text: ''
+			}
 		};
 	}
 
 	componentDidMount() {
 		let parsed = queryString.parse(window.location.search);
 		let token = parsed.access_token;
-
 		this.setState({ accessToken: token });
-
 		if (this.props.spinnerDisplay) this.setState({ spinnerDisplay: false });
 
+		if (parsed.error && parsed.error === 'join_room') {
+			const alertObj = { ...this.props.centerAlert };
+			alertObj.show = true;
+			alertObj.title = 'Something went wrong...';
+			alertObj.text = 'Please enter a valid Room Code and try again';
+
+			this.setState({
+				centerAlert: alertObj
+			});
+
+			setTimeout(
+				() =>
+					this.setState({
+						centerAlert: {
+							show: false,
+							spinner: false,
+							title: '',
+							text: ''
+						}
+					}),
+				3000
+			);
+		}
 		// Fetch user data
 		SpotifyAPI.getUserData(token).then(res => {
 			let profilePicture = '';
@@ -167,7 +195,10 @@ class Home extends Component {
 			this.setState({
 				spinnerDisplay: true
 			});
-			this.setUrl(this.state.accessToken, roomHex);
+
+			window.location.replace(
+				`/room?access_token=${this.state.accessToken}&room_id=${roomHex}`
+			);
 		} catch (err) {
 			console.log('Error:', err);
 		}
@@ -244,6 +275,7 @@ class Home extends Component {
 									<p>
 										Are you sure you want to start a room with this playlist?
 									</p>
+
 									<button
 										onClick={() => {
 											this.createPlaylistRoom();
@@ -252,17 +284,7 @@ class Home extends Component {
 												playlistAlert: false
 											}); // Closes "Are you sure?" modal
 										}}>
-										{this.state.spinnerDisplay ? (
-											<Spinner
-												as="span"
-												animation="border"
-												size="sm"
-												role="status"
-												aria-hidden="true"
-											/>
-										) : null}
-
-										<span> Create Room</span>
+										<span>Create Room</span>
 									</button>
 								</Alert>
 							</div>
@@ -287,17 +309,20 @@ class Home extends Component {
 								{/* Join Room Sync Alert */}
 								<Alert
 									variant="dark"
-									show={this.state.joinRoomAlert}
+									show={this.state.centerAlert.show}
 									className="shadow-lg">
-									<h5>Syncing your Spotify queue with Room...</h5>
-									<Spinner
-										className="text-center"
-										as="span"
-										animation="border"
-										size="lg"
-										role="status"
-										aria-hidden="true"
-									/>{' '}
+									<h4>{this.state.centerAlert.title}</h4>
+									<h5>{this.state.centerAlert.text}</h5>
+									{this.state.centerAlert.spinner ? (
+										<Spinner
+											className="text-center"
+											as="span"
+											animation="border"
+											size="lg"
+											role="status"
+											aria-hidden="true"
+										/>
+									) : null}
 								</Alert>
 							</div>
 						</Col>
@@ -339,6 +364,8 @@ class Home extends Component {
 						token={this.state.accessToken}
 						setUrl={this.setUrl}
 						setJoinRoomAlert={this.setJoinRoomAlert}
+						centerAlert={this.state.centerAlert}
+						setState={this.setState}
 					/>
 				</Container>
 			</div>
