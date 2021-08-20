@@ -4,11 +4,22 @@ import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 
+import style from './utils/style';
 import './style.css';
 
 function About() {
+	const aboutBackgroundStyle = {
+		background: `url('/images/yellow-backdrop.jpg')`,
+		backgroundRepeat: 'no-repeat',
+		backgroundSize: 'cover',
+		backgroundPosition: '40% 85%',
+		opacity: '0.96',
+		height: '100vh',
+		padding: '7.5vh 0 0'
+	};
+
 	return (
-		<Container fluid className="about-bg">
+		<Container fluid className="about-bg" style={style.background}>
 			<Container className="about-card">
 				<h1 className="about-brand text-white text-center">About Playlistr</h1>
 				<Image
@@ -37,14 +48,15 @@ function About() {
 						using React, socket.io, Node, Express, and MongoDB.
 					</p>
 					<p>
-						John and Connie were driven by a love for music and an admiration for
-						companies like Spotify. They were inspired to create a queue building
-						app that uses Spotify so friends can share one queue, add songs to it,
-						and have a chance to control the music together in real-time.
+						John and Connie were driven by a love for music and an admiration
+						for companies like Spotify. They were inspired to create a queue
+						building app that uses Spotify so friends can share one queue, add
+						songs to it, and have a chance to control the music together in
+						real-time.
 					</p>
 					<p>
-						John and Connie are full-stack developers from the Georgia Institute of
-						Technology. You can check out the GitHub repo for Playlistr{' '}
+						John and Connie are full-stack developers from the Georgia Institute
+						of Technology. You can check out the GitHub repo for Playlistr{' '}
 						<a
 							href="https://github.com/connietran-dev/gtech-capstone-playlistr"
 							target="_blank"

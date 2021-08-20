@@ -18,10 +18,13 @@ app.use(morgan('tiny'));
 
 app.use(routes);
 
-mongoose.connect(process.env.MONGODB_ATLAS_URI || 'mongodb://localhost/playlistr', {
-	useNewUrlParser: true, // Removes deprecation warning
-	useUnifiedTopology: true
-});
+mongoose.connect(
+	process.env.MONGODB_ATLAS_URI || 'mongodb://localhost/playlistr',
+	{
+		useNewUrlParser: true, // Removes deprecation warning
+		useUnifiedTopology: true
+	}
+);
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(express.static('client/build'));
@@ -31,67 +34,72 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const server = http.createServer(app);
-const io = socketio(server);
+// const io = socketio(server);
 
-io.on('connect', socket => {
-	console.log('Client connected to server: ', socket.id);
+// io.on('connect', socket => {
+// 	console.log('Client connected to server: ', socket.id);
+// 	// After user is connected, then joins room
+// 	socket.on('join room', (roomId, user) => {
+// 		// console.log(roomId, user);
+// 		// Utilize handler to add user
+// 		handlers.addUser(roomId, user, socket);
 
-	// After user is connected, then joins room
-	socket.on('join room', (roomId, user) => {
-		// Utilize handler to add user
-		handlers.addUser(roomId, user, socket);
+// 		// Then subscribe (join) the user's socket to a channel for the room
+// 		socket.join(roomId);
 
-		// Then subscribe (join) the user's socket to a channel for the room
-		socket.join(roomId);
+// 		// And emit the user just joined to all users in the room, excluding sender
+// 		socket.to(roomId).emit('user status', {
+// 			text: `${user.display_name} joined...`,
+// 			roomId,
+// 			user
+// 		});
 
-		// And emit the user just joined to all users in the room, excluding sender
-		socket.to(roomId).emit('user status', {
-			text: `${user.display_name} joined...`,
-			roomId,
-			user
-		});
+// 		// Get current users in room and emit to room, including sender
+// 		let currentUsers = handlers.getUsersInRoom(roomId);
+// 		io.in(roomId).emit('current users', currentUsers);
+// 	});
 
-		// Get current users in room and emit to room, including sender
-		let currentUsers = handlers.getUsersInRoom(roomId);
-		io.in(roomId).emit('current users', currentUsers);
-	});
+// 	// Emit the host's song as the entire room's song
+// 	// Does not emit to sender who is the host
+// 	socket.on('host song', ({ song, roomId }) => {
+// 		socket.to(roomId).emit('room song', song);
+// 	});
 
-	// Emit the host's song as the entire room's song
-	// Does not emit to sender who is the host
-	socket.on('host song', ({ song, roomId }) => {
-		socket.to(roomId).emit('room song', song);
-	});
+// 	// Emit play/pause/next actions to other users in room, exclude sender
+// 	socket.on('user action', ({ action, roomId, user }) => {
+// 		socket.to(roomId).emit('player action', {
+// 			action,
+// 			message: `${user.display_name} clicked ${action}...`
+// 		});
+// 	});
 
-	// Emit play/pause/next actions to other users in room, exclude sender
-	socket.on('user action', ({ action, roomId, user }) => {
-		socket.to(roomId).emit('player action', {
-			action,
-			message: `${user.display_name} clicked ${action}...`
-		});
-	});
+// 	// If user adds new track to play queue, emit track to users in room, exclude sender
+// 	socket.on('add track', ({ trackId, roomId, user }) => {
+// 		socket.to(roomId).emit('new track', {
+// 			trackId,
+// 			message: `${user.display_name} added a track...`
+// 		});
+// 	});
 
-	// If user adds new track to play queue, emit track to users in room, exclude sender
-	socket.on('add track', ({ trackId, roomId, user }) => {
-		socket.to(roomId).emit('new track', {
-			trackId,
-			message: `${user.display_name} added a track...`
-		});
-	});
+// 	// When a socket disconnects, remove user from usersArray
+// 	socket.on('disconnect', () => {
+// 		let user = handlers.removeUser(socket);
 
-	// When a socket disconnects, remove user from usersArray
-	socket.on('disconnect', () => {
-		let user = handlers.removeUser(socket);
+// 		// If user existed and was removed, emit message that user left to clients in user's room, excluding sender
+// 		// Also emit current users in room
+// 		if (user) {
+// 			io.to(user.room).emit('user status', {
+// 				text: `${user.display_name} left...`
+// 			});
+// 			io.to(user.room).emit(
+// 				'current users',
+// 				handlers.getUsersInRoom(user.room)
+// 			);
+// 		}
 
-		// If user existed and was removed, emit message that user left to clients in user's room, excluding sender
-		// Also emit current users in room
-		if (user) {
-			io.to(user.room).emit('user status', { text: `${user.display_name} left...` });
-			io.to(user.room).emit('current users', handlers.getUsersInRoom(user.room));
-		}
-
-		console.log('Client disconnected from server: ', socket.id);
-	});
-});
+// 		console.log('Client disconnected from server: ', socket.id);
+// 	});
+// });
 
 console.log(`Listening on port ${port}.`);
 

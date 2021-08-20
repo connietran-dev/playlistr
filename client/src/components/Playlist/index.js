@@ -8,7 +8,9 @@ import './style.css';
 const Playlist = props => {
 	return (
 		<Col xs={6} md={3} className="d-flex justify-content-center">
-			<div className="user-playlist text-center" onClick={props.handlePlaylistClick}>
+			<div
+				className="user-playlist text-center"
+				onClick={e => props.handlePlaylistClick(e)}>
 				<Image
 					rounded
 					id={props.playlistId}

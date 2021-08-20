@@ -1,4 +1,4 @@
-.about-bg {
+/* .about-bg {
 	background: url('/images/yellow-backdrop.jpg');
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -6,7 +6,7 @@
 	opacity: 0.96;
 	height: 100vh;
 	padding: 7.5vh 0 0;
-}
+} */
 
 .about-card {
 	background-color: rgba(24, 24, 24, 0.65);

@@ -9,14 +9,14 @@
 	opacity: 0.9;
 }
 
-.login.backdrop {
+/* .login.backdrop {
 	padding: 78px;
-	background: url('/images/yellow-backdrop.jpg');
+	background: url('http://localhost:3000/images/yellow-backdrop.jpg');
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: 40% 85%;
 	opacity: 0.96;
-}
+} */
 
 .login.brand-logo {
 	margin: 26px;
@@ -24,7 +24,7 @@
 
 .copyright-text {
 	margin: 6vh auto 0;
-	font-size: 0.80rem;
+	font-size: 0.8rem;
 }
 
 @media (max-width: 1024px) {
