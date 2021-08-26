@@ -5,7 +5,6 @@ export default {
 		try {
 			const { data } = await SpotifyAPI.getUserData(token);
 			if (Object.keys(data)[0]) {
-				console.log(data);
 				const currentUser = {
 					name: data.display_name,
 					id: data.id,

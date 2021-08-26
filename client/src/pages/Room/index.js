@@ -19,6 +19,7 @@ import apiUrl from '../../apiConfig';
 
 import spotifyHelpers from '../../utils/spotifyHelpers';
 import configureSlides from '../../utils/configureSlides';
+import utils from './utils';
 import './style.css';
 
 // import { socket } from '../../utils/Socket';
@@ -30,12 +31,12 @@ const Room = props => {
 
 	const [user, setUser] = useState(null);
 	const [queueTracks, setQueueTracks] = useState(null);
-	const [userSong, setUserSong] = useState(null);
+	// const [userSong, setUserSong] = useState(null);
 	const [roomUsers, setRoomUsers] = useState([]);
 	// const [roomHost, setRoomHost] = useState(null);
 	// const [roomTrack, setRoomTrack] = useState(null);
 	const [slides, setSlides] = useState(null);
-	const [alertShow, setAlertShow] = useState(false);
+	// const [alertShow, setAlertShow] = useState(false);
 	const [leaveRoomAlert, setLeaveRoomAlert] = useState(false);
 	// const [statusMsg, setStatusMsg] = useState(null);
 	const [trackPlaying, setTrackPlaying] = useState(true);
@@ -61,32 +62,18 @@ const Room = props => {
 	};
 
 	const handleCurrentlyPlaying = async token => {
-		try {
-			const { data } = await SpotifyAPI.getUserQueueData(token);
+		const { trackData, isPlaying, timeRemaining } = await utils.getCurrentTrack(
+			token
+		);
 
-			if (data) {
-				const trackObj = {
-					id: data.item.id,
-					name: data.item.name,
-					duration: data.item.duration_ms,
-					progress: data.progress_ms,
-					albumImages: data.item.album.images.map(image => image.url),
-					artists: data.item.album.artists.map(artist => artist.name)
-				};
+		if (trackData) {
+			setTrack(trackData);
+			setTrackPlaying(isPlaying);
 
-				setTrack(trackObj);
-				setTrackPlaying(data.is_playing);
-				setUserSong(data);
-
-				const timeRemaining = trackObj.duration - trackObj.progress + 500;
-
-				setTimeout(() => {
-					handleCurrentlyPlaying(token);
-				}, timeRemaining);
-			} else setTrackPlaying(false);
-		} catch (err) {
-			console.log(err);
-		}
+			setTimeout(() => {
+				handleCurrentlyPlaying(token);
+			}, timeRemaining);
+		} else setTrackPlaying(false);
 	};
 
 	const handleRoomTracks = async id => {
@@ -108,7 +95,6 @@ const Room = props => {
 
 	useEffect(() => {
 		if (token && roomId) {
-			console.log('firing use effect');
 			handleUser(token);
 			handleCurrentlyPlaying(token);
 		}
@@ -245,9 +231,13 @@ const Room = props => {
 							<Player
 								token={token}
 								track={track}
-								// isPlaying={this.state.isPlaying}
-
+								trackPlaying={trackPlaying}
+								setTrackPlaying={setTrackPlaying}
+								handleCurrentlyPlaying={handleCurrentlyPlaying}
 								user={user}
+								roomId={roomId}
+								queueTrigger={queueTrigger}
+								setQueueTrigger={setQueueTrigger}
 								// emitPlayerAction={this.emitPlayerAction}
 								// handlePlayPauseClick={this.handlePlayPauseClick}
 								// handleNextClick={this.handleNextClick}
@@ -545,29 +535,29 @@ const Room = props => {
 // 			.catch(err => console.log(err));
 // 	};
 
-// 	handleNextClick = token => {
-// 		// POST that changes to next song in users Spotify playback
-// 		SpotifyAPI.nextPlaybackTrack(token).then(() =>
-// 			this.handleNextTrack(this.state.roomId, this.state.item.id)
-// 		);
+// handleNextClick = token => {
+// 	// POST that changes to next song in users Spotify playback
+// 	SpotifyAPI.nextPlaybackTrack(token).then(() =>
+// 		this.handleNextTrack(this.state.roomId, this.state.item.id)
+// 	);
 
-// 		// Allowing time for Spotify API to update what's currently playing after making post to play next song
-// 		setTimeout(() => this.getCurrentlyPlaying(token), 1000);
-// 	};
+// 	// Allowing time for Spotify API to update what's currently playing after making post to play next song
+// 	setTimeout(() => this.getCurrentlyPlaying(token), 1000);
+// };
 
-// 	// Verifies track is associated with DB before updating track's instance in DB
-// 	handleNextTrack = (roomId, trackId) => {
-// 		API.getTracks(roomId).then(res => {
-// 			let trackToUpdate = res.data.addedTracks.filter(
-// 				track => !track.played && track.spotifyId === trackId
-// 			); // Array of tracks yet to be played that match id of track currently in state
+// // Verifies track is associated with DB before updating track's instance in DB
+// handleNextTrack = (roomId, trackId) => {
+// 	API.getTracks(roomId).then(res => {
+// 		let trackToUpdate = res.data.addedTracks.filter(
+// 			track => !track.played && track.spotifyId === trackId
+// 		); // Array of tracks yet to be played that match id of track currently in state
 
-// 			if (trackToUpdate.length > 0) {
-// 				// Updating first track in array to allow duplicate tracks to remain unplayed
-// 				API.updateTrackPlayedStatus(roomId, trackToUpdate[0].spotifyId);
-// 			} else return;
-// 		});
-// 	};
+// 		if (trackToUpdate.length > 0) {
+// 			// Updating first track in array to allow duplicate tracks to remain unplayed
+// 			API.updateTrackPlayedStatus(roomId, trackToUpdate[0].spotifyId);
+// 		} else return;
+// 	});
+// };
 
 // 	// Helper method that compares two id's and sets a variant based on result
 // 	setVariant = (id, comparedId, variantA, variantB) => {

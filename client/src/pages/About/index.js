@@ -8,18 +8,8 @@ import style from './utils/style';
 import './style.css';
 
 function About() {
-	const aboutBackgroundStyle = {
-		background: `url('/images/yellow-backdrop.jpg')`,
-		backgroundRepeat: 'no-repeat',
-		backgroundSize: 'cover',
-		backgroundPosition: '40% 85%',
-		opacity: '0.96',
-		height: '100vh',
-		padding: '7.5vh 0 0'
-	};
-
 	return (
-		<Container fluid className="about-bg" style={style.background}>
+		<Container fluid style={style.background}>
 			<Container className="about-card">
 				<h1 className="about-brand text-white text-center">About Playlistr</h1>
 				<Image

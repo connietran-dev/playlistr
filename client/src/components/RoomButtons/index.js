@@ -51,18 +51,18 @@ const RoomButtons = props => {
 		}
 	};
 
-	const handleCreateRoom = () => {
-		props.renderCenterAlert(props.centerAlertConfig.createRoom);
+	const handleCreateRoom = async () => {
+		try {
+			props.renderCenterAlert(props.centerAlertConfig.createRoom);
 
-		API.createRoom(hexGen(16))
-			.then(res => {
-				props.renderCenterAlert(props.centerAlertConfig.clear);
-				addRoomToURL(window.location.href, props.token, res.data.room_id);
-			})
-			.catch(err => {
-				console.log(err);
-				props.renderCenterAlert(props.centerAlertConfig.somethingWentWrong);
-			});
+			const { data } = await API.createRoom(hexGen(16));
+
+			props.renderCenterAlert(props.centerAlertConfig.clear);
+			addRoomToURL(window.location.href, props.token, data.room_id);
+		} catch (err) {
+			console.log(err);
+			props.renderCenterAlert(props.centerAlertConfig.somethingWentWrong);
+		}
 	};
 
 	return (

@@ -7,19 +7,17 @@ import Form from 'react-bootstrap/Form';
 
 import './style.css';
 
-import { socket } from '../../utils/Socket';
+// import { socket } from '../../utils/Socket';
 import SpotifyAPI from '../../utils/SpotifyAPI';
 import API from '../../utils/API';
 
 const TrackSearch = props => {
-	// console.log(props);
 	const [input, setInput] = useState('');
 	const [tracks, setTracks] = useState([]);
 	const [display, setDisplay] = useState(false);
 	const [searchIcon, setSearchIcon] = useState(true);
 
 	const handleTrackSelection = async track => {
-		console.log(track);
 		await API.addTrack(
 			props.roomId,
 			track.id,

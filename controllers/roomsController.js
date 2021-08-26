@@ -33,15 +33,17 @@ module.exports = {
 	updatePlayedStatus: (req, res) => {
 		db.Room.findOne({ room_id: req.params.roomId })
 			.then(data => {
-				let updatedTrack = data.addedTracks.filter(
-					track => track.spotifyId == req.params.trackId
-				);
-
-				if (updatedTrack.length > 1) return;
-
-				updatedTrack[0].played = true;
-
-				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
+				if (data && data.addedTracks[0]) {
+					data.addedTracks = data.addedTracks.map(track => {
+						if (track.spotifyId == req.params.trackId) {
+							track.played = true;
+							return track;
+						} else return track;
+					});
+					db.Room.updateOne({ _id: data._id }, data)
+						.then(result => res.json(result))
+						.catch(err => res.status(422).json(err));
+				} else res.json('No Track to Update');
 			})
 			.catch(err => res.status(422).json(err));
 	},
@@ -63,7 +65,9 @@ module.exports = {
 				updatedTrack[0].nowPlaying = true;
 				otherTracks.map(track => (track.nowPlaying = false));
 
-				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
+				db.Room.updateOne({ _id: data._id }, data).then(result =>
+					res.json(result)
+				);
 			})
 			.catch(err => res.status(422).json(err));
 	},
@@ -79,7 +83,9 @@ module.exports = {
 
 				updatedTrack[0].progress = req.params.progress;
 
-				db.Room.updateOne({ _id: data._id }, data).then(result => res.json(result));
+				db.Room.updateOne({ _id: data._id }, data).then(result =>
+					res.json(result)
+				);
 			})
 			.catch(err => res.status(422).json(err));
 	},

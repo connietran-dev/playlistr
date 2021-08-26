@@ -25,7 +25,7 @@ import configureSlides from '../../utils/configureSlides';
 
 const Home = () => {
 	const [user, setUser] = useState(null);
-	const [playlists, setPlaylists] = useState(null);
+	// const [playlists, setPlaylists] = useState(null);
 	const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 	const [spotifyAlert, setSpotifyAlert] = useState(false);
 	const [playlistAlert, setPlaylistAlert] = useState(false);
@@ -45,7 +45,7 @@ const Home = () => {
 		const playlists = await utils.getPlaylists(token);
 
 		if (playlists[0]) {
-			setPlaylists(playlists);
+			// setPlaylists(playlists);
 			setSlides(configureSlides(playlists, 8));
 		}
 	};
@@ -235,7 +235,7 @@ const Home = () => {
 				<RoomButtons
 					token={token}
 					// setUrl={this.setUrl}
-					setJoinRoomAlert={setJoinAlert}
+					// setJoinRoomAlert={setJoinAlert}
 					renderCenterAlert={renderCenterAlert}
 					centerAlertConfig={config.centerAlert}
 					// setState={this.setState}
