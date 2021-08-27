@@ -18,7 +18,8 @@ import RoomUser from '../../components/RoomUser';
 import apiUrl from '../../apiConfig';
 
 import spotifyHelpers from '../../utils/spotifyHelpers';
-import configureSlides from '../../utils/configureSlides';
+// import configureSlides from '../../utils/configureSlides';
+import globalUtils from '../../utils/globalUtils';
 import utils from './utils';
 import './style.css';
 
@@ -90,7 +91,7 @@ const Room = props => {
 
 	const renderAvatarSlides = () => {
 		const currentUsers = [...roomUsers];
-		setSlides(configureSlides(currentUsers, 3));
+		setSlides(globalUtils.configureSlides(currentUsers, 3));
 	};
 
 	useEffect(() => {
@@ -239,9 +240,6 @@ const Room = props => {
 								queueTrigger={queueTrigger}
 								setQueueTrigger={setQueueTrigger}
 								// emitPlayerAction={this.emitPlayerAction}
-								// handlePlayPauseClick={this.handlePlayPauseClick}
-								// handleNextClick={this.handleNextClick}
-								// getCurrentlyPlaying={this.getCurrentlyPlaying}
 								room={roomId}
 							/>
 						) : null}

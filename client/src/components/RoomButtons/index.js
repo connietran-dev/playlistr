@@ -26,7 +26,7 @@ const RoomButtons = props => {
 		try {
 			props.renderCenterAlert(props.centerAlertConfig.joinRoom);
 
-			if (tracks[0]) {
+			if (tracks && tracks[0]) {
 				for await (const track of tracks) {
 					await SpotifyAPI.addTrackToQueue(props.token, track.spotifyId);
 				}
@@ -44,7 +44,9 @@ const RoomButtons = props => {
 
 		if (input) {
 			const unplayedTracks = await utils.getUnplayedTracks(input);
-			await syncQueueWithRoomAndJoin(unplayedTracks);
+			unplayedTracks
+				? await syncQueueWithRoomAndJoin(unplayedTracks)
+				: props.renderCenterAlert(props.centerAlertConfig.noRoomData);
 		} else {
 			setShowAlert(true);
 			setTimeout(() => setShowAlert(false), 3000);

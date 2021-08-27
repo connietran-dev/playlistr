@@ -29,8 +29,6 @@ const Player = props => {
 		try {
 			await API.updateTrackPlayedStatus(props.roomId, props.track.id);
 			await SpotifyAPI.nextPlaybackTrack(props.token);
-			// await props.handleCurrentlyPlaying(props.token);
-			// props.setQueueTrigger(props.queueTrigger ? false : true);
 			window.location.reload();
 		} catch (err) {
 			console.log(err);

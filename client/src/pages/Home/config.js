@@ -27,8 +27,15 @@ export default {
 		},
 		somethingWentWrong: {
 			show: true,
-			spinner: true,
+			spinner: false,
 			title: 'Something went wrong...',
+			text: 'Please try again.',
+			disappear: true
+		},
+		noRoomData: {
+			show: true,
+			spinner: false,
+			title: 'Invalid Room...',
 			text: 'Please try again.',
 			disappear: true
 		},

@@ -20,8 +20,7 @@ import utils from './utils';
 import API from '../../utils/API';
 import SpotifyAPI from '../../utils/SpotifyAPI';
 import spotifyHelpers from '../../utils/spotifyHelpers';
-import addRoomToURL from '../../utils/addRoomToURL';
-import configureSlides from '../../utils/configureSlides';
+import globalUtils from '../../utils/globalUtils';
 
 const Home = () => {
 	const [user, setUser] = useState(null);
@@ -46,7 +45,7 @@ const Home = () => {
 
 		if (playlists[0]) {
 			// setPlaylists(playlists);
-			setSlides(configureSlides(playlists, 8));
+			setSlides(globalUtils.configureSlides(playlists, 8));
 		}
 	};
 
@@ -88,9 +87,10 @@ const Home = () => {
 	const playlistRoomHandler = async () => {
 		setPlaylistAlert(false);
 		renderCenterAlert(config.centerAlert.playlistRoom);
+		// Returns roomHex after room is created
 		await createPlaylistRoom().then(roomHex => {
 			renderCenterAlert(config.centerAlert.clear);
-			addRoomToURL(window.location.href, token, roomHex);
+			globalConfigs.addRoomToURL(window.location.href, token, roomHex);
 		});
 	};
 
@@ -106,9 +106,9 @@ const Home = () => {
 		if (token && !user) {
 			if (spinnerDisplay) setSpinnerDisplay(false);
 
-			if (parsedURL.error === 'join_room') {
-				renderCenterAlert(config.centerAlert.urlErr);
-			}
+			// if (parsedURL.error === 'join_room') {
+			// 	renderCenterAlert(config.centerAlert.urlErr);
+			// }
 			handleUser(token);
 			handlePlaylists(token);
 			verifyTrackPlaying(token);
