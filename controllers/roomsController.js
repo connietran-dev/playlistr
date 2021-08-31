@@ -30,15 +30,23 @@ module.exports = {
 			.catch(err => res.status(422).json(err));
 	},
 	// Using Spotify track id as trackId
-	updatePlayedStatus: (req, res) => {
+	updateTrack: (req, res) => {
 		db.Room.findOne({ room_id: req.params.roomId })
 			.then(data => {
 				if (data && data.addedTracks[0]) {
 					data.addedTracks = data.addedTracks.map(track => {
-						if (track.spotifyId == req.params.trackId) {
-							track.played = true;
-							return track;
-						} else return track;
+						switch (req.params.updateType) {
+							case 'played':
+								if (track.spotifyId == req.params.trackId) track.played = true;
+								break;
+							case 'now_playing':
+								track.nowPlaying =
+									track.spotifyId == req.params.trackId ? true : false;
+								break;
+							default:
+								break;
+						}
+						return track;
 					});
 					db.Room.updateOne({ _id: data._id }, data)
 						.then(result => res.json(result))

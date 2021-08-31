@@ -18,7 +18,10 @@ const Player = props => {
 				progress += 1000;
 				const updatedProgress = (progress / duration) * 100;
 
-				if (updatedProgress >= 99) clearInterval(progressInterval);
+				if (updatedProgress >= 99) {
+					API.updateTrack(props.roomId, props.track.id, 'played');
+					clearInterval(progressInterval);
+				}
 
 				setCurrentProgress(updatedProgress);
 			}, 1000);
@@ -27,7 +30,7 @@ const Player = props => {
 
 	const handleNextClick = async () => {
 		try {
-			await API.updateTrackPlayedStatus(props.roomId, props.track.id);
+			await API.updateTrack(props.roomId, props.track.id, 'played');
 			await SpotifyAPI.nextPlaybackTrack(props.token);
 			window.location.reload();
 		} catch (err) {

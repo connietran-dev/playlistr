@@ -94,6 +94,23 @@ const Room = props => {
 		setSlides(globalUtils.configureSlides(currentUsers, 3));
 	};
 
+	const updateTrackInDB = async () => {
+		try {
+			if (track && queueTracks) {
+				// console.log(track, queueTracks);
+				const trackPlaying = queueTracks.filter(
+					item => item.spotifyId === track.id
+				)[0];
+
+				if (trackPlaying && !trackPlaying.nowPlaying) {
+					await API.updateTrack(roomId, trackPlaying.spotifyId, 'now_playing');
+				}
+			}
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	useEffect(() => {
 		if (token && roomId) {
 			handleUser(token);
@@ -106,6 +123,7 @@ const Room = props => {
 	}, [queueTrigger]);
 
 	useEffect(renderAvatarSlides, [roomUsers]);
+	useEffect(updateTrackInDB, [track, queueTracks]);
 
 	return roomId && user && token ? (
 		<div>

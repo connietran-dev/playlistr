@@ -11,16 +11,13 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Alert from 'react-bootstrap/Alert';
 
-import addRoomToURL from '../../utils/addRoomToURL';
+import globalUtils from '../../utils/globalUtils';
 import utils from './utils';
 import './style.css';
 
 const RoomButtons = props => {
-	// console.log(props);
 	const [input, setInput] = useState('');
 	const [showAlert, setShowAlert] = useState(false);
-	// const roomHex = hexGen(16);
-	// console.log(roomHex);
 
 	const syncQueueWithRoomAndJoin = async tracks => {
 		try {
@@ -60,7 +57,7 @@ const RoomButtons = props => {
 			const { data } = await API.createRoom(hexGen(16));
 
 			props.renderCenterAlert(props.centerAlertConfig.clear);
-			addRoomToURL(window.location.href, props.token, data.room_id);
+			globalUtils.addRoomToURL(window.location.href, props.token, data.room_id);
 		} catch (err) {
 			console.log(err);
 			props.renderCenterAlert(props.centerAlertConfig.somethingWentWrong);
