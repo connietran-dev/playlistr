@@ -8,7 +8,8 @@ router.route('/').get(roomsController.findAll).post(roomsController.create);
 router
 	.route('/:id')
 	.get(roomsController.findByName)
-	.put(roomsController.update)
+	.put(roomsController.addTrack)
+	// .post(roomsController.addTrack)
 	.delete(roomsController.remove);
 
 // ROUTE: /api/rooms/:roomId/:trackId/:updateType

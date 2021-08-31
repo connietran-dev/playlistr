@@ -18,13 +18,13 @@ app.use(morgan('tiny'));
 
 app.use(routes);
 
-mongoose.connect(
-	process.env.MONGODB_ATLAS_URI || 'mongodb://localhost/playlistr',
-	{
+mongoose
+	.connect(process.env.MONGODB_ATLAS_URI || 'mongodb://localhost/playlistr', {
 		useNewUrlParser: true, // Removes deprecation warning
-		useUnifiedTopology: true
-	}
-);
+		useUnifiedTopology: true,
+		useFindAndModify: false
+	})
+	.catch(err => console.log(err));
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(express.static('client/build'));

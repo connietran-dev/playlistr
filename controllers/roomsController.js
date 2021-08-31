@@ -16,19 +16,16 @@ module.exports = {
 			.then(data => res.json(data))
 			.catch(err => res.status(422).json(err));
 	},
-	update: (req, res) => {
-		db.Room.findOne({ room_id: req.params.id })
-			.then(data => {
-				let currentTracks = data.addedTracks;
+	addTrack: (req, res) =>
+		db.Room.findOneAndUpdate(
+			{ room_id: req.params.id },
+			{
+				$push: { addedTracks: req.body }
+			}
+		)
+			.then(data => res.json(data))
+			.catch(err => res.status(422).json(err)),
 
-				currentTracks.push(req.body);
-
-				db.Room.updateOne({ _id: data._id }, data)
-					.then(result => res.json(result))
-					.catch(err => res.status(422).json(err));
-			})
-			.catch(err => res.status(422).json(err));
-	},
 	// Using Spotify track id as trackId
 	updateTrack: (req, res) => {
 		db.Room.findOne({ room_id: req.params.roomId })
