@@ -27,28 +27,39 @@ module.exports = {
 			.catch(err => res.status(422).json(err)),
 
 	// Using Spotify track id as trackId
-	updateTrack: (req, res) => {
-		db.Room.findOne({ room_id: req.params.roomId })
+	updateTrack: ({ params, query }, res) => {
+		db.Room.findOne({ room_id: params.roomId })
 			.then(data => {
 				if (data && data.addedTracks[0]) {
 					data.addedTracks = data.addedTracks.map(track => {
-						switch (req.params.updateType) {
+						switch (params.updateType) {
 							case 'played':
-								if (track.spotifyId == req.params.trackId) track.played = true;
+								if (track.spotifyId == params.trackId) track.played = true;
 								break;
 							case 'now_playing':
 								track.nowPlaying =
-									track.spotifyId == req.params.trackId ? true : false;
+									track.spotifyId == params.trackId ? true : false;
+								break;
+							case 'like':
+								if (track.spotifyId == params.trackId)
+									track.likes.push(query.user);
+
+								break;
+
+							case 'unlike':
+								if (track.spotifyId == params.trackId)
+									track.likes = track.likes.filter(user => user !== query.user);
 								break;
 							default:
 								break;
 						}
 						return track;
 					});
+
 					db.Room.updateOne({ _id: data._id }, data)
 						.then(result => res.json(result))
 						.catch(err => res.status(422).json(err));
-				} else res.json('No Track to Update');
+				} else res.status(304).json('No Track to Update');
 			})
 			.catch(err => res.status(422).json(err));
 	},

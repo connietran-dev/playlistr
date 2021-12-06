@@ -24,10 +24,7 @@ const trackSchema = new Schema(
 			type: Boolean,
 			default: false
 		},
-		likes: {
-			type: Number,
-			default: 0
-		}
+		likes: []
 	},
 	{
 		toJSON: {

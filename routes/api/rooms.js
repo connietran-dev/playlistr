@@ -9,7 +9,6 @@ router
 	.route('/:id')
 	.get(roomsController.findByName)
 	.put(roomsController.addTrack)
-	// .post(roomsController.addTrack)
 	.delete(roomsController.remove);
 
 // ROUTE: /api/rooms/:roomId/:trackId/:updateType

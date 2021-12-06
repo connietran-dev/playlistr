@@ -6,9 +6,14 @@ import API from '../../utils/API';
 import './style.css';
 
 const Player = props => {
+	const [liked, setLiked] = useState(false);
 	const [currentProgress, setCurrentProgress] = useState(
 		(props.track.progress / props.track.duration) * 100
 	);
+
+	const dbTrack = props.queueTracks.filter(
+		track => track.spotifyId === props.track.id
+	)[0];
 
 	const addToProgressBar = () => {
 		if (props.trackPlaying) {
@@ -19,8 +24,15 @@ const Player = props => {
 				const updatedProgress = (progress / duration) * 100;
 
 				if (updatedProgress >= 99) {
-					API.updateTrack(props.roomId, props.track.id, 'played');
+					API.updateTrack(
+						props.roomId,
+						props.track.id,
+						'played',
+						props.user.id
+					);
+
 					clearInterval(progressInterval);
+					// setLiked(false);
 				}
 
 				setCurrentProgress(updatedProgress);
@@ -28,17 +40,50 @@ const Player = props => {
 		}
 	};
 
-	const handleNextClick = async () => {
-		try {
-			await API.updateTrack(props.roomId, props.track.id, 'played');
-			await SpotifyAPI.nextPlaybackTrack(props.token);
-			window.location.reload();
-		} catch (err) {
-			console.log(err);
+	const handlers = {
+		next: async () => {
+			try {
+				console.log(props.roomId, props.track.id);
+				await SpotifyAPI.nextPlaybackTrack(props.token);
+				if (
+					props.queueTracks.filter(
+						track => track.spotifyId === props.track.id
+					)[0]
+				) {
+					await API.updateTrack(props.roomId, props.track.id, 'played');
+				}
+				window.location.reload();
+			} catch (err) {
+				console.log(err);
+				window.location.reload();
+			}
+		},
+		like: async () => {
+			try {
+				const type = liked ? 'unlike' : 'like';
+				setLiked(liked ? false : true);
+				await API.updateTrack(
+					props.roomId,
+					props.track.id,
+					type,
+					props.user.id
+				);
+				props.setQueueTrigger(props.queueTrigger ? false : true);
+			} catch (err) {
+				console.log(err);
+			}
 		}
 	};
 
-	useEffect(addToProgressBar, [props.track, props.trackPlaying]);
+	useEffect(() => {
+		setLiked(
+			dbTrack && !dbTrack.likes.filter(item => item === props.user.id)[0]
+				? false
+				: true
+		);
+
+		addToProgressBar();
+	}, [props.track, props.trackPlaying]);
 
 	return (
 		<div className="now-playing-container">
@@ -56,27 +101,36 @@ const Player = props => {
 						style={{ height: '10px', width: '70%' }}
 					/>
 					<div className="text-center player-buttons">
+						{dbTrack ? (
+							<>
+								<button
+									type="button"
+									className="btn"
+									onClick={() => {
+										handlers.like();
+									}}>
+									<i
+										className={
+											liked ? `fa fa-heart fa-2x` : `fa fa-heart-o fa-2x`
+										}></i>
+									{dbTrack && dbTrack.likes[0] ? dbTrack.likes.length : null}
+								</button>
+								<button
+									type="button"
+									className="btn"
+									onClick={() => {
+										console.log('comment!');
+									}}>
+									<i className="fa fa-comment fa-2x"></i>
+								</button>
+							</>
+						) : null}
+
 						<button
 							type="button"
 							className="btn"
 							onClick={() => {
-								console.log('like!');
-							}}>
-							<i className="fa fa-heart fa-2x"></i>
-						</button>
-						<button
-							type="button"
-							className="btn"
-							onClick={() => {
-								console.log('comment!');
-							}}>
-							<i className="fa fa-comment fa-2x"></i>
-						</button>
-						<button
-							type="button"
-							className="btn"
-							onClick={() => {
-								handleNextClick();
+								handlers.next();
 							}}>
 							<i className="fa fa-forward fa-2x"></i>
 						</button>

@@ -29,7 +29,7 @@ const RoomButtons = props => {
 				}
 			}
 			props.renderCenterAlert(props.centerAlertConfig.clear);
-			addRoomToURL(window.location.href, props.token, input);
+			globalUtils.addRoomToURL(window.location.href, props.token, input);
 		} catch (err) {
 			console.log(err);
 			props.renderCenterAlert(props.centerAlertConfig.somethingWentWrong);

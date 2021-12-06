@@ -97,9 +97,8 @@ const Room = props => {
 	const updateTrackInDB = async () => {
 		try {
 			if (track && queueTracks) {
-				// console.log(track, queueTracks);
 				const trackPlaying = queueTracks.filter(
-					item => item.spotifyId === track.id
+					item => item.spotifyId == track.id
 				)[0];
 
 				if (trackPlaying && !trackPlaying.nowPlaying) {
@@ -246,7 +245,8 @@ const Room = props => {
 						{track.name &&
 						track.artists[0] &&
 						track.duration &&
-						track.progress ? (
+						track.progress &&
+						queueTracks ? (
 							<Player
 								token={token}
 								track={track}
@@ -255,6 +255,7 @@ const Room = props => {
 								handleCurrentlyPlaying={handleCurrentlyPlaying}
 								user={user}
 								roomId={roomId}
+								queueTracks={queueTracks}
 								queueTrigger={queueTrigger}
 								setQueueTrigger={setQueueTrigger}
 								// emitPlayerAction={this.emitPlayerAction}

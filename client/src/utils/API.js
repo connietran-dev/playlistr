@@ -9,8 +9,11 @@ export default {
 	getTracks: roomId => {
 		return axios.get(`/api/rooms/${roomId}`);
 	},
-	updateTrack: (roomId, trackId, type) => {
-		return axios.put(`/api/rooms/${roomId}/track/${trackId}/${type}`);
+	updateTrack: (roomId, trackId, type, user) => {
+		const url = !user
+			? `/api/rooms/${roomId}/track/${trackId}/${type}`
+			: `/api/rooms/${roomId}/track/${trackId}/${type}?user=${user}`;
+		return axios.put(url);
 	},
 	updateNowPlaying: (roomId, trackId) => {
 		return axios.put(`/api/rooms/${roomId}/playing/${trackId}`);
