@@ -15,18 +15,18 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"concurrently": "^4.1.0",
+		"concurrently": "^6.4.0",
 		"nodemon": "^2.0.4"
 	},
 	"dependencies": {
 		"dotenv": "^8.2.0",
 		"express": "^4.16.3",
 		"if-env": "^1.0.4",
-		"mongoose": "^5.9.27",
+		"mongoose": "^6.0.15",
 		"morgan": "^1.10.0",
 		"query-string": "^6.13.1",
 		"request": "^2.81.0",
-		"serve": "^11.3.2",
-		"socket.io": "^2.4.0"
+		"serve": "^13.0.2",
+		"socket.io": "^4.4.0"
 	}
 }

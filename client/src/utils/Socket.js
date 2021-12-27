@@ -1,6 +1,7 @@
-// import apiUrl from '../apiConfig';
-// import socketIOClient from 'socket.io-client';
+import apiUrl from '../apiConfig';
+import { io } from 'socket.io-client';
 
 // const ENDPOINT = apiUrl;
-
-// export const socket = socketIOClient('/');
+// const socket = io(ENDPOINT);
+console.log(apiUrl);
+export const socket = io(apiUrl);

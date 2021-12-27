@@ -1,14 +1,14 @@
 let apiUrl;
 
 const apiUrls = {
-  production: 'https://playlistr-io.herokuapp.com',
-  development: 'http://localhost:8888'
+	production: 'https://playlistr-io.herokuapp.com',
+	development: 'http://localhost:8888'
 };
 
 if (window.location.hostname === 'localhost') {
-  apiUrl = apiUrls.development;
+	apiUrl = apiUrls.development;
 } else {
-  apiUrl = apiUrls.production;
+	apiUrl = apiUrls.production;
 }
 
 export default apiUrl;
