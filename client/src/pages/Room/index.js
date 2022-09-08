@@ -23,6 +23,8 @@ import globalUtils from '../../utils/globalUtils';
 import utils from './utils';
 import './style.css';
 
+const socket = io(apiURL);
+
 const Room = () => {
   const parsedUrl = queryString.parse(window.location.search);
   const token = parsedUrl.access_token;
@@ -49,12 +51,9 @@ const Room = () => {
     progress: 0
   });
 
-  const socket = io(apiURL);
-
   const handleUser = async token => {
     try {
       const currentUser = await spotifyHelpers.user(token);
-      console.log(currentUser);
       setUser(currentUser);
     } catch (err) {
       console.log(err);
@@ -78,7 +77,6 @@ const Room = () => {
         }
       });
       socket.on('room song', track => {
-        // console.log(track);
         setTrack(track);
       });
     }
