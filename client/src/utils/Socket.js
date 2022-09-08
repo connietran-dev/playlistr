@@ -1,7 +1,6 @@
-import apiUrl from '../apiConfig';
 import { io } from 'socket.io-client';
 
-// const ENDPOINT = apiUrl;
-// const socket = io(ENDPOINT);
-console.log(apiUrl);
-export const socket = io(apiUrl);
+const prodURL = 'https://playlistr-io.herokuapp.com';
+const devURL = 'http://localhost:8888';
+
+export const socket = io(window.location.hostname === 'localhost' ? devURL : prodURL);
