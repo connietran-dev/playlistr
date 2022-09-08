@@ -23,8 +23,8 @@ import globalUtils from '../../utils/globalUtils';
 import utils from './utils';
 import './style.css';
 
-const Room = ({ location }) => {
-  const parsedUrl = queryString.parse(location.search);
+const Room = () => {
+  const parsedUrl = queryString.parse(window.location.search);
   const token = parsedUrl.access_token;
   const roomId = parsedUrl.room_id;
 
@@ -46,7 +46,7 @@ const Room = ({ location }) => {
     albumImages: [],
     artists: [],
     duration: 0,
-    progress: 0,
+    progress: 0
   });
 
   const socket = io(apiURL);
@@ -54,6 +54,7 @@ const Room = ({ location }) => {
   const handleUser = async token => {
     try {
       const currentUser = await spotifyHelpers.user(token);
+      console.log(currentUser);
       setUser(currentUser);
     } catch (err) {
       console.log(err);
@@ -143,13 +144,26 @@ const Room = ({ location }) => {
   }, []);
 
   useEffect(() => {
-    if (roomId) handleRoomTracks(roomId);
+    if (roomId) {
+      handleRoomTracks(roomId);
+    }
   }, [queueTrigger]);
 
-  useEffect(handleSockets, [user]);
-  useEffect(handleCurrentRoomTrack, [user, roomHost]);
-  useEffect(renderAvatarSlides, [roomUsers]);
-  useEffect(updateTrackInDB, [track, queueTracks]);
+  useEffect(() => {
+    updateTrackInDB();
+  }, [track, queueTracks]);
+
+  useEffect(() => {
+    handleSockets();
+  }, [user]);
+
+  useEffect(() => {
+    handleCurrentRoomTrack();
+  }, [user, roomHost]);
+
+  useEffect(() => {
+    renderAvatarSlides();
+  }, [roomUsers]);
 
   return roomId && user && token ? (
     <div>
