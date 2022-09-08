@@ -1,9 +1,6 @@
 import axios from 'axios';
 
 export default {
-  getSpotifyAuthURI: () => {
-    return axios.get('/api/spotify/login');
-  },
   createRoom: roomId => {
     return axios.post('/api/rooms', {
       room_id: roomId,

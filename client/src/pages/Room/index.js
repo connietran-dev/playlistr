@@ -1,8 +1,9 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import queryString from 'query-string';
+import { io } from 'socket.io-client';
 
+import { apiURL } from '../../App.config';
 import API from '../../utils/API';
-import SpotifyAPI from '../../utils/SpotifyAPI';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -21,8 +22,6 @@ import spotifyHelpers from '../../utils/spotifyHelpers';
 import globalUtils from '../../utils/globalUtils';
 import utils from './utils';
 import './style.css';
-
-import { socket } from '../../utils/Socket';
 
 const Room = ({ location }) => {
   const parsedUrl = queryString.parse(location.search);
@@ -49,6 +48,8 @@ const Room = ({ location }) => {
     duration: 0,
     progress: 0,
   });
+
+  const socket = io(apiURL);
 
   const handleUser = async token => {
     try {

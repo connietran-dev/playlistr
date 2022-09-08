@@ -20,7 +20,7 @@ router.get('/login', function (req, res) {
       redirect_uri: redirectURI,
     });
 
-  res.json({ url });
+  res.redirect(url);
 });
 
 // ROUTE: /api/spotify/callback

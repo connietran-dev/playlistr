@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 
-import API from '../../utils/API';
+import { apiURL } from '../../App.config';
 import style from './utils/style';
 import './style.css';
 
@@ -26,11 +26,9 @@ function Login() {
           <div className='login-div text-center'>
             <h5>To continue, log in to your Spotify account</h5>
             <button
-              onClick={() =>
-                API.getSpotifyAuthURI().then(({ data }) => {
-                  window.location = data.url;
-                })
-              }
+              onClick={() => {
+                window.location = `${apiURL}/api/spotify/login`;
+              }}
             >
               Sign in with Spotify
             </button>
