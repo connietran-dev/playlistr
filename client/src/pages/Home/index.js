@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import queryString from 'query-string';
 import hexGen from 'hex-generator';
 
@@ -15,362 +15,218 @@ import RoomButtons from '../../components/RoomButtons';
 
 import './style.css';
 
-import SpotifyAPI from '../../utils/SpotifyAPI';
+import config from './config';
+import utils from './utils';
 import API from '../../utils/API';
-import { Link } from 'react-router-dom';
+import SpotifyAPI from '../../utils/SpotifyAPI';
+import spotifyHelpers from '../../utils/spotifyHelpers';
+import globalUtils from '../../utils/globalUtils';
 
-class Home extends Component {
-	constructor() {
-		super();
+const Home = () => {
+  const [user, setUser] = useState(null);
+  // const [playlists, setPlaylists] = useState(null);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [spotifyAlert, setSpotifyAlert] = useState(false);
+  const [playlistAlert, setPlaylistAlert] = useState(false);
+  const [joinAlert, setJoinAlert] = useState(false);
+  const [spinnerDisplay, setSpinnerDisplay] = useState(false);
+  const [slides, setSlides] = useState(null);
+  const [centerAlert, setCenterAlert] = useState(config.centerAlert.clear);
+  const parsedURL = queryString.parse(window.location.search);
+  const token = parsedURL.access_token;
 
-		this.state = {
-			user: {},
-			userImage: '',
-			playlists: [],
-			accessToken: '',
-			selectedPlaylist: '',
-			openSpotifyAlert: false,
-			playlistAlert: false,
-			playlistProgressAlert: false,
-			joinRoomAlert: false,
-			spinnerDisplay: false,
-			slides: [],
-			centerAlert: {
-				show: false,
-				spinner: false,
-				title: '',
-				text: ''
-			}
-		};
-	}
+  const handleUser = async () => {
+    const currentUser = await spotifyHelpers.user(token);
+    if (currentUser) setUser(currentUser);
+  };
 
-	componentDidMount() {
-		let parsed = queryString.parse(window.location.search);
-		let token = parsed.access_token;
-		this.setState({ accessToken: token });
-		if (this.props.spinnerDisplay) this.setState({ spinnerDisplay: false });
+  const handlePlaylists = async token => {
+    const playlists = await utils.getPlaylists(token);
 
-		if (parsed.error && parsed.error === 'join_room') {
-			const alertObj = { ...this.props.centerAlert };
-			alertObj.show = true;
-			alertObj.title = 'Something went wrong...';
-			alertObj.text = 'Please enter a valid Room Code and try again';
+    if (playlists[0]) {
+      // setPlaylists(playlists);
+      setSlides(globalUtils.configureSlides(playlists, 8));
+    }
+  };
 
-			this.setState({
-				centerAlert: alertObj
-			});
+  const verifyTrackPlaying = async token => {
+    const isCurrentlyPlaying = await utils.verifySpotifyActive(token);
 
-			setTimeout(
-				() =>
-					this.setState({
-						centerAlert: {
-							show: false,
-							spinner: false,
-							title: '',
-							text: ''
-						}
-					}),
-				3000
-			);
-		}
-		// Fetch user data
-		SpotifyAPI.getUserData(token).then(res => {
-			let profilePicture = '';
+    !isCurrentlyPlaying ? setSpotifyAlert(true) : setSpotifyAlert(false);
+  };
 
-			!res.data.images[0]
-				? (profilePicture = './images/icons/playlistr-yellow-icon.png')
-				: (profilePicture = res.data.images[0].url);
+  const handlePlaylistClick = e => {
+    setPlaylistAlert(true);
+    setSelectedPlaylist(e.target.id);
+  };
 
-			this.setState({
-				user: res.data,
-				userImage: profilePicture
-			});
-		});
+  // Creates room containing user's playlist
+  const createPlaylistRoom = async () => {
+    try {
+      const roomHex = hexGen(16);
+      const { data } = await SpotifyAPI.getPlaylistTracks(token, selectedPlaylist);
 
-		this.verifySpotifyIsActive(token);
+      await API.createRoom(roomHex);
 
-		// Fetch playlists & map 8 to each carousel slide - 50 is the max limit to fetch
-		SpotifyAPI.getUserPlaylists(token, 50).then(res => {
-			let playlists = res.data.items;
+      for await (const trackObj of data.items) {
+        let trackInfo = `${trackObj.track.name} - ${trackObj.track.artists[0].name}`;
 
-			// If playlist image is undefined, use placeholder image
-			playlists.map(item => {
-				if (!item.images[0]) {
-					return item.images.push({
-						url: './images/icons/playlistr-icon.png'
-					});
-				} else {
-					return item.images;
-				}
-			});
+        await API.addTrack(roomHex, trackObj.track.id, trackInfo);
+        await SpotifyAPI.addTrackToQueue(token, trackObj.track.id);
+      }
 
-			// Create array of slides with 8 playlists per slide
-			let allSlides = [];
-			let numSlides = playlists.length / 8;
+      return roomHex;
+    } catch (err) {
+      console.log('Error:', err);
+    }
+  };
 
-			for (let slideIndex = 0; slideIndex < numSlides; slideIndex++) {
-				let currentSlide = [];
+  const playlistRoomHandler = async () => {
+    setPlaylistAlert(false);
+    renderCenterAlert(config.centerAlert.playlistRoom);
+    // Returns roomHex after room is created
+    await createPlaylistRoom().then(roomHex => {
+      renderCenterAlert(config.centerAlert.clear);
+      globalConfigs.addRoomToURL(window.location.href, token, roomHex);
+    });
+  };
 
-				for (let itemIndex = 0; itemIndex < 8; itemIndex++) {
-					let playlist = playlists[itemIndex];
-					if (playlist !== undefined) currentSlide.push(playlist);
-				}
+  const renderCenterAlert = errorObj => {
+    setCenterAlert(errorObj);
 
-				// Remove first 8 playlists from array in order to add next 8 playlists to next slide, etc.
-				playlists.splice(0, 8);
+    if (errorObj.disappear) {
+      setTimeout(() => setCenterAlert(config.centerAlert.clear), 3000);
+    }
+  };
 
-				allSlides.push(currentSlide);
-			}
+  useEffect(() => {
+    if (token && !user) {
+      if (spinnerDisplay) setSpinnerDisplay(false);
 
-			this.setState({ slides: allSlides });
-		});
-	}
+      // if (parsedURL.error === 'join_room') {
+      // 	renderCenterAlert(config.centerAlert.urlErr);
+      // }
+      handleUser(token);
+      handlePlaylists(token);
+      verifyTrackPlaying(token);
+    }
+  });
 
-	// Verifies Spotify app is open and playing a track
-	verifySpotifyIsActive = token => {
-		SpotifyAPI.getUserQueueData(token)
-			.then(res => {
-				if (!res.data.is_playing) {
-					throw new Error('Error: Please open Spotify and play a track.');
-				} else {
-					this.setState({
-						openSpotifyAlert: false
-					});
-				}
-			})
-			.catch(err => {
-				this.setState({
-					openSpotifyAlert: true
-				});
-				console.log('Error:', err);
-			});
-	};
+  return user && token ? (
+    <div>
+      <Container>
+        <Row className='top-banner'>
+          {/* Profile Image */}
+          <Col xs={12} sm={12} md={3} lg={2} className='text-center'>
+            <Image roundedCircle src={user.image} className='home profile-pic' />
+            <p className='user-name'>{user.name}</p>
+          </Col>
 
-	// Redirects user to a Room passing along the token and room id in the url
-	setUrl = (accessToken, hex) => {
-		let homeUrl = window.location.href;
+          {/* Welcome to Playlistr Banner */}
+          <Col
+            xs={12}
+            sm={12}
+            md={6}
+            lg={7}
+            className='d-flex justify-content-center align-items-center'
+          >
+            <h1 className='home-banner'>
+              Welcome to <span className='welcome-brand'>Playlistr</span>
+            </h1>
+          </Col>
 
-		homeUrl === `http://localhost:3000/home?access_token=${accessToken}`
-			? window.location.replace(
-					`http://localhost:3000/room?access_token=${accessToken}&room_id=${hex}`
-			  )
-			: homeUrl ===
-			  `https://playlistr-io.herokuapp.com/home?access_token=${accessToken}`
-			? window.location.replace(
-					`http://playlistr-io.herokuapp.com/room?access_token=${accessToken}&room_id=${hex}`
-			  )
-			: console.log('URL Error');
-	};
+          {/* Inactive Spotify Alert */}
+          <Col xs={12} md={3} lg={3}>
+            <div className='d-flex align-items-center'>
+              <Alert variant='dark' show={spotifyAlert}>
+                <p>To queue up songs when joining a Room, open Spotify & play a track</p>
+                <button className='alert-button' onClick={() => verifyTrackPlaying(token)}>
+                  Ready
+                </button>
+              </Alert>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          {/* Create Room with Playlist Alert */}
+          <Col>
+            <div className='playlist-alert d-flex align-items-center'>
+              <Alert
+                variant='dark'
+                show={playlistAlert}
+                onClose={() => setPlaylistAlert(false)}
+                dismissible
+              >
+                <p>Are you sure you want to start a room with this playlist?</p>
 
-	handlePlaylistClick = e => {
-		if (!this.state.playlistAlert) {
-			this.setState({ playlistAlert: true });
-			this.setState({ selectedPlaylist: e.target.id });
-		} else {
-			this.setState({ playlistAlert: false });
-		}
-	};
+                <button onClick={() => playlistRoomHandler()}>
+                  <span>Create Room</span>
+                </button>
+              </Alert>
+            </div>
 
-	// Creates room containing user's playlist
-	createPlaylistRoom = async () => {
-		try {
-			const roomHex = hexGen(16);
-			const playlist = await SpotifyAPI.getPlaylistTracks(
-				this.state.accessToken,
-				this.state.selectedPlaylist
-			);
+            {/* Center Alert */}
+            <div className='playlist-alert d-flex align-items-center text-center'>
+              <Alert variant='dark' show={centerAlert.show} className='shadow-lg'>
+                <h4>{centerAlert.title}</h4>
+                {centerAlert.text ? <h5>{centerAlert.text}</h5> : null}
 
-			await API.createRoom(roomHex);
+                {centerAlert.spinner ? (
+                  <Spinner
+                    className='text-center'
+                    as='span'
+                    animation='border'
+                    size='lg'
+                    role='status'
+                    aria-hidden='true'
+                  />
+                ) : null}
+              </Alert>
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
-			for await (const trackObj of playlist.data.items) {
-				let trackInfo = `${trackObj.track.name} - ${trackObj.track.artists[0].name}`;
+      {/* Playlist Carousel */}
+      <Container>
+        <Row>
+          <Carousel className='mb-2 home-carousel' controls interval={5000} indicators={false}>
+            {slides
+              ? slides.map(slide => (
+                  <Carousel.Item key={slides.indexOf(slide)}>
+                    <Container>
+                      <Row>
+                        {slide.map(playlist => (
+                          <Playlist
+                            key={`playlist-${playlist.id}`}
+                            playlistId={playlist.id}
+                            image={playlist.images[0].url}
+                            name={playlist.name}
+                            handlePlaylistClick={handlePlaylistClick}
+                          />
+                        ))}
+                      </Row>
+                    </Container>
+                  </Carousel.Item>
+                ))
+              : null}
+          </Carousel>
+        </Row>
+      </Container>
 
-				await API.addTrack(roomHex, trackObj.track.id, trackInfo);
-				await SpotifyAPI.addTrackToQueue(
-					this.state.accessToken,
-					trackObj.track.id
-				);
-			}
-
-			this.setState({
-				spinnerDisplay: true
-			});
-
-			window.location.replace(
-				`/room?access_token=${this.state.accessToken}&room_id=${roomHex}`
-			);
-		} catch (err) {
-			console.log('Error:', err);
-		}
-	};
-
-	// Sets boolean value of playlistProgressAlert state based on current state
-	setPlaylistProgress = () => {
-		this.state.playlistProgressAlert
-			? this.setState({ playlistProgressAlert: false })
-			: this.setState({ playlistProgressAlert: true });
-	};
-
-	// Sets boolean value of joinRoomAlert state based on current state
-	setJoinRoomAlert = () => {
-		this.state.joinRoomAlert
-			? this.setState({ joinRoomAlert: false })
-			: this.setState({ joinRoomAlert: true });
-	};
-
-	render() {
-		return (
-			<div>
-				<Container>
-					<Row className="top-banner">
-						{/* Profile Image */}
-						<Col xs={12} sm={12} md={3} lg={2} className="text-center">
-							<Image
-								roundedCircle
-								src={this.state.userImage}
-								className="home profile-pic"
-							/>
-							<p className="user-name">{this.state.user.display_name}</p>
-						</Col>
-
-						{/* Welcome to Playlistr Banner */}
-						<Col
-							xs={12}
-							sm={12}
-							md={6}
-							lg={7}
-							className="d-flex justify-content-center align-items-center">
-							<h1 className="home-banner">
-								Welcome to <span className="welcome-brand">Playlistr</span>
-							</h1>
-						</Col>
-						<Col xs={12} md={3} lg={3}>
-							<div className="d-flex align-items-center">
-								{/* Inactive Spotify Alert */}
-								<Alert variant="dark" show={this.state.openSpotifyAlert}>
-									<p>
-										To queue up songs when joining a Room, open Spotify & play a
-										track
-									</p>
-									<button
-										className="alert-button"
-										onClick={() =>
-											this.verifySpotifyIsActive(this.state.accessToken)
-										}>
-										Ready
-									</button>
-								</Alert>
-							</div>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<div className="playlist-alert d-flex align-items-center">
-								{/* Create Room with Playlist Alert */}
-								<Alert
-									variant="dark"
-									show={this.state.playlistAlert}
-									onClose={this.handlePlaylistClick}
-									dismissible>
-									<p>
-										Are you sure you want to start a room with this playlist?
-									</p>
-
-									<button
-										onClick={() => {
-											this.createPlaylistRoom();
-											this.setPlaylistProgress(); // Displays playlist progress spinner
-											this.setState({
-												playlistAlert: false
-											}); // Closes "Are you sure?" modal
-										}}>
-										<span>Create Room</span>
-									</button>
-								</Alert>
-							</div>
-							<div className="playlist-alert d-flex align-items-center text-center">
-								{/* Creating Room from Playlist Alert */}
-								<Alert
-									variant="dark"
-									show={this.state.playlistProgressAlert}
-									className="shadow-lg">
-									<h5>Creating room from playlist...</h5>
-									<Spinner
-										className="text-center"
-										as="span"
-										animation="border"
-										size="lg"
-										role="status"
-										aria-hidden="true"
-									/>{' '}
-								</Alert>
-							</div>
-							<div className="playlist-alert d-flex align-items-center text-center">
-								{/* Join Room Sync Alert */}
-								<Alert
-									variant="dark"
-									show={this.state.centerAlert.show}
-									className="shadow-lg">
-									<h4>{this.state.centerAlert.title}</h4>
-									<h5>{this.state.centerAlert.text}</h5>
-									{this.state.centerAlert.spinner ? (
-										<Spinner
-											className="text-center"
-											as="span"
-											animation="border"
-											size="lg"
-											role="status"
-											aria-hidden="true"
-										/>
-									) : null}
-								</Alert>
-							</div>
-						</Col>
-					</Row>
-				</Container>
-
-				{/* Playlist Carousel */}
-				<Container>
-					<Row>
-						<Carousel
-							className="mb-2 home-carousel"
-							interval={5000}
-							indicators={false}>
-							{this.state.slides.map(slide => (
-								<Carousel.Item key={this.state.slides.indexOf(slide)}>
-									<Container>
-										<Row>
-											{slide.map(playlist => (
-												<Playlist
-													key={playlist.id}
-													playlistId={playlist.id}
-													image={playlist.images[0].url}
-													link={playlist.owner.external_urls.spotify}
-													name={playlist.name}
-													handlePlaylistClick={this.handlePlaylistClick}
-												/>
-											))}
-										</Row>
-									</Container>
-								</Carousel.Item>
-							))}
-						</Carousel>
-					</Row>
-				</Container>
-
-				{/* Room Buttons */}
-				<Container>
-					<RoomButtons
-						token={this.state.accessToken}
-						setUrl={this.setUrl}
-						setJoinRoomAlert={this.setJoinRoomAlert}
-						centerAlert={this.state.centerAlert}
-						setState={this.setState}
-					/>
-				</Container>
-			</div>
-		);
-	}
-}
+      {/* Room Buttons */}
+      <Container>
+        <RoomButtons
+          token={token}
+          // setUrl={this.setUrl}
+          // setJoinRoomAlert={setJoinAlert}
+          renderCenterAlert={renderCenterAlert}
+          centerAlertConfig={config.centerAlert}
+          // setState={this.setState}
+        />
+      </Container>
+    </div>
+  ) : null;
+};
 
 export default Home;
