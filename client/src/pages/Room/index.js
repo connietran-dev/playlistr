@@ -279,7 +279,7 @@ const Room = () => {
             ) : null}
 
             {/* Music Player */}
-            {track.name && track.artists[0] && track.duration && track.progress && queueTracks ? (
+            {track.name && track.artists[0] && track.duration && track.progress ? (
               <Player
                 token={token}
                 track={track}
